@@ -26,6 +26,26 @@
           "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
           "scan_interval": "Interwal aktualizacji w minutach"
         }
+      },
+      "certificates": {
+        "title": "Certyfikaty Leapmotor",
+        "description": "Przeslij wymagany certyfikat aplikacji i klucz prywatny albo wklej ich tresc PEM. Sa zapisywane tylko lokalnie w tej instalacji Home Assistant i nie sa zawarte w publicznym repozytorium.",
+        "data": {
+          "app_cert_file": "Plik certyfikatu aplikacji (wymagany)",
+          "app_key_file": "Plik klucza prywatnego aplikacji (wymagany)",
+          "app_cert_pem": "Certyfikat PEM aplikacji (awaryjnie)",
+          "app_key_pem": "Klucz prywatny PEM aplikacji (awaryjnie)"
+        }
+      },
+      "account": {
+        "title": "Polacz konto Leapmotor",
+        "description": "Wprowadz dane konta Leapmotor. PIN pojazdu jest opcjonalny; bez niego dzialaja tylko dane odczytu.",
+        "data": {
+          "username": "Nazwa uzytkownika / e-mail",
+          "password": "Haslo",
+          "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
+          "scan_interval": "Interwal aktualizacji w minutach"
+        }
       }
     },
     "error": {

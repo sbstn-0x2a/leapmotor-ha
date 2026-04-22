@@ -23,6 +23,7 @@ DEFAULT_P12_ENC_ALG = "1"
 DEFAULT_OPERPWD_AES_KEY = "f1cf0c025baec0e2"
 DEFAULT_OPERPWD_AES_IV = "6b6a1fe94e133fd7"
 DEFAULT_SCAN_INTERVAL_MINUTES = 5
+REMOTE_ACTION_COOLDOWN_SECONDS = 10
 
 # Normal setup derives the account certificate password from login id + uid.
 KNOWN_ACCOUNT_P12_PASSWORDS: tuple[str, ...] = ()

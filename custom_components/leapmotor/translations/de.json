@@ -26,6 +26,26 @@
           "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten"
         }
+      },
+      "certificates": {
+        "title": "Leapmotor Zertifikate",
+        "description": "Erforderliches App-Zertifikat und Private-Key hochladen oder PEM-Inhalte einfuegen. Sie werden nur lokal in dieser Home-Assistant-Installation gespeichert und sind nicht im Public-Repo enthalten.",
+        "data": {
+          "app_cert_file": "App-Zertifikatdatei (erforderlich)",
+          "app_key_file": "App-Private-Key-Datei (erforderlich)",
+          "app_cert_pem": "App-Zertifikat PEM (Fallback)",
+          "app_key_pem": "App-Private-Key PEM (Fallback)"
+        }
+      },
+      "account": {
+        "title": "Leapmotor Konto verbinden",
+        "description": "Leapmotor-Zugangsdaten eingeben. Die Fahrzeug-PIN ist optional; ohne PIN funktionieren nur Lesedaten, keine Fahrzeugsteuerung.",
+        "data": {
+          "username": "Benutzername / E-Mail",
+          "password": "Passwort",
+          "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
+          "scan_interval": "Aktualisierungsintervall in Minuten"
+        }
       }
     },
     "error": {

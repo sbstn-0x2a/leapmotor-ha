@@ -1,0 +1,51 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Python files
+        run: python -m py_compile custom_components/leapmotor/*.py
+
+      - name: Validate JSON files
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          paths = [
+              Path("hacs.json"),
+              Path("custom_components/leapmotor/manifest.json"),
+              *Path("custom_components/leapmotor/translations").glob("*.json"),
+          ]
+          for path in paths:
+              json.loads(path.read_text(encoding="utf-8"))
+              print(f"ok {path}")
+          PY
+
+      - name: Check forbidden files
+        run: |
+          test ! -e custom_components/leapmotor/app_cert.pem
+          test ! -e custom_components/leapmotor/app_key.pem
+          ! find . -name '*.p12' -o -name '*.log' | grep .
+
+      - name: Secret pattern scan
+        run: |
+          ! grep -RIE \
+            'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|BEGIN CERTIFICATE|@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|192\.168\.|LFZ63|Jjinqil|Dsb6|e/t9jEg|VPlWT|BAqKLV|qeyhK' \
+            --exclude-dir=.git \
+            --exclude='validate.yml' \
+            --exclude='config_flow.py' \
+            .

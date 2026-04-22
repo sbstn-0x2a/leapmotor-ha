@@ -26,6 +26,26 @@
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
           "scan_interval": "Update-interval in minuten"
         }
+      },
+      "certificates": {
+        "title": "Leapmotor-certificaten",
+        "description": "Upload het vereiste app-certificaat en de privesleutel, of plak hun PEM-inhoud. Ze worden alleen lokaal opgeslagen in deze Home Assistant-installatie en staan niet in de publieke repository.",
+        "data": {
+          "app_cert_file": "App-certificaatbestand (verplicht)",
+          "app_key_file": "App-privesleutelbestand (verplicht)",
+          "app_cert_pem": "App-certificaat PEM (fallback)",
+          "app_key_pem": "App-privesleutel PEM (fallback)"
+        }
+      },
+      "account": {
+        "title": "Leapmotor-account verbinden",
+        "description": "Voer je Leapmotor-accountgegevens in. De voertuig-PIN is optioneel; zonder PIN werken alleen leesgegevens.",
+        "data": {
+          "username": "Gebruikersnaam / e-mail",
+          "password": "Wachtwoord",
+          "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
+          "scan_interval": "Update-interval in minuten"
+        }
       }
     },
     "error": {

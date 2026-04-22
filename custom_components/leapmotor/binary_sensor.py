@@ -32,6 +32,7 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[LeapmotorBinarySensorEntityDescription, ...] =
     LeapmotorBinarySensorEntityDescription(
         key="charging_planned_enabled",
         name="Geplantes Laden",
+        icon="mdi:calendar-clock",
         value_fn=lambda data: data["charging"].get("charging_planned_enabled"),
     ),
 )

@@ -169,6 +169,11 @@ class LeapmotorActionButton(CoordinatorEntity[LeapmotorDataUpdateCoordinator], B
 
     async def async_press(self) -> None:
         """Execute the configured remote-control action."""
+        cooldown = self.coordinator.remote_action_cooldown_remaining(self.vin)
+        if cooldown:
+            raise HomeAssistantError(
+                f"Remote action cooldown active. Try again in {cooldown} seconds."
+            )
         method = getattr(self.coordinator.client, self.spec.method_name)
         try:
             result = await self.hass.async_add_executor_job(method, self.vin)

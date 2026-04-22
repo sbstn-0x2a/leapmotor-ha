@@ -78,6 +78,26 @@ Without these files, direct authentication fails by design.
 - Vehicle PIN is optional for setup
 - Without the Vehicle PIN, the integration works in read-only mode
 - Remote-control actions stay unavailable until a Vehicle PIN is configured
+- Remote-control actions have a short cooldown to reduce accidental duplicate commands
+
+## FAQ
+
+### Why are app_cert.pem and app_key.pem not included?
+
+They are app-level client certificate material required by the current login
+path. Publishing them would expose reusable authentication material. Users must
+provide legitimate local certificate material themselves.
+
+### Can the integration generate these certificates?
+
+No. Self-generated certificates are not useful unless the Leapmotor backend
+trusts them. The integration can import existing PEM files, but it cannot create
+valid backend-trusted app certificates.
+
+### Why do range and odometer not show `.00`?
+
+Whole kilometer values are exposed as integers so Home Assistant displays
+`123 km` instead of `123.00 km`. Values with real decimals are preserved.
 
 ## Repository Layout
 

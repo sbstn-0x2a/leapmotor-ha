@@ -39,6 +39,17 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
+        vol.Optional(CONF_OPERATION_PASSWORD, default=""): str,
+        vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL_MINUTES): vol.All(
+            vol.Coerce(int),
+            vol.Range(min=1, max=120),
+        ),
+    }
+)
+
+
+CERTIFICATE_DATA_SCHEMA = vol.Schema(
+    {
         vol.Optional(CONF_APP_CERT_FILE): selector.FileSelector(
             selector.FileSelectorConfig(accept=".pem,.crt,.cert")
         ),
@@ -51,13 +62,14 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         vol.Optional(CONF_APP_KEY_PEM, default=""): selector.TextSelector(
             selector.TextSelectorConfig(multiline=True)
         ),
-        vol.Optional(CONF_OPERATION_PASSWORD, default=""): str,
-        vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL_MINUTES): vol.All(
-            vol.Coerce(int),
-            vol.Range(min=1, max=120),
-        ),
     }
 )
+
+
+def has_app_certificate_material() -> bool:
+    """Return whether the required local app certificate files exist."""
+    component_dir = Path(__file__).resolve().parent
+    return (component_dir / STATIC_APP_CERT).exists() and (component_dir / STATIC_APP_KEY).exists()
 
 
 def _write_pem_if_provided(path: Path, value: str, marker: str, mode: int) -> None:
@@ -155,7 +167,51 @@ class LeapmotorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> config_entries.ConfigFlowResult:
-        """Handle the initial step."""
+        """Start setup with certificate material if it is not installed yet."""
+        if await self.hass.async_add_executor_job(has_app_certificate_material):
+            return await self.async_step_account(user_input)
+        return await self.async_step_certificates()
+
+    async def async_step_certificates(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> config_entries.ConfigFlowResult:
+        """Collect required app certificate material before account login."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            try:
+                await self.hass.async_add_executor_job(
+                    save_app_certificate_material,
+                    self.hass,
+                    user_input,
+                )
+            except ValueError:
+                errors["base"] = "certificate_import_error"
+            else:
+                if await self.hass.async_add_executor_job(has_app_certificate_material):
+                    return await self.async_step_account()
+                errors["base"] = "missing_app_cert"
+
+        return self.async_show_form(
+            step_id="certificates",
+            data_schema=CERTIFICATE_DATA_SCHEMA,
+            errors=errors,
+        )
+
+    async def async_step_account(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> config_entries.ConfigFlowResult:
+        """Handle account credentials after certificate material is available."""
+        return await self._async_handle_account_step(user_input, step_id="account")
+
+    async def _async_handle_account_step(
+        self,
+        user_input: dict[str, Any] | None,
+        *,
+        step_id: str,
+    ) -> config_entries.ConfigFlowResult:
+        """Handle account validation and entry creation."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -186,7 +242,7 @@ class LeapmotorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=info["title"], data=data)
 
         return self.async_show_form(
-            step_id="user",
+            step_id=step_id,
             data_schema=STEP_USER_DATA_SCHEMA,
             errors=errors,
         )

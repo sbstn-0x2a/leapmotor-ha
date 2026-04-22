@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import LeapmotorApiClient, LeapmotorApiError
-from .const import DOMAIN
+from .const import DOMAIN, REMOTE_ACTION_COOLDOWN_SECONDS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +35,17 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
         self.client = client
         self._lock_state_overrides: dict[str, tuple[bool, float]] = {}
         self._last_remote_results: dict[str, dict[str, Any]] = {}
+
+    def remote_action_cooldown_remaining(self, vin: str) -> int:
+        """Return remaining remote-action cooldown seconds for one vehicle."""
+        last_result = self._last_remote_results.get(vin)
+        if not last_result:
+            return 0
+        updated_at = last_result.get("updated_at")
+        if not isinstance(updated_at, (int, float)):
+            return 0
+        remaining = REMOTE_ACTION_COOLDOWN_SECONDS - (time.time() - updated_at)
+        return max(0, int(remaining + 0.999))
 
     async def _async_update_data(self) -> dict:
         try:

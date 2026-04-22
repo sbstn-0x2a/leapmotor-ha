@@ -13,7 +13,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature
+from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfLength, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -24,6 +24,7 @@ from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name
 
 PRESSURE_BAR = "bar"
+WHOLE_KILOMETER_KEYS = {"remaining_range_km", "odometer_km"}
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -48,6 +49,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         device_class=SensorDeviceClass.DISTANCE,
         state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:map-marker-distance",
         value_fn=lambda data: data["status"].get("remaining_range_km"),
     ),
     LeapmotorSensorEntityDescription(
@@ -56,6 +58,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         device_class=SensorDeviceClass.DISTANCE,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:counter",
         value_fn=lambda data: data["status"].get("odometer_km"),
     ),
     LeapmotorSensorEntityDescription(
@@ -87,16 +90,20 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         name="Ladelimit",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:battery-sync",
         value_fn=lambda data: data["charging"].get("charge_limit_percent"),
     ),
     LeapmotorSensorEntityDescription(
         key="vehicle_state",
         name="Fahrzeugstatus",
+        icon="mdi:car-info",
         value_fn=lambda data: data["status"].get("vehicle_state"),
     ),
     LeapmotorSensorEntityDescription(
         key="last_remote_control",
         name="Letzte Fahrzeugaktion",
+        icon="mdi:remote",
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: (data.get("remote_control") or {}).get("status"),
     ),
     LeapmotorSensorEntityDescription(
@@ -105,6 +112,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         native_unit_of_measurement=PRESSURE_BAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["diagnostics"].get("tire_pressure_front_left_bar"),
     ),
     LeapmotorSensorEntityDescription(
@@ -113,6 +121,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         native_unit_of_measurement=PRESSURE_BAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["diagnostics"].get("tire_pressure_front_right_bar"),
     ),
     LeapmotorSensorEntityDescription(
@@ -121,6 +130,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         native_unit_of_measurement=PRESSURE_BAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["diagnostics"].get("tire_pressure_rear_left_bar"),
     ),
     LeapmotorSensorEntityDescription(
@@ -129,6 +139,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         native_unit_of_measurement=PRESSURE_BAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["diagnostics"].get("tire_pressure_rear_right_bar"),
     ),
 )
@@ -185,7 +196,10 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
     @property
     def native_value(self) -> Any:
         """Return the sensor value."""
-        return self.entity_description.value_fn(self.vehicle_data)
+        value = self.entity_description.value_fn(self.vehicle_data)
+        if self.entity_description.key in WHOLE_KILOMETER_KEYS:
+            return _whole_number_if_possible(value)
+        return value
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -221,3 +235,16 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
                 }
             )
         return attributes
+
+
+def _whole_number_if_possible(value: Any) -> Any:
+    """Return int for whole numeric values to avoid unnecessary .00 display."""
+    if value is None:
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return value
+    if numeric.is_integer():
+        return int(numeric)
+    return value

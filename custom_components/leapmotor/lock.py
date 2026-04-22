@@ -89,6 +89,11 @@ class LeapmotorVehicleLock(CoordinatorEntity[LeapmotorDataUpdateCoordinator], Lo
 
     async def async_lock(self, **kwargs: Any) -> None:
         """Lock the vehicle."""
+        cooldown = self.coordinator.remote_action_cooldown_remaining(self.vin)
+        if cooldown:
+            raise HomeAssistantError(
+                f"Remote action cooldown active. Try again in {cooldown} seconds."
+            )
         if not self.coordinator.client.operation_password:
             raise HomeAssistantError(
                 "Vehicle PIN is not configured. Read-only lock state is available, "
@@ -110,6 +115,11 @@ class LeapmotorVehicleLock(CoordinatorEntity[LeapmotorDataUpdateCoordinator], Lo
 
     async def async_unlock(self, **kwargs: Any) -> None:
         """Unlock the vehicle."""
+        cooldown = self.coordinator.remote_action_cooldown_remaining(self.vin)
+        if cooldown:
+            raise HomeAssistantError(
+                f"Remote action cooldown active. Try again in {cooldown} seconds."
+            )
         if not self.coordinator.client.operation_password:
             raise HomeAssistantError(
                 "Vehicle PIN is not configured. Read-only lock state is available, "

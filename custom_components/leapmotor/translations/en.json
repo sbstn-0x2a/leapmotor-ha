@@ -26,6 +26,26 @@
           "operation_password": "Vehicle PIN (optional, for control)",
           "scan_interval": "Update interval in minutes"
         }
+      },
+      "certificates": {
+        "title": "Leapmotor certificates",
+        "description": "Upload the required app certificate and private key, or paste their PEM contents. They are stored only locally in this Home Assistant installation and are not included in the public repository.",
+        "data": {
+          "app_cert_file": "App certificate file (required)",
+          "app_key_file": "App private key file (required)",
+          "app_cert_pem": "App certificate PEM (fallback)",
+          "app_key_pem": "App private key PEM (fallback)"
+        }
+      },
+      "account": {
+        "title": "Connect Leapmotor account",
+        "description": "Enter your Leapmotor account credentials. The vehicle PIN is optional; without it only read-only data works, not remote control.",
+        "data": {
+          "username": "Username / email",
+          "password": "Password",
+          "operation_password": "Vehicle PIN (optional, for control)",
+          "scan_interval": "Update interval in minutes"
+        }
       }
     },
     "error": {
