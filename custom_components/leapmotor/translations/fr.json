@@ -1,0 +1,146 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connecter Leapmotor",
+        "description": "Configure les donnees vehicule Leapmotor. Le certificat app et la cle privee app sont obligatoires pour la connexion; collez-les ici ou placez app_cert.pem/app_key.pem dans le dossier de l integration. Le PIN vehicule est optionnel; sans lui seules les donnees lecture fonctionnent. Integration non officielle: utilisation a vos risques.",
+        "data": {
+          "username": "Nom d'utilisateur / e-mail",
+          "password": "Mot de passe",
+          "app_cert_file": "Fichier certificat app (obligatoire)",
+          "app_key_file": "Fichier cle privee app (obligatoire)",
+          "app_cert_pem": "Certificat PEM app (alternative)",
+          "app_key_pem": "Cle privee PEM app (alternative)",
+          "operation_password": "PIN vehicule (optionnel, pour le controle)",
+          "scan_interval": "Intervalle de mise a jour en minutes"
+        }
+      },
+      "init": {
+        "title": "Options Leapmotor",
+        "description": "Modifier certificat, cle privee, PIN vehicule et intervalle. Certificat/cle sont obligatoires pour la connexion. Sans PIN, les actions distantes restent desactivees.",
+        "data": {
+          "app_cert_file": "Fichier certificat app (obligatoire)",
+          "app_key_file": "Fichier cle privee app (obligatoire)",
+          "app_cert_pem": "Certificat PEM app (alternative)",
+          "app_key_pem": "Cle privee PEM app (alternative)",
+          "operation_password": "PIN vehicule (optionnel, pour le controle)",
+          "scan_interval": "Intervalle de mise a jour en minutes"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Authentification echouee.",
+      "account_cert_error": "La connexion a reussi, mais le certificat du compte n'a pas pu etre ouvert.",
+      "cannot_connect": "Connexion ou mise a jour API echouee.",
+      "unknown": "Erreur inattendue.",
+      "missing_app_cert": "Certificat/cle privee app manquants. Collez les deux valeurs PEM ou placez app_cert.pem et app_key.pem dans le dossier de l integration.",
+      "certificate_import_error": "Echec import certificat. Verifiez le certificat PEM et la cle privee."
+    },
+    "abort": {
+      "already_configured": "Ce compte est deja configure."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_percent": {
+        "name": "Batterie"
+      },
+      "remaining_range_km": {
+        "name": "Autonomie"
+      },
+      "odometer_km": {
+        "name": "Compteur kilometrique"
+      },
+      "interior_temp_c": {
+        "name": "Temperature interieure"
+      },
+      "climate_set_temp_left_c": {
+        "name": "Temperature cible gauche"
+      },
+      "climate_set_temp_right_c": {
+        "name": "Temperature cible droite"
+      },
+      "charge_limit_percent": {
+        "name": "Limite de charge"
+      },
+      "vehicle_state": {
+        "name": "Etat du vehicule"
+      },
+      "tire_pressure_front_left_bar": {
+        "name": "Pression pneu avant gauche"
+      },
+      "tire_pressure_front_right_bar": {
+        "name": "Pression pneu avant droit"
+      },
+      "tire_pressure_rear_left_bar": {
+        "name": "Pression pneu arriere gauche"
+      },
+      "tire_pressure_rear_right_bar": {
+        "name": "Pression pneu arriere droit"
+      },
+      "last_remote_control": {
+        "name": "Derniere action vehicule"
+      }
+    },
+    "binary_sensor": {
+      "charging_planned_enabled": {
+        "name": "Charge programmee"
+      }
+    },
+    "button": {
+      "open_trunk": {
+        "name": "Coffre"
+      },
+      "find_vehicle": {
+        "name": "Localiser le vehicule"
+      },
+      "sunshade_action": {
+        "name": "Pare-soleil"
+      },
+      "battery_preheat": {
+        "name": "Prechauffage batterie"
+      },
+      "windows": {
+        "name": "Action vitres"
+      },
+      "ac_switch": {
+        "name": "Interrupteur A/C"
+      },
+      "quick_cool": {
+        "name": "Refroidissement rapide"
+      },
+      "quick_heat": {
+        "name": "Chauffage rapide"
+      },
+      "windshield_defrost": {
+        "name": "Degivrage pare-brise"
+      }
+    },
+    "lock": {
+      "vehicle_lock": {
+        "name": "Verrouillage"
+      }
+    },
+    "device_tracker": {
+      "location": {
+        "name": "Position"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options Leapmotor",
+        "description": "Modifier certificat, cle privee, PIN vehicule et intervalle. Certificat/cle sont obligatoires pour la connexion. Sans PIN, les actions distantes restent desactivees.",
+        "data": {
+          "app_cert_file": "Fichier certificat app (obligatoire)",
+          "app_key_file": "Fichier cle privee app (obligatoire)",
+          "app_cert_pem": "Certificat PEM app (alternative)",
+          "app_key_pem": "Cle privee PEM app (alternative)",
+          "operation_password": "PIN vehicule (optionnel, pour le controle)",
+          "scan_interval": "Intervalle de mise a jour en minutes"
+        }
+      }
+    }
+  }
+}

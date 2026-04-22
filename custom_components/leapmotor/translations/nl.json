@@ -1,0 +1,146 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Leapmotor verbinden",
+        "description": "Stelt Leapmotor-voertuiggegevens in. App-certificaat en app-privesleutel zijn verplicht voor login; plak ze hier of plaats app_cert.pem/app_key.pem in de integratiemap. De voertuig-PIN is optioneel; zonder PIN werken alleen leesgegevens. Onofficiele integratie: gebruik op eigen risico.",
+        "data": {
+          "username": "Gebruikersnaam / e-mail",
+          "password": "Wachtwoord",
+          "app_cert_file": "App-certificaatbestand (verplicht)",
+          "app_key_file": "App-privesleutelbestand (verplicht)",
+          "app_cert_pem": "App-certificaat PEM (fallback)",
+          "app_key_pem": "App-privesleutel PEM (fallback)",
+          "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
+          "scan_interval": "Update-interval in minuten"
+        }
+      },
+      "init": {
+        "title": "Leapmotor opties",
+        "description": "Wijzig certificaatmateriaal, voertuig-PIN en interval. Certificaat/sleutel zijn verplicht voor login. Zonder PIN blijven bediening-acties uitgeschakeld.",
+        "data": {
+          "app_cert_file": "App-certificaatbestand (verplicht)",
+          "app_key_file": "App-privesleutelbestand (verplicht)",
+          "app_cert_pem": "App-certificaat PEM (fallback)",
+          "app_key_pem": "App-privesleutel PEM (fallback)",
+          "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
+          "scan_interval": "Update-interval in minuten"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Authenticatie mislukt.",
+      "account_cert_error": "Inloggen is gelukt, maar het accountcertificaat kon niet worden geopend.",
+      "cannot_connect": "Verbinding of API-update mislukt.",
+      "unknown": "Onverwachte fout.",
+      "missing_app_cert": "App-certificaat/privesleutel ontbreekt. Plak beide PEM-waarden of plaats app_cert.pem en app_key.pem in de integratiemap.",
+      "certificate_import_error": "Certificaatimport mislukt. Controleer het PEM-certificaat en de privesleutel."
+    },
+    "abort": {
+      "already_configured": "Dit account is al geconfigureerd."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_percent": {
+        "name": "Accu"
+      },
+      "remaining_range_km": {
+        "name": "Bereik"
+      },
+      "odometer_km": {
+        "name": "Kilometerstand"
+      },
+      "interior_temp_c": {
+        "name": "Binnentemperatuur"
+      },
+      "climate_set_temp_left_c": {
+        "name": "Doeltemperatuur links"
+      },
+      "climate_set_temp_right_c": {
+        "name": "Doeltemperatuur rechts"
+      },
+      "charge_limit_percent": {
+        "name": "Laadlimiet"
+      },
+      "vehicle_state": {
+        "name": "Voertuigstatus"
+      },
+      "tire_pressure_front_left_bar": {
+        "name": "Bandenspanning linksvoor"
+      },
+      "tire_pressure_front_right_bar": {
+        "name": "Bandenspanning rechtsvoor"
+      },
+      "tire_pressure_rear_left_bar": {
+        "name": "Bandenspanning linksachter"
+      },
+      "tire_pressure_rear_right_bar": {
+        "name": "Bandenspanning rechtsachter"
+      },
+      "last_remote_control": {
+        "name": "Laatste voertuigactie"
+      }
+    },
+    "binary_sensor": {
+      "charging_planned_enabled": {
+        "name": "Gepland laden"
+      }
+    },
+    "button": {
+      "open_trunk": {
+        "name": "Kofferbak"
+      },
+      "find_vehicle": {
+        "name": "Voertuig vinden"
+      },
+      "sunshade_action": {
+        "name": "Zonnescherm"
+      },
+      "battery_preheat": {
+        "name": "Accu voorverwarmen"
+      },
+      "windows": {
+        "name": "Raamactie"
+      },
+      "ac_switch": {
+        "name": "A/C-schakelaar"
+      },
+      "quick_cool": {
+        "name": "Snel koelen"
+      },
+      "quick_heat": {
+        "name": "Snel verwarmen"
+      },
+      "windshield_defrost": {
+        "name": "Voorruit ontdooien"
+      }
+    },
+    "lock": {
+      "vehicle_lock": {
+        "name": "Vergrendeling"
+      }
+    },
+    "device_tracker": {
+      "location": {
+        "name": "Locatie"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Leapmotor opties",
+        "description": "Wijzig certificaatmateriaal, voertuig-PIN en interval. Certificaat/sleutel zijn verplicht voor login. Zonder PIN blijven bediening-acties uitgeschakeld.",
+        "data": {
+          "app_cert_file": "App-certificaatbestand (verplicht)",
+          "app_key_file": "App-privesleutelbestand (verplicht)",
+          "app_cert_pem": "App-certificaat PEM (fallback)",
+          "app_key_pem": "App-privesleutel PEM (fallback)",
+          "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
+          "scan_interval": "Update-interval in minuten"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Leapmotor Logo</title>
+  <desc id="desc">Stylized Leapmotor badge for the Home Assistant custom integration.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1d2e"/>
+      <stop offset="100%" stop-color="#24486b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8fd3ff"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M120 318c0-54 41-98 92-98h88c37 0 71 21 88 54l24 44H120z" fill="#11263c"/>
+  <path d="M112 334h288c8 0 14 6 14 14v10c0 8-6 14-14 14H112c-8 0-14-6-14-14v-10c0-8 6-14 14-14z" fill="#0a1624"/>
+  <circle cx="176" cy="366" r="28" fill="#0b1118"/>
+  <circle cx="336" cy="366" r="28" fill="#0b1118"/>
+  <circle cx="176" cy="366" r="14" fill="#91d8ff"/>
+  <circle cx="336" cy="366" r="14" fill="#91d8ff"/>
+  <path d="M155 170h38v118h110v36H155z" fill="url(#accent)"/>
+  <path d="M246 170h38v82l73-82h47l-82 92 91 100h-49l-80-88v88h-38z" fill="url(#accent)"/>
+</svg>

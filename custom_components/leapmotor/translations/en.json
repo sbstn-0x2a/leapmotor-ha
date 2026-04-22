@@ -1,0 +1,146 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Leapmotor",
+        "description": "Sets up Leapmotor vehicle data. App certificate and app private key are required for login; paste them here or place app_cert.pem/app_key.pem in the integration folder first. The vehicle PIN is optional; without it only read-only data works, not remote control. Unofficial integration: use at your own risk; no liability for account restrictions, API changes, or vehicle consequences.",
+        "data": {
+          "username": "Username / email",
+          "password": "Password",
+          "app_cert_file": "App certificate file (required)",
+          "app_key_file": "App private key file (required)",
+          "app_cert_pem": "App certificate PEM (fallback)",
+          "app_key_pem": "App private key PEM (fallback)",
+          "operation_password": "Vehicle PIN (optional, for control)",
+          "scan_interval": "Update interval in minutes"
+        }
+      },
+      "init": {
+        "title": "Leapmotor options",
+        "description": "Change certificate material, vehicle PIN, and update interval. App certificate/private key are required for login. Without a PIN, remote-control actions remain disabled.",
+        "data": {
+          "app_cert_file": "App certificate file (required)",
+          "app_key_file": "App private key file (required)",
+          "app_cert_pem": "App certificate PEM (fallback)",
+          "app_key_pem": "App private key PEM (fallback)",
+          "operation_password": "Vehicle PIN (optional, for control)",
+          "scan_interval": "Update interval in minutes"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Authentication failed.",
+      "account_cert_error": "Login succeeded, but the account certificate could not be opened.",
+      "cannot_connect": "Connection or API refresh failed.",
+      "unknown": "Unexpected error.",
+      "missing_app_cert": "Missing app certificate/private key. Paste both PEM values or place app_cert.pem and app_key.pem in the integration folder.",
+      "certificate_import_error": "Certificate import failed. Check the PEM certificate and private key."
+    },
+    "abort": {
+      "already_configured": "This account is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_percent": {
+        "name": "Battery"
+      },
+      "remaining_range_km": {
+        "name": "Range"
+      },
+      "odometer_km": {
+        "name": "Odometer"
+      },
+      "interior_temp_c": {
+        "name": "Interior temperature"
+      },
+      "climate_set_temp_left_c": {
+        "name": "Target temperature left"
+      },
+      "climate_set_temp_right_c": {
+        "name": "Target temperature right"
+      },
+      "charge_limit_percent": {
+        "name": "Charge limit"
+      },
+      "vehicle_state": {
+        "name": "Vehicle state"
+      },
+      "tire_pressure_front_left_bar": {
+        "name": "Tire pressure front left"
+      },
+      "tire_pressure_front_right_bar": {
+        "name": "Tire pressure front right"
+      },
+      "tire_pressure_rear_left_bar": {
+        "name": "Tire pressure rear left"
+      },
+      "tire_pressure_rear_right_bar": {
+        "name": "Tire pressure rear right"
+      },
+      "last_remote_control": {
+        "name": "Last vehicle action"
+      }
+    },
+    "binary_sensor": {
+      "charging_planned_enabled": {
+        "name": "Scheduled charging"
+      }
+    },
+    "button": {
+      "open_trunk": {
+        "name": "Trunk"
+      },
+      "find_vehicle": {
+        "name": "Find vehicle"
+      },
+      "sunshade_action": {
+        "name": "Sunshade"
+      },
+      "battery_preheat": {
+        "name": "Battery preheat"
+      },
+      "windows": {
+        "name": "Window action"
+      },
+      "ac_switch": {
+        "name": "A/C switch"
+      },
+      "quick_cool": {
+        "name": "Quick cool"
+      },
+      "quick_heat": {
+        "name": "Quick heat"
+      },
+      "windshield_defrost": {
+        "name": "Windshield defrost"
+      }
+    },
+    "lock": {
+      "vehicle_lock": {
+        "name": "Lock"
+      }
+    },
+    "device_tracker": {
+      "location": {
+        "name": "Location"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Leapmotor options",
+        "description": "Change certificate material, vehicle PIN, and update interval. App certificate/private key are required for login. Without a PIN, remote-control actions remain disabled.",
+        "data": {
+          "app_cert_file": "App certificate file (required)",
+          "app_key_file": "App private key file (required)",
+          "app_cert_pem": "App certificate PEM (fallback)",
+          "app_key_pem": "App private key PEM (fallback)",
+          "operation_password": "Vehicle PIN (optional, for control)",
+          "scan_interval": "Update interval in minutes"
+        }
+      }
+    }
+  }
+}

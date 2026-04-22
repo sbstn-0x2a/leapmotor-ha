@@ -1,0 +1,146 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Polacz Leapmotor",
+        "description": "Konfiguruje dane pojazdu Leapmotor. Certyfikat aplikacji i klucz prywatny sa wymagane do logowania; wklej je tutaj albo umiesc app_cert.pem/app_key.pem w folderze integracji. PIN pojazdu jest opcjonalny; bez niego dzialaja tylko dane odczytu. Integracja nieoficjalna: uzywasz na wlasne ryzyko.",
+        "data": {
+          "username": "Nazwa uzytkownika / e-mail",
+          "password": "Haslo",
+          "app_cert_file": "Plik certyfikatu aplikacji (wymagany)",
+          "app_key_file": "Plik klucza prywatnego aplikacji (wymagany)",
+          "app_cert_pem": "Certyfikat PEM aplikacji (awaryjnie)",
+          "app_key_pem": "Klucz prywatny PEM aplikacji (awaryjnie)",
+          "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
+          "scan_interval": "Interwal aktualizacji w minutach"
+        }
+      },
+      "init": {
+        "title": "Opcje Leapmotor",
+        "description": "Zmien certyfikat, klucz prywatny, PIN pojazdu i interwal. Certyfikat/klucz sa wymagane do logowania. Bez PIN akcje zdalne sa wylaczone.",
+        "data": {
+          "app_cert_file": "Plik certyfikatu aplikacji (wymagany)",
+          "app_key_file": "Plik klucza prywatnego aplikacji (wymagany)",
+          "app_cert_pem": "Certyfikat PEM aplikacji (awaryjnie)",
+          "app_key_pem": "Klucz prywatny PEM aplikacji (awaryjnie)",
+          "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
+          "scan_interval": "Interwal aktualizacji w minutach"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Uwierzytelnianie nie powiodlo sie.",
+      "account_cert_error": "Logowanie powiodlo sie, ale nie mozna otworzyc certyfikatu konta.",
+      "cannot_connect": "Polaczenie lub odswiezanie API nie powiodlo sie.",
+      "unknown": "Nieoczekiwany blad.",
+      "missing_app_cert": "Brak certyfikatu/klucza prywatnego aplikacji. Wklej oba PEM lub umiesc app_cert.pem i app_key.pem w folderze integracji.",
+      "certificate_import_error": "Import certyfikatu nie powiodl sie. Sprawdz certyfikat PEM i klucz prywatny."
+    },
+    "abort": {
+      "already_configured": "To konto jest juz skonfigurowane."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_percent": {
+        "name": "Bateria"
+      },
+      "remaining_range_km": {
+        "name": "Zasieg"
+      },
+      "odometer_km": {
+        "name": "Przebieg"
+      },
+      "interior_temp_c": {
+        "name": "Temperatura wnetrza"
+      },
+      "climate_set_temp_left_c": {
+        "name": "Temperatura docelowa lewa"
+      },
+      "climate_set_temp_right_c": {
+        "name": "Temperatura docelowa prawa"
+      },
+      "charge_limit_percent": {
+        "name": "Limit ladowania"
+      },
+      "vehicle_state": {
+        "name": "Stan pojazdu"
+      },
+      "tire_pressure_front_left_bar": {
+        "name": "Cisnienie opony przedniej lewej"
+      },
+      "tire_pressure_front_right_bar": {
+        "name": "Cisnienie opony przedniej prawej"
+      },
+      "tire_pressure_rear_left_bar": {
+        "name": "Cisnienie opony tylnej lewej"
+      },
+      "tire_pressure_rear_right_bar": {
+        "name": "Cisnienie opony tylnej prawej"
+      },
+      "last_remote_control": {
+        "name": "Ostatnia akcja pojazdu"
+      }
+    },
+    "binary_sensor": {
+      "charging_planned_enabled": {
+        "name": "Planowane ladowanie"
+      }
+    },
+    "button": {
+      "open_trunk": {
+        "name": "Bagaznik"
+      },
+      "find_vehicle": {
+        "name": "Znajdz pojazd"
+      },
+      "sunshade_action": {
+        "name": "Roleta przeciwsloneczna"
+      },
+      "battery_preheat": {
+        "name": "Podgrzewanie baterii"
+      },
+      "windows": {
+        "name": "Akcja szyb"
+      },
+      "ac_switch": {
+        "name": "Przelacznik A/C"
+      },
+      "quick_cool": {
+        "name": "Szybkie chlodzenie"
+      },
+      "quick_heat": {
+        "name": "Szybkie ogrzewanie"
+      },
+      "windshield_defrost": {
+        "name": "Odmrazanie szyby przedniej"
+      }
+    },
+    "lock": {
+      "vehicle_lock": {
+        "name": "Zamek"
+      }
+    },
+    "device_tracker": {
+      "location": {
+        "name": "Lokalizacja"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opcje Leapmotor",
+        "description": "Zmien certyfikat, klucz prywatny, PIN pojazdu i interwal. Certyfikat/klucz sa wymagane do logowania. Bez PIN akcje zdalne sa wylaczone.",
+        "data": {
+          "app_cert_file": "Plik certyfikatu aplikacji (wymagany)",
+          "app_key_file": "Plik klucza prywatnego aplikacji (wymagany)",
+          "app_cert_pem": "Certyfikat PEM aplikacji (awaryjnie)",
+          "app_key_pem": "Klucz prywatny PEM aplikacji (awaryjnie)",
+          "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
+          "scan_interval": "Interwal aktualizacji w minutach"
+        }
+      }
+    }
+  }
+}

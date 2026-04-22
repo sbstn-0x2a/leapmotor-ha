@@ -1,0 +1,43 @@
+"""Constants for the Leapmotor integration."""
+
+from __future__ import annotations
+
+DOMAIN = "leapmotor"
+
+CONF_ACCOUNT_P12_PASSWORD = "account_p12_password"
+CONF_APP_CERT_FILE = "app_cert_file"
+CONF_APP_CERT_PEM = "app_cert_pem"
+CONF_APP_KEY_FILE = "app_key_file"
+CONF_APP_KEY_PEM = "app_key_pem"
+CONF_OPERATION_PASSWORD = "operation_password"
+CONF_SCAN_INTERVAL = "scan_interval"
+
+DEFAULT_BASE_URL = "https://appgateway.leapmotor-international.de"
+DEFAULT_APP_VERSION = "1.12.3"
+DEFAULT_DEVICE_ID = "bd605e5c599944efb846bcf70f1449d8"
+DEFAULT_SOURCE = "leapmotor"
+DEFAULT_CHANNEL = "1"
+DEFAULT_LANGUAGE = "de-DE"
+DEFAULT_DEVICE_TYPE = "1"
+DEFAULT_P12_ENC_ALG = "1"
+DEFAULT_OPERPWD_AES_KEY = "f1cf0c025baec0e2"
+DEFAULT_OPERPWD_AES_IV = "6b6a1fe94e133fd7"
+DEFAULT_SCAN_INTERVAL_MINUTES = 5
+
+# Normal setup derives the account certificate password from login id + uid.
+KNOWN_ACCOUNT_P12_PASSWORDS: tuple[str, ...] = ()
+
+STATIC_APP_CERT = "app_cert.pem"
+STATIC_APP_KEY = "app_key.pem"
+
+REMOTE_CTL_LOCK = "lock"
+REMOTE_CTL_UNLOCK = "unlock"
+REMOTE_CTL_TRUNK = "trunk"
+REMOTE_CTL_FIND_CAR = "find_car"
+REMOTE_CTL_SUNSHADE = "sunshade"
+REMOTE_CTL_BATTERY_PREHEAT = "battery_preheat"
+REMOTE_CTL_WINDOWS = "windows"
+REMOTE_CTL_AC_SWITCH = "ac_switch"
+REMOTE_CTL_QUICK_COOL = "quick_cool"
+REMOTE_CTL_QUICK_HEAT = "quick_heat"
+REMOTE_CTL_WINDSHIELD_DEFROST = "windshield_defrost"

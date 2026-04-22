@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.zip
+.DS_Store
+
+# Never commit local certificate material
+custom_components/leapmotor/app_cert.pem
+custom_components/leapmotor/app_key.pem
+custom_components/leapmotor/*.p12

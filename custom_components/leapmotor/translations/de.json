@@ -1,0 +1,146 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Leapmotor verbinden",
+        "description": "Richtet Leapmotor-Fahrzeugdaten ein. App-Zertifikat und App-Private-Key sind fuer den Login erforderlich; hier einfuegen oder app_cert.pem/app_key.pem vorher im Integrationsordner ablegen. Die Fahrzeug-PIN ist optional; ohne PIN funktionieren nur Lesedaten, keine Fahrzeugsteuerung. Inoffizielle Integration: Nutzung auf eigenes Risiko; keine Haftung fuer Account-Sperren, API-Aenderungen oder Fahrzeugfolgen.",
+        "data": {
+          "username": "Benutzername / E-Mail",
+          "password": "Passwort",
+          "app_cert_file": "App-Zertifikatdatei (erforderlich)",
+          "app_key_file": "App-Private-Key-Datei (erforderlich)",
+          "app_cert_pem": "App-Zertifikat PEM (Fallback)",
+          "app_key_pem": "App-Private-Key PEM (Fallback)",
+          "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
+          "scan_interval": "Aktualisierungsintervall in Minuten"
+        }
+      },
+      "init": {
+        "title": "Leapmotor Optionen",
+        "description": "Zertifikatsmaterial, Fahrzeug-PIN und Aktualisierungsintervall nachtraeglich anpassen. App-Zertifikat/Private-Key sind fuer den Login erforderlich. Ohne PIN bleiben Steuerfunktionen deaktiviert.",
+        "data": {
+          "app_cert_file": "App-Zertifikatdatei (erforderlich)",
+          "app_key_file": "App-Private-Key-Datei (erforderlich)",
+          "app_cert_pem": "App-Zertifikat PEM (Fallback)",
+          "app_key_pem": "App-Private-Key PEM (Fallback)",
+          "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
+          "scan_interval": "Aktualisierungsintervall in Minuten"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Anmeldung fehlgeschlagen.",
+      "account_cert_error": "Login war erfolgreich, aber das Konto-Zertifikat konnte nicht geoeffnet werden.",
+      "cannot_connect": "Verbindung oder API-Abruf fehlgeschlagen.",
+      "unknown": "Unerwarteter Fehler.",
+      "missing_app_cert": "App-Zertifikat/Private-Key fehlen. Beide PEM-Werte einfuegen oder app_cert.pem und app_key.pem im Integrationsordner ablegen.",
+      "certificate_import_error": "Zertifikatsimport fehlgeschlagen. PEM-Zertifikat und Private-Key pruefen."
+    },
+    "abort": {
+      "already_configured": "Dieses Konto ist bereits eingerichtet."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_percent": {
+        "name": "Batterie"
+      },
+      "remaining_range_km": {
+        "name": "Reichweite"
+      },
+      "odometer_km": {
+        "name": "Kilometerstand"
+      },
+      "interior_temp_c": {
+        "name": "Innentemperatur"
+      },
+      "climate_set_temp_left_c": {
+        "name": "Solltemperatur links"
+      },
+      "climate_set_temp_right_c": {
+        "name": "Solltemperatur rechts"
+      },
+      "charge_limit_percent": {
+        "name": "Ladelimit"
+      },
+      "vehicle_state": {
+        "name": "Fahrzeugstatus"
+      },
+      "tire_pressure_front_left_bar": {
+        "name": "Reifendruck vorne links"
+      },
+      "tire_pressure_front_right_bar": {
+        "name": "Reifendruck vorne rechts"
+      },
+      "tire_pressure_rear_left_bar": {
+        "name": "Reifendruck hinten links"
+      },
+      "tire_pressure_rear_right_bar": {
+        "name": "Reifendruck hinten rechts"
+      },
+      "last_remote_control": {
+        "name": "Letzte Fahrzeugaktion"
+      }
+    },
+    "binary_sensor": {
+      "charging_planned_enabled": {
+        "name": "Geplantes Laden"
+      }
+    },
+    "button": {
+      "open_trunk": {
+        "name": "Kofferraum"
+      },
+      "find_vehicle": {
+        "name": "Fahrzeug orten"
+      },
+      "sunshade_action": {
+        "name": "Sonnenblende"
+      },
+      "battery_preheat": {
+        "name": "Batterie vorwaermen"
+      },
+      "windows": {
+        "name": "Fensteraktion"
+      },
+      "ac_switch": {
+        "name": "A/C-Schalter"
+      },
+      "quick_cool": {
+        "name": "Schnelles Kuehlen"
+      },
+      "quick_heat": {
+        "name": "Schnelles Beheizen"
+      },
+      "windshield_defrost": {
+        "name": "Windschutzscheibe auftauen"
+      }
+    },
+    "lock": {
+      "vehicle_lock": {
+        "name": "Verriegelung"
+      }
+    },
+    "device_tracker": {
+      "location": {
+        "name": "Standort"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Leapmotor Optionen",
+        "description": "Zertifikatsmaterial, Fahrzeug-PIN und Aktualisierungsintervall nachtraeglich anpassen. App-Zertifikat/Private-Key sind fuer den Login erforderlich. Ohne PIN bleiben Steuerfunktionen deaktiviert.",
+        "data": {
+          "app_cert_file": "App-Zertifikatdatei (erforderlich)",
+          "app_key_file": "App-Private-Key-Datei (erforderlich)",
+          "app_cert_pem": "App-Zertifikat PEM (Fallback)",
+          "app_key_pem": "App-Private-Key PEM (Fallback)",
+          "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
+          "scan_interval": "Aktualisierungsintervall in Minuten"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connetti Leapmotor",
+        "description": "Configura i dati veicolo Leapmotor. Certificato app e chiave privata app sono obbligatori per il login; incollali qui o inserisci app_cert.pem/app_key.pem nella cartella integrazione. Il PIN veicolo e opzionale; senza PIN funzionano solo dati in lettura. Integrazione non ufficiale: uso a proprio rischio.",
+        "data": {
+          "username": "Nome utente / e-mail",
+          "password": "Password",
+          "app_cert_file": "File certificato app (obbligatorio)",
+          "app_key_file": "File chiave privata app (obbligatorio)",
+          "app_cert_pem": "Certificato PEM app (alternativa)",
+          "app_key_pem": "Chiave privata PEM app (alternativa)",
+          "operation_password": "PIN veicolo (opzionale, per controllo)",
+          "scan_interval": "Intervallo di aggiornamento in minuti"
+        }
+      },
+      "init": {
+        "title": "Opzioni Leapmotor",
+        "description": "Modifica certificato, chiave privata, PIN veicolo e intervallo. Certificato/chiave sono obbligatori per il login. Senza PIN, i comandi remoti restano disabilitati.",
+        "data": {
+          "app_cert_file": "File certificato app (obbligatorio)",
+          "app_key_file": "File chiave privata app (obbligatorio)",
+          "app_cert_pem": "Certificato PEM app (alternativa)",
+          "app_key_pem": "Chiave privata PEM app (alternativa)",
+          "operation_password": "PIN veicolo (opzionale, per controllo)",
+          "scan_interval": "Intervallo di aggiornamento in minuti"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Autenticazione non riuscita.",
+      "account_cert_error": "Accesso riuscito, ma il certificato dell'account non puo essere aperto.",
+      "cannot_connect": "Connessione o aggiornamento API non riuscito.",
+      "unknown": "Errore imprevisto.",
+      "missing_app_cert": "Certificato/chiave privata app mancanti. Incolla entrambi i valori PEM o inserisci app_cert.pem e app_key.pem nella cartella integrazione.",
+      "certificate_import_error": "Importazione certificato non riuscita. Controlla certificato PEM e chiave privata."
+    },
+    "abort": {
+      "already_configured": "Questo account e gia configurato."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_percent": {
+        "name": "Batteria"
+      },
+      "remaining_range_km": {
+        "name": "Autonomia"
+      },
+      "odometer_km": {
+        "name": "Contachilometri"
+      },
+      "interior_temp_c": {
+        "name": "Temperatura interna"
+      },
+      "climate_set_temp_left_c": {
+        "name": "Temperatura target sinistra"
+      },
+      "climate_set_temp_right_c": {
+        "name": "Temperatura target destra"
+      },
+      "charge_limit_percent": {
+        "name": "Limite di carica"
+      },
+      "vehicle_state": {
+        "name": "Stato veicolo"
+      },
+      "tire_pressure_front_left_bar": {
+        "name": "Pressione pneumatico anteriore sinistro"
+      },
+      "tire_pressure_front_right_bar": {
+        "name": "Pressione pneumatico anteriore destro"
+      },
+      "tire_pressure_rear_left_bar": {
+        "name": "Pressione pneumatico posteriore sinistro"
+      },
+      "tire_pressure_rear_right_bar": {
+        "name": "Pressione pneumatico posteriore destro"
+      },
+      "last_remote_control": {
+        "name": "Ultima azione veicolo"
+      }
+    },
+    "binary_sensor": {
+      "charging_planned_enabled": {
+        "name": "Ricarica programmata"
+      }
+    },
+    "button": {
+      "open_trunk": {
+        "name": "Bagagliaio"
+      },
+      "find_vehicle": {
+        "name": "Trova veicolo"
+      },
+      "sunshade_action": {
+        "name": "Tendina parasole"
+      },
+      "battery_preheat": {
+        "name": "Preriscaldamento batteria"
+      },
+      "windows": {
+        "name": "Azione finestrini"
+      },
+      "ac_switch": {
+        "name": "Interruttore A/C"
+      },
+      "quick_cool": {
+        "name": "Raffreddamento rapido"
+      },
+      "quick_heat": {
+        "name": "Riscaldamento rapido"
+      },
+      "windshield_defrost": {
+        "name": "Sbrinamento parabrezza"
+      }
+    },
+    "lock": {
+      "vehicle_lock": {
+        "name": "Blocco"
+      }
+    },
+    "device_tracker": {
+      "location": {
+        "name": "Posizione"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni Leapmotor",
+        "description": "Modifica certificato, chiave privata, PIN veicolo e intervallo. Certificato/chiave sono obbligatori per il login. Senza PIN, i comandi remoti restano disabilitati.",
+        "data": {
+          "app_cert_file": "File certificato app (obbligatorio)",
+          "app_key_file": "File chiave privata app (obbligatorio)",
+          "app_cert_pem": "Certificato PEM app (alternativa)",
+          "app_key_pem": "Chiave privata PEM app (alternativa)",
+          "operation_password": "PIN veicolo (opzionale, per controllo)",
+          "scan_interval": "Intervallo di aggiornamento in minuti"
+        }
+      }
+    }
+  }
+}

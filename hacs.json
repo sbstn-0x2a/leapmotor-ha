@@ -1,0 +1,7 @@
+{
+  "name": "Leapmotor",
+  "render_readme": true,
+  "homeassistant": "2024.6.0",
+  "domains": ["binary_sensor", "button", "device_tracker", "lock", "sensor"],
+  "iot_class": "cloud_polling"
+}
