@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.14 - 2026-04-27
+
+- Make the approved logo/icon artwork transparent outside the vehicle graphic.
+
 ## 0.5.13 - 2026-04-27
 
 - Replace the rejected generated logo/icon with the cleaned user-provided
