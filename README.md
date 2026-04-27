@@ -73,6 +73,26 @@ Without these files, direct authentication fails by design.
 
 ## Installation
 
+### HACS
+
+1. Open HACS in Home Assistant.
+2. Open the three-dot menu and choose `Custom repositories`.
+3. Add this repository URL:
+
+   ```text
+   https://github.com/kerniger/leapmotor-ha
+   ```
+
+4. Select `Integration` as the repository type and add it.
+5. Search for `Leapmotor` in HACS and install it.
+6. Restart Home Assistant.
+7. Add the `Leapmotor` integration from `Settings -> Devices & services`.
+8. During setup, upload/paste the required `app_cert.pem` and `app_key.pem`
+   material, or place both files in `config/custom_components/leapmotor/`
+   before setup.
+
+### Manual
+
 1. Copy `custom_components/leapmotor` into your Home Assistant config directory under `config/custom_components/leapmotor`.
 2. Provide the required local `app_cert.pem` and `app_key.pem` files in that directory, or upload/paste them during setup.
 3. Restart Home Assistant.

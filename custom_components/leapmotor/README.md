@@ -46,6 +46,31 @@ Available data includes:
 
 ## Install
 
+### HACS
+
+1. Open HACS in Home Assistant.
+2. Open the three-dot menu and choose `Custom repositories`.
+3. Add this repository URL:
+
+   ```text
+   https://github.com/kerniger/leapmotor-ha
+   ```
+
+4. Select `Integration` as the repository type and add it.
+5. Search for `Leapmotor` in HACS and install it.
+6. Restart Home Assistant.
+7. Add the integration from:
+
+   ```text
+   Settings -> Devices & services -> Add integration -> Leapmotor
+   ```
+
+8. During setup, upload/paste the required `app_cert.pem` and `app_key.pem`
+   material, or place both files in `config/custom_components/leapmotor/`
+   before setup.
+
+### Manual
+
 Copy the complete folder:
 
 ```text
