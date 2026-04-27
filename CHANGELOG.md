@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.12 - 2026-04-27
+
+- Replace logo/icon PNG assets with clean transparent-background images and
+  opaque vehicle windows so checkerboard artifacts are not visible.
+
 ## 0.5.11 - 2026-04-27
 
 - Fix vehicle-state mapping so app-correlated parked states are no longer shown
