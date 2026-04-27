@@ -27,7 +27,6 @@ _SENSITIVE_KEYS = {
     "gigyaSessionSecret",
     "car_picture_url",
     "url",
-    "abrp_api_key",
     "abrp_token",
 }
 

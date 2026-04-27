@@ -15,9 +15,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .abrp import build_abrp_telemetry, send_abrp_telemetry
 from .api import LeapmotorApiClient, LeapmotorApiError
 from .const import (
-    CONF_ABRP_API_KEY,
     CONF_ABRP_ENABLED,
     CONF_ABRP_TOKEN,
+    DEFAULT_ABRP_API_KEY,
     DEFAULT_STATE_STALE_SECONDS,
     DOMAIN,
     REMOTE_ACTION_COOLDOWN_SECONDS,
@@ -227,10 +227,10 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
 
     async def _async_push_abrp(self, data: dict[str, Any]) -> None:
         """Push vehicle telemetry to ABRP when configured."""
-        if not self.config_entry.options.get(CONF_ABRP_ENABLED):
+        if not self._config_value(CONF_ABRP_ENABLED, False):
             return
-        api_key = str(self.config_entry.options.get(CONF_ABRP_API_KEY) or "")
-        token = str(self.config_entry.options.get(CONF_ABRP_TOKEN) or "")
+        api_key = DEFAULT_ABRP_API_KEY
+        token = str(self._config_value(CONF_ABRP_TOKEN, "") or "")
         if not api_key.strip() or not token.strip():
             return
 
@@ -269,6 +269,12 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
                 "missing": result.get("missing"),
                 "telemetry_keys": sorted(telemetry),
             }
+
+    def _config_value(self, key: str, default: Any = None) -> Any:
+        """Return an option value with config-entry data as migration fallback."""
+        if key in self.config_entry.options:
+            return self.config_entry.options[key]
+        return self.config_entry.data.get(key, default)
 
     def _stabilize_vehicle_states(self, data: dict[str, Any]) -> None:
         """Keep the last valid parked/driving state across weak startup polls."""

@@ -97,6 +97,7 @@ Normal setup path:
 
 - install the Custom Component
 - provide local `app_cert.pem` and `app_key.pem` in `config/custom_components/leapmotor`, or upload/paste them during setup/options
+- optionally enable ABRP live data and enter your ABRP Generic token
 - configure the integration in Home Assistant
 
 The component itself contains both parts needed at runtime: the Home Assistant
@@ -117,6 +118,8 @@ normal user install path.
   usually require this PIN and stay unavailable without it. Sending a
   destination does not require the PIN, matching the observed app flow.
 - Update interval: default `5` minutes
+- ABRP live data: optional
+- ABRP Generic token: optional; only required when ABRP live data is enabled
 
 After setup, the Vehicle PIN and update interval can be changed from the
 integration options without recreating the entry.
@@ -136,14 +139,16 @@ integration options without recreating the entry.
 
 ## ABRP Live Data
 
-ABRP telemetry is optional and disabled by default. If enabled in the
-integration options, the integration sends one Generic Telemetry update after
-each successful Leapmotor poll.
+ABRP telemetry is optional and disabled by default. If enabled during setup or
+in the integration options, the integration sends one Generic Telemetry update
+after each successful Leapmotor poll.
 
 Required ABRP options:
 
-- ABRP API key
 - ABRP Generic token from the ABRP vehicle live-data setup
+
+The integration includes a default ABRP API key. Normal users only need their
+vehicle-specific ABRP Generic token.
 
 The submitted telemetry includes state of charge, estimated range, charging
 state, odometer, speed fallback `0`, and GPS coordinates when available and not

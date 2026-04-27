@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Leapmotor verbinden",
-        "description": "Richtet Leapmotor-Fahrzeugdaten ein. App-Zertifikat und App-Private-Key sind für den Login erforderlich; hier einfügen oder app_cert.pem/app_key.pem vorher im Integrationsordner ablegen. Die Fahrzeug-PIN ist optional; ohne PIN funktionieren nur Lesedaten, keine Fahrzeugsteuerung. Inoffizielle Integration: Nutzung auf eigenes Risiko; keine Haftung für Account-Sperren, API-Änderungen oder Fahrzeugfolgen.",
+        "description": "Richtet Leapmotor-Fahrzeugdaten ein. App-Zertifikat und App-Private-Key sind für den Login erforderlich; hier einfügen oder app_cert.pem/app_key.pem vorher im Integrationsordner ablegen. Die Fahrzeug-PIN ist optional; ohne PIN funktionieren nur Lesedaten, keine Fahrzeugsteuerung. ABRP Live-Daten sind optional; benötigt wird nur der ABRP Generic Token aus der ABRP-Fahrzeug-Livedaten-Einrichtung. Inoffizielle Integration: Nutzung auf eigenes Risiko; keine Haftung für Account-Sperren, API-Änderungen oder Fahrzeugfolgen.",
         "data": {
           "username": "Benutzername / E-Mail",
           "password": "Passwort",
@@ -12,7 +12,9 @@
           "app_cert_pem": "App-Zertifikat PEM (Fallback)",
           "app_key_pem": "App-Private-Key PEM (Fallback)",
           "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
-          "scan_interval": "Aktualisierungsintervall in Minuten"
+          "scan_interval": "Aktualisierungsintervall in Minuten",
+          "abrp_enabled": "ABRP Live-Daten aktivieren",
+          "abrp_token": "ABRP Generic Token"
         }
       },
       "init": {
@@ -39,12 +41,14 @@
       },
       "account": {
         "title": "Leapmotor Konto verbinden",
-        "description": "Leapmotor-Zugangsdaten eingeben. Die Fahrzeug-PIN ist optional; ohne PIN funktionieren nur Lesedaten, keine Fahrzeugsteuerung.",
+        "description": "Leapmotor-Zugangsdaten eingeben. Die Fahrzeug-PIN ist optional; ohne PIN funktionieren nur Lesedaten, keine Fahrzeugsteuerung. ABRP Live-Daten sind optional und benötigen nur den ABRP Generic Token.",
         "data": {
           "username": "Benutzername / E-Mail",
           "password": "Passwort",
           "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
-          "scan_interval": "Aktualisierungsintervall in Minuten"
+          "scan_interval": "Aktualisierungsintervall in Minuten",
+          "abrp_enabled": "ABRP Live-Daten aktivieren",
+          "abrp_token": "ABRP Generic Token"
         }
       }
     },
@@ -202,7 +206,7 @@
     "step": {
       "init": {
         "title": "Leapmotor Optionen",
-        "description": "Zertifikatsmaterial, Fahrzeug-PIN und Aktualisierungsintervall nachträglich anpassen. App-Zertifikat/Private-Key sind für den Login erforderlich. Ohne PIN bleiben Steuerfunktionen deaktiviert.",
+        "description": "Zertifikatsmaterial, Fahrzeug-PIN, Aktualisierungsintervall und optionale ABRP Live-Daten nachträglich anpassen. App-Zertifikat/Private-Key sind für den Login erforderlich. Ohne PIN bleiben Steuerfunktionen deaktiviert.",
         "data": {
           "app_cert_file": "App-Zertifikatdatei (erforderlich)",
           "app_key_file": "App-Private-Key-Datei (erforderlich)",
@@ -211,7 +215,6 @@
           "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten",
           "abrp_enabled": "ABRP Live-Daten aktivieren",
-          "abrp_api_key": "ABRP API-Key",
           "abrp_token": "ABRP Generic Token"
         }
       }

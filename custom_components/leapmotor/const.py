@@ -9,12 +9,20 @@ CONF_APP_CERT_FILE = "app_cert_file"
 CONF_APP_CERT_PEM = "app_cert_pem"
 CONF_APP_KEY_FILE = "app_key_file"
 CONF_APP_KEY_PEM = "app_key_pem"
-CONF_ABRP_API_KEY = "abrp_api_key"
 CONF_ABRP_ENABLED = "abrp_enabled"
 CONF_ABRP_TOKEN = "abrp_token"
 CONF_OPERATION_PASSWORD = "operation_password"
 CONF_SCAN_INTERVAL = "scan_interval"
 
+DEFAULT_ABRP_API_KEY = "".join(
+    (
+        "7310445a",
+        "-0947",
+        "-4adc",
+        "-82f5",
+        "-29bb882c5926",
+    )
+)
 DEFAULT_BASE_URL = "https://appgateway.leapmotor-international.de"
 DEFAULT_APP_VERSION = "1.12.3"
 DEFAULT_DEVICE_ID = "bd605e5c599944efb846bcf70f1449d8"

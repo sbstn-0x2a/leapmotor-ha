@@ -27,7 +27,7 @@ It intentionally does not contain:
 - Native Home Assistant services for supported remote actions
 - Send destination to vehicle navigation via Home Assistant service
 - Optional ABRP Generic Telemetry live-data push
-- Options flow for vehicle PIN and update interval
+- Setup/options flow for vehicle PIN, update interval, and optional ABRP token
 - Redacted diagnostics export
 - Multi-language translations
 - Multi-vehicle support for main-account and shared-car vehicles
@@ -104,6 +104,7 @@ Without these files, direct authentication fails by design.
 - Email and password are required
 - App certificate and app private key are required, but are not included in this repository
 - Vehicle PIN is optional for setup
+- ABRP live data is optional during setup; users only need their ABRP Generic Token
 - Without the Vehicle PIN, the integration works in read-only mode
 - Most remote-control actions stay unavailable until a Vehicle PIN is configured
 - `send_destination` does not require the Vehicle PIN, matching the observed app flow
@@ -137,6 +138,12 @@ Each service accepts:
 
 `send_destination` additionally requires `name`, `latitude`, and `longitude`.
 `address` is optional and defaults to `name`.
+
+## ABRP Live Data
+
+ABRP telemetry is optional and disabled by default. During setup, enable
+`ABRP live data` and enter the `ABRP Generic Token` from the ABRP vehicle
+live-data setup. Users do not need to request or enter an ABRP API key.
 
 ## Diagnostics
 

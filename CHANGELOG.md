@@ -1,9 +1,11 @@
 # Changelog
 
-## 0.5.9 - Planned
+## 0.5.9 - 2026-04-27
 
 - Ask for optional ABRP live-data settings during the initial setup flow, not
   only in the integration options.
+- Use an internal default ABRP API key so users only need their vehicle-specific
+  ABRP Generic token.
 - Move local brand images into the Home Assistant custom-integration brand
   folder so the integration logo/icon can be discovered by newer HA versions.
 

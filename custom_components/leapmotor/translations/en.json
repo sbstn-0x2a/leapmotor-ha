@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Connect Leapmotor",
-        "description": "Sets up Leapmotor vehicle data. App certificate and app private key are required for login; paste them here or place app_cert.pem/app_key.pem in the integration folder first. The vehicle PIN is optional; without it only read-only data works, not remote control. Unofficial integration: use at your own risk; no liability for account restrictions, API changes, or vehicle consequences.",
+        "description": "Sets up Leapmotor vehicle data. App certificate and app private key are required for login; paste them here or place app_cert.pem/app_key.pem in the integration folder first. The vehicle PIN is optional; without it only read-only data works, not remote control. ABRP live data is optional; use your ABRP Generic token from the ABRP vehicle live-data setup. Unofficial integration: use at your own risk; no liability for account restrictions, API changes, or vehicle consequences.",
         "data": {
           "username": "Username / email",
           "password": "Password",
@@ -12,7 +12,9 @@
           "app_cert_pem": "App certificate PEM (fallback)",
           "app_key_pem": "App private key PEM (fallback)",
           "operation_password": "Vehicle PIN (optional, for control)",
-          "scan_interval": "Update interval in minutes"
+          "scan_interval": "Update interval in minutes",
+          "abrp_enabled": "Enable ABRP live data",
+          "abrp_token": "ABRP Generic token"
         }
       },
       "init": {
@@ -39,12 +41,14 @@
       },
       "account": {
         "title": "Connect Leapmotor account",
-        "description": "Enter your Leapmotor account credentials. The vehicle PIN is optional; without it only read-only data works, not remote control.",
+        "description": "Enter your Leapmotor account credentials. The vehicle PIN is optional; without it only read-only data works, not remote control. ABRP live data is optional and only needs your ABRP Generic token.",
         "data": {
           "username": "Username / email",
           "password": "Password",
           "operation_password": "Vehicle PIN (optional, for control)",
-          "scan_interval": "Update interval in minutes"
+          "scan_interval": "Update interval in minutes",
+          "abrp_enabled": "Enable ABRP live data",
+          "abrp_token": "ABRP Generic token"
         }
       }
     },
@@ -202,7 +206,7 @@
     "step": {
       "init": {
         "title": "Leapmotor options",
-        "description": "Change certificate material, vehicle PIN, and update interval. App certificate/private key are required for login. Without a PIN, remote-control actions remain disabled.",
+        "description": "Change certificate material, vehicle PIN, update interval, and optional ABRP live-data forwarding. App certificate/private key are required for login. Without a PIN, remote-control actions remain disabled.",
         "data": {
           "app_cert_file": "App certificate file (required)",
           "app_key_file": "App private key file (required)",
@@ -211,7 +215,6 @@
           "operation_password": "Vehicle PIN (optional, for control)",
           "scan_interval": "Update interval in minutes",
           "abrp_enabled": "Enable ABRP live data",
-          "abrp_api_key": "ABRP API key",
           "abrp_token": "ABRP Generic token"
         }
       }
