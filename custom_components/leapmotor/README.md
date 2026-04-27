@@ -66,8 +66,7 @@ Available data includes:
    ```
 
 8. During setup, upload/paste the required `app_cert.pem` and `app_key.pem`
-   material, or place both files in `config/custom_components/leapmotor/`
-   before setup.
+   material, or place both files in `config/leapmotor/` before setup.
 
 ### Manual
 
@@ -96,7 +95,7 @@ This public repository does not ship app certificate material.
 Normal setup path:
 
 - install the Custom Component
-- provide local `app_cert.pem` and `app_key.pem` in `config/custom_components/leapmotor`, or upload/paste them during setup/options
+- provide local `app_cert.pem` and `app_key.pem` in `config/leapmotor/`, or upload/paste them during setup/options
 - optionally enable ABRP live data and enter your ABRP Generic token
 - configure the integration in Home Assistant
 
@@ -109,9 +108,9 @@ normal user install path.
 - Username / email: your Leapmotor account email
 - Password: your Leapmotor account password
 - App certificate file: required for login; upload it here or leave the field
-  empty only if `app_cert.pem` already exists locally.
+  empty only if `app_cert.pem` already exists under `config/leapmotor/`.
 - App private key file: required for login; upload it here or leave the field
-  empty only if `app_key.pem` already exists locally.
+  empty only if `app_key.pem` already exists under `config/leapmotor/`.
 - App certificate/private key PEM: fallback paste fields if file upload is not
   convenient.
 - Vehicle PIN: optional; leave empty for read-only mode. Remote-control actions

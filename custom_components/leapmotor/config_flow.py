@@ -35,6 +35,7 @@ from .const import (
     DOMAIN,
     STATIC_APP_CERT,
     STATIC_APP_KEY,
+    STATIC_CERT_STORAGE_DIR,
 )
 
 
@@ -71,10 +72,29 @@ CERTIFICATE_DATA_SCHEMA = vol.Schema(
 )
 
 
-def has_app_certificate_material() -> bool:
-    """Return whether the required local app certificate files exist."""
+def app_certificate_dir(hass: HomeAssistant) -> Path:
+    """Return the persistent directory for user-provided app certificate files."""
+    return Path(hass.config.path(STATIC_CERT_STORAGE_DIR))
+
+
+def migrate_legacy_app_certificate_material(hass: HomeAssistant) -> None:
+    """Copy pre-0.5.11 cert files out of the HACS-managed integration folder."""
+    cert_dir = app_certificate_dir(hass)
+    cert_dir.mkdir(parents=True, exist_ok=True)
     component_dir = Path(__file__).resolve().parent
-    return (component_dir / STATIC_APP_CERT).exists() and (component_dir / STATIC_APP_KEY).exists()
+    for file_name in (STATIC_APP_CERT, STATIC_APP_KEY):
+        legacy_path = component_dir / file_name
+        target_path = cert_dir / file_name
+        if legacy_path.exists() and not target_path.exists():
+            target_path.write_bytes(legacy_path.read_bytes())
+            os.chmod(target_path, 0o600 if file_name == STATIC_APP_KEY else 0o644)
+
+
+def has_app_certificate_material(hass: HomeAssistant) -> bool:
+    """Return whether the required local app certificate files exist."""
+    migrate_legacy_app_certificate_material(hass)
+    cert_dir = app_certificate_dir(hass)
+    return (cert_dir / STATIC_APP_CERT).exists() and (cert_dir / STATIC_APP_KEY).exists()
 
 
 def _write_pem_if_provided(path: Path, value: str, marker: str, mode: int) -> None:
@@ -107,29 +127,30 @@ def _write_uploaded_pem_if_provided(
 
 def save_app_certificate_material(hass: HomeAssistant, data: dict[str, Any]) -> None:
     """Persist user-provided app certificate material locally, if supplied."""
-    component_dir = Path(__file__).resolve().parent
+    cert_dir = app_certificate_dir(hass)
+    cert_dir.mkdir(parents=True, exist_ok=True)
     _write_uploaded_pem_if_provided(
         hass,
-        component_dir / STATIC_APP_CERT,
+        cert_dir / STATIC_APP_CERT,
         data.get(CONF_APP_CERT_FILE),
         "BEGIN CERTIFICATE",
         0o644,
     )
     _write_uploaded_pem_if_provided(
         hass,
-        component_dir / STATIC_APP_KEY,
+        cert_dir / STATIC_APP_KEY,
         data.get(CONF_APP_KEY_FILE),
         "PRIVATE KEY",
         0o600,
     )
     _write_pem_if_provided(
-        component_dir / STATIC_APP_CERT,
+        cert_dir / STATIC_APP_CERT,
         str(data.get(CONF_APP_CERT_PEM) or ""),
         "BEGIN CERTIFICATE",
         0o644,
     )
     _write_pem_if_provided(
-        component_dir / STATIC_APP_KEY,
+        cert_dir / STATIC_APP_KEY,
         str(data.get(CONF_APP_KEY_PEM) or ""),
         "PRIVATE KEY",
         0o600,
@@ -143,6 +164,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         username=data[CONF_USERNAME],
         password=data[CONF_PASSWORD],
         operation_password=data.get(CONF_OPERATION_PASSWORD) or None,
+        static_cert_dir=app_certificate_dir(hass),
     )
     try:
         result = await hass.async_add_executor_job(client.fetch_data)
@@ -175,7 +197,7 @@ class LeapmotorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         user_input: dict[str, Any] | None = None,
     ) -> config_entries.ConfigFlowResult:
         """Start setup with certificate material if it is not installed yet."""
-        if await self.hass.async_add_executor_job(has_app_certificate_material):
+        if await self.hass.async_add_executor_job(has_app_certificate_material, self.hass):
             return await self.async_step_account(user_input)
         return await self.async_step_certificates()
 
@@ -195,7 +217,7 @@ class LeapmotorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except ValueError:
                 errors["base"] = "certificate_import_error"
             else:
-                if await self.hass.async_add_executor_job(has_app_certificate_material):
+                if await self.hass.async_add_executor_job(has_app_certificate_material, self.hass):
                     return await self.async_step_account()
                 errors["base"] = "missing_app_cert"
 

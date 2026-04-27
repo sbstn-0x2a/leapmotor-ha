@@ -21,7 +21,7 @@ Fahrzeugaktionen nur bewusst und in sicherem Fahrzeugzustand testen.
 - `custom_components/leapmotor` liegt im HA-Konfigurationsordner
 - Home Assistant wurde nach dem Kopieren neu gestartet
 - Zugangsdaten fuer das richtige Leapmotor-Konto sind bekannt
-- `app_cert.pem` und `app_key.pem` liegen lokal vor oder werden im Setup
+- `app_cert.pem` und `app_key.pem` liegen unter `config/leapmotor/` vor oder werden im Setup
   hochgeladen/eingefuegt
 - Fahrzeug-PIN ist bekannt, falls Steuerfunktionen getestet werden sollen
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.11 - 2026-04-27
+
+- Fix vehicle-state mapping so app-correlated parked states are no longer shown
+  as driving.
+- Store user-provided `app_cert.pem` and `app_key.pem` under
+  `/config/leapmotor/` so HACS updates do not remove them.
+- Automatically copy legacy certificate files from
+  `/config/custom_components/leapmotor/` to `/config/leapmotor/` when present.
+
 ## 0.5.10 - 2026-04-27
 
 - Fix charging-power mapping by deriving it from voltage/current instead of the

@@ -61,14 +61,15 @@ Current reality:
 - the internal backend path covers login, vehicle list, status, and remote commands
 - additional read-only calls cover total mileage and charging-plan details
 
-Expected local files inside `custom_components/leapmotor/`:
+Expected local files for persistent storage:
 
-- `app_cert.pem`
-- `app_key.pem`
+- `config/leapmotor/app_cert.pem`
+- `config/leapmotor/app_key.pem`
 
 They can be copied manually or pasted into the setup/options form if you already
 have legitimate certificate material. The setup/options form also supports
-uploading the certificate/key files directly.
+uploading the certificate/key files directly. Uploaded/pasted files are stored
+outside `custom_components`, so HACS updates do not remove them.
 
 Without these files, direct authentication fails by design.
 
@@ -89,13 +90,12 @@ Without these files, direct authentication fails by design.
 6. Restart Home Assistant.
 7. Add the `Leapmotor` integration from `Settings -> Devices & services`.
 8. During setup, upload/paste the required `app_cert.pem` and `app_key.pem`
-   material, or place both files in `config/custom_components/leapmotor/`
-   before setup.
+   material, or place both files in `config/leapmotor/` before setup.
 
 ### Manual
 
 1. Copy `custom_components/leapmotor` into your Home Assistant config directory under `config/custom_components/leapmotor`.
-2. Provide the required local `app_cert.pem` and `app_key.pem` files in that directory, or upload/paste them during setup.
+2. Provide the required local `app_cert.pem` and `app_key.pem` files under `config/leapmotor/`, or upload/paste them during setup.
 3. Restart Home Assistant.
 4. Add the `Leapmotor` integration from `Settings -> Devices & services`.
 
@@ -171,6 +171,14 @@ local custom integration package.
 They are app-level client certificate material required by the current login
 path. Publishing them would expose reusable authentication material. Users must
 provide legitimate local certificate material themselves.
+
+### Where are app_cert.pem and app_key.pem stored?
+
+Uploaded or pasted certificate files are stored under `config/leapmotor/`.
+This folder is outside `custom_components`, so HACS updates do not remove the
+files. Older installs that still have the files in
+`config/custom_components/leapmotor/` are copied to the persistent folder
+automatically when possible.
 
 ### Can the integration generate these certificates?
 

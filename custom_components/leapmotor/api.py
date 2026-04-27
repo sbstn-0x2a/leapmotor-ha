@@ -149,6 +149,7 @@ class LeapmotorApiClient:
         operation_password: str | None = None,
         account_p12_password: str | None = None,
         base_url: str = DEFAULT_BASE_URL,
+        static_cert_dir: str | Path | None = None,
     ) -> None:
         self.username = username
         self.password = password
@@ -168,9 +169,9 @@ class LeapmotorApiClient:
         self.account_p12_password_source: str | None = None
         self.remote_cert_synced = False
         self.last_api_results: dict[str, dict[str, Any]] = {}
-        component_dir = Path(__file__).resolve().parent
-        self.static_cert = str(component_dir / STATIC_APP_CERT)
-        self.static_key = str(component_dir / STATIC_APP_KEY)
+        cert_dir = Path(static_cert_dir) if static_cert_dir else Path(__file__).resolve().parent
+        self.static_cert = str(cert_dir / STATIC_APP_CERT)
+        self.static_key = str(cert_dir / STATIC_APP_KEY)
 
     def close(self) -> None:
         """Close HTTP resources and remove temporary account cert files."""
@@ -1363,8 +1364,14 @@ def _derive_vehicle_state(signal: dict[str, Any]) -> str | None:
     parked = _safe_int(signal.get("1298"))
     if parked == 1:
         return "parked"
-    if parked == 0:
+
+    drive_status = _safe_int(signal.get("1941"))
+    vehicle_state = _safe_int(signal.get("1944"))
+    if drive_status in (1, 2, 4) or vehicle_state in (0, 1, 3):
+        return "parked"
+    if drive_status in (3, 5) or vehicle_state in (2, 4, 5):
         return "driving"
+
     return None
 
 

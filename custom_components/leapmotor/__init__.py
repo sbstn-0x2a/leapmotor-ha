@@ -20,6 +20,7 @@ from .const import (
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL_MINUTES,
     DOMAIN,
+    STATIC_CERT_STORAGE_DIR,
 )
 from .coordinator import LeapmotorDataUpdateCoordinator
 from .lock import LOCK_ACTION, UNLOCK_ACTION
@@ -82,6 +83,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         password=entry.data[CONF_PASSWORD],
         account_p12_password=entry.data.get(CONF_ACCOUNT_P12_PASSWORD),
         operation_password=operation_password or None,
+        static_cert_dir=hass.config.path(STATIC_CERT_STORAGE_DIR),
     )
     coordinator = LeapmotorDataUpdateCoordinator(
         hass=hass,

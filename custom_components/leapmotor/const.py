@@ -42,6 +42,7 @@ KNOWN_ACCOUNT_P12_PASSWORDS: tuple[str, ...] = ()
 
 STATIC_APP_CERT = "app_cert.pem"
 STATIC_APP_KEY = "app_key.pem"
+STATIC_CERT_STORAGE_DIR = "leapmotor"
 
 REMOTE_CTL_LOCK = "lock"
 REMOTE_CTL_UNLOCK = "unlock"
