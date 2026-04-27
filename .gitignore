@@ -4,6 +4,7 @@ __pycache__/
 *.log
 *.zip
 .DS_Store
+Gemini_Generated_Image_*.png
 
 # Never commit local certificate material
 custom_components/leapmotor/app_cert.pem

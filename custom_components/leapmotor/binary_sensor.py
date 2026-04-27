@@ -9,6 +9,7 @@ from typing import Any
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
+    BinarySensorDeviceClass,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -30,10 +31,23 @@ class LeapmotorBinarySensorEntityDescription(BinarySensorEntityDescription):
 
 BINARY_SENSOR_DESCRIPTIONS: tuple[LeapmotorBinarySensorEntityDescription, ...] = (
     LeapmotorBinarySensorEntityDescription(
+        key="is_charging",
+        name="Lädt",
+        icon="mdi:ev-station",
+        device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+        value_fn=lambda data: data["charging"].get("is_charging"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
         key="charging_planned_enabled",
         name="Geplantes Laden",
         icon="mdi:calendar-clock",
         value_fn=lambda data: data["charging"].get("charging_planned_enabled"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="charging_planned_weekly",
+        name="Ladeplanung wöchentlich",
+        icon="mdi:calendar-week",
+        value_fn=lambda data: (data["charging"].get("charging_planned_cycles") or "") == "1,1,1,1,1,1,1",
     ),
 )
 

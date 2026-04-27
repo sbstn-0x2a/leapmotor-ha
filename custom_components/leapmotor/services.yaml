@@ -1,0 +1,270 @@
+lock:
+  name: Lock vehicle
+  description: Lock a Leapmotor vehicle.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      example: LPXXXXXXXXXXXXXXX
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      example: lock.leapmotor_vehicle_lock
+      selector:
+        text:
+unlock:
+  name: Unlock vehicle
+  description: Unlock a Leapmotor vehicle.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+trunk_open:
+  name: Open trunk
+  description: Open the trunk.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+trunk_close:
+  name: Close trunk
+  description: Close the trunk.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+find_car:
+  name: Find vehicle
+  description: Trigger the horn/find-vehicle action.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+sunshade_open:
+  name: Open sunshade
+  description: Open the sunshade.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+sunshade_close:
+  name: Close sunshade
+  description: Close the sunshade.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+battery_preheat:
+  name: Battery preheat
+  description: Trigger the verified battery preheat action.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+windows_open:
+  name: Open windows
+  description: Open the windows.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+windows_close:
+  name: Close windows
+  description: Close the windows.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+ac_switch:
+  name: Climate off
+  description: Turn climate control off with the verified normal profile.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+quick_cool:
+  name: Quick cool
+  description: Trigger the verified quick-cool profile.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+quick_heat:
+  name: Quick heat
+  description: Trigger the verified quick-heat profile.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+windshield_defrost:
+  name: Windshield defrost
+  description: Trigger the verified windshield-defrost profile.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+set_charge_limit:
+  name: Set charge limit
+  description: Set the charging upper limit while preserving the current charging schedule from the vehicle.
+  fields:
+    charge_limit_percent:
+      name: Charge limit
+      description: New upper charge limit in percent.
+      required: true
+      example: 85
+      selector:
+        number:
+          min: 1
+          max: 100
+          mode: box
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
+send_destination:
+  name: Send destination
+  description: Send a navigation destination to the vehicle.
+  fields:
+    name:
+      name: Destination name
+      description: Short destination label shown in the vehicle navigation.
+      required: true
+      example: Bern
+      selector:
+        text:
+    address:
+      name: Address
+      description: Full destination address. Defaults to the destination name when omitted.
+      example: Bern, Schweiz
+      selector:
+        text:
+    latitude:
+      name: Latitude
+      description: Destination latitude.
+      required: true
+      example: 46.9479739
+      selector:
+        number:
+          min: -90
+          max: 90
+          mode: box
+    longitude:
+      name: Longitude
+      description: Destination longitude.
+      required: true
+      example: 7.4474468
+      selector:
+        number:
+          min: -180
+          max: 180
+          mode: box
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        entity:
+          integration: leapmotor

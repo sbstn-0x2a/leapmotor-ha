@@ -52,6 +52,8 @@
       "invalid_auth": "Authentication failed.",
       "account_cert_error": "Login succeeded, but the account certificate could not be opened.",
       "cannot_connect": "Connection or API refresh failed.",
+      "api_refresh_failed": "Login succeeded, but the first vehicle-data API refresh failed.",
+      "no_vehicle": "This account has no linked vehicle.",
       "unknown": "Unexpected error.",
       "missing_app_cert": "Missing app certificate/private key. Paste both PEM values or place app_cert.pem and app_key.pem in the integration folder.",
       "certificate_import_error": "Certificate import failed. Check the PEM certificate and private key."
@@ -83,8 +85,26 @@
       "charge_limit_percent": {
         "name": "Charge limit"
       },
+      "charging_planned_start": {
+        "name": "Scheduled charging start"
+      },
+      "charging_planned_end": {
+        "name": "Scheduled charging end"
+      },
+      "charging_planned_circulation": {
+        "name": "Scheduled charging recurrence"
+      },
+      "charging_plan_updated_at": {
+        "name": "Charging plan updated"
+      },
       "vehicle_state": {
         "name": "Vehicle state"
+      },
+      "last_successful_refresh": {
+        "name": "Last refresh"
+      },
+      "total_mileage_km": {
+        "name": "Total mileage"
       },
       "tire_pressure_front_left_bar": {
         "name": "Tire pressure front left"
@@ -97,34 +117,57 @@
       },
       "tire_pressure_rear_right_bar": {
         "name": "Tire pressure rear right"
-      },
-      "last_remote_control": {
-        "name": "Last vehicle action"
       }
     },
     "binary_sensor": {
+      "is_charging": {
+        "name": "Charging"
+      },
+      "charging_planned_weekly": {
+        "name": "Scheduled charging weekly"
+      },
       "charging_planned_enabled": {
         "name": "Scheduled charging"
       }
     },
+    "image": {
+      "vehicle_picture": {
+        "name": "Vehicle picture"
+      }
+    },
     "button": {
       "open_trunk": {
-        "name": "Trunk"
+        "name": "Open trunk"
+      },
+      "close_trunk": {
+        "name": "Close trunk"
       },
       "find_vehicle": {
         "name": "Find vehicle"
       },
       "sunshade_action": {
-        "name": "Sunshade"
+        "name": "Close sunshade"
+      },
+      "open_sunshade": {
+        "name": "Open sunshade"
+      },
+      "close_sunshade": {
+        "name": "Close sunshade"
       },
       "battery_preheat": {
         "name": "Battery preheat"
       },
       "windows": {
-        "name": "Window action"
+        "name": "Open windows"
+      },
+      "open_windows": {
+        "name": "Open windows"
+      },
+      "close_windows": {
+        "name": "Close windows"
       },
       "ac_switch": {
-        "name": "A/C switch"
+        "name": "Climate off"
       },
       "quick_cool": {
         "name": "Quick cool"
@@ -134,6 +177,9 @@
       },
       "windshield_defrost": {
         "name": "Windshield defrost"
+      },
+      "refresh_data": {
+        "name": "Refresh data"
       }
     },
     "lock": {
@@ -144,6 +190,11 @@
     "device_tracker": {
       "location": {
         "name": "Location"
+      }
+    },
+    "number": {
+      "charge_limit_setting": {
+        "name": "Set charge limit"
       }
     }
   },
@@ -158,7 +209,10 @@
           "app_cert_pem": "App certificate PEM (fallback)",
           "app_key_pem": "App private key PEM (fallback)",
           "operation_password": "Vehicle PIN (optional, for control)",
-          "scan_interval": "Update interval in minutes"
+          "scan_interval": "Update interval in minutes",
+          "abrp_enabled": "Enable ABRP live data",
+          "abrp_api_key": "ABRP API key",
+          "abrp_token": "ABRP Generic token"
         }
       }
     }

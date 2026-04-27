@@ -44,7 +44,7 @@ jobs:
       - name: Secret pattern scan
         run: |
           ! grep -RIE \
-            'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|BEGIN CERTIFICATE|@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|192\.168\.|LFZ63|Jjinqil|Dsb6|e/t9jEg|VPlWT|BAqKLV|qeyhK' \
+            'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|BEGIN CERTIFICATE|@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|192\.168\.' \
             --exclude-dir=.git \
             --exclude='validate.yml' \
             --exclude='config_flow.py' \

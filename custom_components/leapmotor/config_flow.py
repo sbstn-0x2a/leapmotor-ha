@@ -20,8 +20,12 @@ from .api import (
     LeapmotorApiError,
     LeapmotorAuthError,
     LeapmotorMissingAppCertError,
+    LeapmotorNoVehicleError,
 )
 from .const import (
+    CONF_ABRP_API_KEY,
+    CONF_ABRP_ENABLED,
+    CONF_ABRP_TOKEN,
     CONF_APP_CERT_FILE,
     CONF_APP_CERT_PEM,
     CONF_APP_KEY_FILE,
@@ -145,6 +149,8 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         await hass.async_add_executor_job(client.close)
 
     vehicles = result.get("vehicles") or {}
+    if not vehicles:
+        raise LeapmotorNoVehicleError("No vehicle linked to this account.")
     return {
         "title": f"Leapmotor ({data[CONF_USERNAME]})",
         "vehicles": len(vehicles),
@@ -221,12 +227,14 @@ class LeapmotorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "missing_app_cert"
             except LeapmotorAccountCertError:
                 errors["base"] = "account_cert_error"
+            except LeapmotorNoVehicleError:
+                errors["base"] = "no_vehicle"
             except ValueError:
                 errors["base"] = "certificate_import_error"
             except LeapmotorAuthError:
                 errors["base"] = "invalid_auth"
             except LeapmotorApiError:
-                errors["base"] = "cannot_connect"
+                errors["base"] = "api_refresh_failed"
             except Exception:  # noqa: BLE001
                 errors["base"] = "unknown"
             else:
@@ -279,6 +287,9 @@ class LeapmotorOptionsFlow(config_entries.OptionsFlow):
                 data={
                     CONF_OPERATION_PASSWORD: user_input.get(CONF_OPERATION_PASSWORD) or "",
                     CONF_SCAN_INTERVAL: user_input[CONF_SCAN_INTERVAL],
+                    CONF_ABRP_ENABLED: bool(user_input.get(CONF_ABRP_ENABLED)),
+                    CONF_ABRP_API_KEY: user_input.get(CONF_ABRP_API_KEY) or "",
+                    CONF_ABRP_TOKEN: user_input.get(CONF_ABRP_TOKEN) or "",
                 },
             )
 
@@ -321,5 +332,17 @@ class LeapmotorOptionsFlow(config_entries.OptionsFlow):
                     vol.Coerce(int),
                     vol.Range(min=1, max=120),
                 ),
+                vol.Optional(
+                    CONF_ABRP_ENABLED,
+                    default=bool(self._config_entry.options.get(CONF_ABRP_ENABLED, False)),
+                ): bool,
+                vol.Optional(
+                    CONF_ABRP_API_KEY,
+                    default=str(self._config_entry.options.get(CONF_ABRP_API_KEY, "")),
+                ): str,
+                vol.Optional(
+                    CONF_ABRP_TOKEN,
+                    default=str(self._config_entry.options.get(CONF_ABRP_TOKEN, "")),
+                ): str,
             }
         )

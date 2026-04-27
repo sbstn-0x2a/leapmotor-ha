@@ -83,8 +83,23 @@
       "charge_limit_percent": {
         "name": "Laadlimiet"
       },
+      "charging_planned_start": {
+        "name": "Gepland laden start"
+      },
+      "charging_planned_end": {
+        "name": "Gepland laden einde"
+      },
+      "charging_planned_circulation": {
+        "name": "Gepland laden herhaling"
+      },
+      "charging_plan_updated_at": {
+        "name": "Laadplan bijgewerkt"
+      },
       "vehicle_state": {
         "name": "Voertuigstatus"
+      },
+      "total_mileage_km": {
+        "name": "Totale kilometerstand"
       },
       "tire_pressure_front_left_bar": {
         "name": "Bandenspanning linksvoor"
@@ -97,14 +112,22 @@
       },
       "tire_pressure_rear_right_bar": {
         "name": "Bandenspanning rechtsachter"
-      },
-      "last_remote_control": {
-        "name": "Laatste voertuigactie"
       }
     },
     "binary_sensor": {
+      "is_charging": {
+        "name": "Laden"
+      },
+      "charging_planned_weekly": {
+        "name": "Gepland laden wekelijks"
+      },
       "charging_planned_enabled": {
         "name": "Gepland laden"
+      }
+    },
+    "image": {
+      "vehicle_picture": {
+        "name": "Voertuigafbeelding"
       }
     },
     "button": {
@@ -124,7 +147,7 @@
         "name": "Raamactie"
       },
       "ac_switch": {
-        "name": "A/C-schakelaar"
+        "name": "Climate uitschakelen"
       },
       "quick_cool": {
         "name": "Snel koelen"
@@ -144,6 +167,11 @@
     "device_tracker": {
       "location": {
         "name": "Locatie"
+      }
+    },
+    "number": {
+      "charge_limit_setting": {
+        "name": "Laadlimiet instellen"
       }
     }
   },

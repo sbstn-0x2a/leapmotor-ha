@@ -83,8 +83,23 @@
       "charge_limit_percent": {
         "name": "Limit ladowania"
       },
+      "charging_planned_start": {
+        "name": "Start planowanego ladowania"
+      },
+      "charging_planned_end": {
+        "name": "Koniec planowanego ladowania"
+      },
+      "charging_planned_circulation": {
+        "name": "Powtarzanie planowanego ladowania"
+      },
+      "charging_plan_updated_at": {
+        "name": "Plan ladowania zaktualizowany"
+      },
       "vehicle_state": {
         "name": "Stan pojazdu"
+      },
+      "total_mileage_km": {
+        "name": "Całkowity przebieg"
       },
       "tire_pressure_front_left_bar": {
         "name": "Cisnienie opony przedniej lewej"
@@ -97,14 +112,22 @@
       },
       "tire_pressure_rear_right_bar": {
         "name": "Cisnienie opony tylnej prawej"
-      },
-      "last_remote_control": {
-        "name": "Ostatnia akcja pojazdu"
       }
     },
     "binary_sensor": {
+      "is_charging": {
+        "name": "Ladowanie"
+      },
+      "charging_planned_weekly": {
+        "name": "Planowane ladowanie tygodniowe"
+      },
       "charging_planned_enabled": {
         "name": "Planowane ladowanie"
+      }
+    },
+    "image": {
+      "vehicle_picture": {
+        "name": "Zdjęcie pojazdu"
       }
     },
     "button": {
@@ -124,7 +147,7 @@
         "name": "Akcja szyb"
       },
       "ac_switch": {
-        "name": "Przelacznik A/C"
+        "name": "Wylacz klimatyzacje"
       },
       "quick_cool": {
         "name": "Szybkie chlodzenie"
@@ -144,6 +167,11 @@
     "device_tracker": {
       "location": {
         "name": "Lokalizacja"
+      }
+    },
+    "number": {
+      "charge_limit_setting": {
+        "name": "Ustaw limit ladowania"
       }
     }
   },

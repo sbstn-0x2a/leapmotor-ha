@@ -1,6 +1,6 @@
 # Leapmotor HA Test Runbook
 
-Stand: 2026-04-21
+Stand: 2026-04-27
 
 ## Ziel
 
@@ -21,6 +21,8 @@ Fahrzeugaktionen nur bewusst und in sicherem Fahrzeugzustand testen.
 - `custom_components/leapmotor` liegt im HA-Konfigurationsordner
 - Home Assistant wurde nach dem Kopieren neu gestartet
 - Zugangsdaten fuer das richtige Leapmotor-Konto sind bekannt
+- `app_cert.pem` und `app_key.pem` liegen lokal vor oder werden im Setup
+  hochgeladen/eingefuegt
 - Fahrzeug-PIN ist bekannt, falls Steuerfunktionen getestet werden sollen
 
 ## Installation
@@ -28,8 +30,9 @@ Fahrzeugaktionen nur bewusst und in sicherem Fahrzeugzustand testen.
 1. `custom_components/leapmotor` nach `config/custom_components/leapmotor` kopieren.
 2. Home Assistant neu starten.
 3. Unter `Einstellungen -> Geraete & Dienste -> Integration hinzufuegen` nach `Leapmotor` suchen.
-4. Benutzername, Passwort und Intervall eingeben.
-5. Fahrzeug-PIN optional eintragen; ohne PIN laeuft die Integration im Read-only-Modus.
+4. Benutzername, Passwort, Zertifikat, privaten Schluessel und Intervall eingeben.
+5. Fahrzeug-PIN optional eintragen. Ohne PIN bleiben die meisten
+   Remote-Control-Aktionen deaktiviert.
 
 ## Sicherer Ersttest
 
@@ -59,16 +62,19 @@ Diese Reihenfolge minimiert Risiko und hilft beim Eingrenzen:
 9. `Sonnenblende`
 10. `Kofferraum`
 11. `Fensteraktion`
+12. `leapmotor.send_destination` mit einem bewusst gewaehlten Ziel
 
 ## Vorsichtsregeln
 
 - Immer nur genau eine Live-Aktion testen.
 - Nach jeder Aktion auf das Ergebnis am Fahrzeug warten.
-- `Kofferraum`, `Sonnenblende`, Klima und `Fensteraktion`
+- `Kofferraum`, `Sonnenblende`, Klima, `Fensteraktion` und Zielversand
   erst testen, wenn `Fahrzeug orten`, `Entriegeln` und `Verriegeln`
   sauber funktioniert haben.
 - `Fensteraktion` nur bewusst testen, weil die Semantik der
   beobachteten Fenster-Unteraktion noch nicht vollstaendig geklaert ist.
+- Zielversand nur bewusst testen, weil das Ziel direkt an die Fahrzeugnavigation
+  gesendet wird.
 
 ## Modellhinweis
 

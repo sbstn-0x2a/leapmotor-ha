@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Leapmotor verbinden",
-        "description": "Richtet Leapmotor-Fahrzeugdaten ein. App-Zertifikat und App-Private-Key sind fuer den Login erforderlich; hier einfuegen oder app_cert.pem/app_key.pem vorher im Integrationsordner ablegen. Die Fahrzeug-PIN ist optional; ohne PIN funktionieren nur Lesedaten, keine Fahrzeugsteuerung. Inoffizielle Integration: Nutzung auf eigenes Risiko; keine Haftung fuer Account-Sperren, API-Aenderungen oder Fahrzeugfolgen.",
+        "description": "Richtet Leapmotor-Fahrzeugdaten ein. App-Zertifikat und App-Private-Key sind für den Login erforderlich; hier einfügen oder app_cert.pem/app_key.pem vorher im Integrationsordner ablegen. Die Fahrzeug-PIN ist optional; ohne PIN funktionieren nur Lesedaten, keine Fahrzeugsteuerung. Inoffizielle Integration: Nutzung auf eigenes Risiko; keine Haftung für Account-Sperren, API-Änderungen oder Fahrzeugfolgen.",
         "data": {
           "username": "Benutzername / E-Mail",
           "password": "Passwort",
@@ -11,25 +11,25 @@
           "app_key_file": "App-Private-Key-Datei (erforderlich)",
           "app_cert_pem": "App-Zertifikat PEM (Fallback)",
           "app_key_pem": "App-Private-Key PEM (Fallback)",
-          "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
+          "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten"
         }
       },
       "init": {
         "title": "Leapmotor Optionen",
-        "description": "Zertifikatsmaterial, Fahrzeug-PIN und Aktualisierungsintervall nachtraeglich anpassen. App-Zertifikat/Private-Key sind fuer den Login erforderlich. Ohne PIN bleiben Steuerfunktionen deaktiviert.",
+        "description": "Zertifikatsmaterial, Fahrzeug-PIN und Aktualisierungsintervall nachträglich anpassen. App-Zertifikat/Private-Key sind für den Login erforderlich. Ohne PIN bleiben Steuerfunktionen deaktiviert.",
         "data": {
           "app_cert_file": "App-Zertifikatdatei (erforderlich)",
           "app_key_file": "App-Private-Key-Datei (erforderlich)",
           "app_cert_pem": "App-Zertifikat PEM (Fallback)",
           "app_key_pem": "App-Private-Key PEM (Fallback)",
-          "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
+          "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten"
         }
       },
       "certificates": {
         "title": "Leapmotor Zertifikate",
-        "description": "Erforderliches App-Zertifikat und Private-Key hochladen oder PEM-Inhalte einfuegen. Sie werden nur lokal in dieser Home-Assistant-Installation gespeichert und sind nicht im Public-Repo enthalten.",
+        "description": "Erforderliches App-Zertifikat und Private-Key hochladen oder PEM-Inhalte einfügen. Sie werden nur lokal in dieser Home-Assistant-Installation gespeichert und sind nicht im Public-Repo enthalten.",
         "data": {
           "app_cert_file": "App-Zertifikatdatei (erforderlich)",
           "app_key_file": "App-Private-Key-Datei (erforderlich)",
@@ -43,18 +43,20 @@
         "data": {
           "username": "Benutzername / E-Mail",
           "password": "Passwort",
-          "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
+          "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten"
         }
       }
     },
     "error": {
       "invalid_auth": "Anmeldung fehlgeschlagen.",
-      "account_cert_error": "Login war erfolgreich, aber das Konto-Zertifikat konnte nicht geoeffnet werden.",
+      "account_cert_error": "Login war erfolgreich, aber das Konto-Zertifikat konnte nicht geöffnet werden.",
       "cannot_connect": "Verbindung oder API-Abruf fehlgeschlagen.",
+      "api_refresh_failed": "Login war erfolgreich, aber der erste API-Abruf der Fahrzeugdaten ist fehlgeschlagen.",
+      "no_vehicle": "Dieses Konto hat kein verknüpftes Fahrzeug.",
       "unknown": "Unerwarteter Fehler.",
-      "missing_app_cert": "App-Zertifikat/Private-Key fehlen. Beide PEM-Werte einfuegen oder app_cert.pem und app_key.pem im Integrationsordner ablegen.",
-      "certificate_import_error": "Zertifikatsimport fehlgeschlagen. PEM-Zertifikat und Private-Key pruefen."
+      "missing_app_cert": "App-Zertifikat/Private-Key fehlen. Beide PEM-Werte einfügen oder app_cert.pem und app_key.pem im Integrationsordner ablegen.",
+      "certificate_import_error": "Zertifikatsimport fehlgeschlagen. PEM-Zertifikat und Private-Key prüfen."
     },
     "abort": {
       "already_configured": "Dieses Konto ist bereits eingerichtet."
@@ -83,8 +85,26 @@
       "charge_limit_percent": {
         "name": "Ladelimit"
       },
+      "charging_planned_start": {
+        "name": "Ladeplanung Start"
+      },
+      "charging_planned_end": {
+        "name": "Ladeplanung Ende"
+      },
+      "charging_planned_circulation": {
+        "name": "Ladeplanung Wiederholung"
+      },
+      "charging_plan_updated_at": {
+        "name": "Ladeplanung aktualisiert"
+      },
       "vehicle_state": {
         "name": "Fahrzeugstatus"
+      },
+      "last_successful_refresh": {
+        "name": "Zuletzt aktualisiert"
+      },
+      "total_mileage_km": {
+        "name": "Gesamtkilometer"
       },
       "tire_pressure_front_left_bar": {
         "name": "Reifendruck vorne links"
@@ -97,43 +117,69 @@
       },
       "tire_pressure_rear_right_bar": {
         "name": "Reifendruck hinten rechts"
-      },
-      "last_remote_control": {
-        "name": "Letzte Fahrzeugaktion"
       }
     },
     "binary_sensor": {
+      "is_charging": {
+        "name": "Lädt"
+      },
+      "charging_planned_weekly": {
+        "name": "Ladeplanung wöchentlich"
+      },
       "charging_planned_enabled": {
         "name": "Geplantes Laden"
       }
     },
+    "image": {
+      "vehicle_picture": {
+        "name": "Fahrzeugbild"
+      }
+    },
     "button": {
       "open_trunk": {
-        "name": "Kofferraum"
+        "name": "Kofferraum öffnen"
+      },
+      "close_trunk": {
+        "name": "Kofferraum schließen"
       },
       "find_vehicle": {
         "name": "Fahrzeug orten"
       },
       "sunshade_action": {
-        "name": "Sonnenblende"
+        "name": "Sonnenblende schließen"
+      },
+      "open_sunshade": {
+        "name": "Sonnenblende öffnen"
+      },
+      "close_sunshade": {
+        "name": "Sonnenblende schließen"
       },
       "battery_preheat": {
-        "name": "Batterie vorwaermen"
+        "name": "Batterie vorwärmen"
       },
       "windows": {
-        "name": "Fensteraktion"
+        "name": "Fenster öffnen"
+      },
+      "open_windows": {
+        "name": "Fenster öffnen"
+      },
+      "close_windows": {
+        "name": "Fenster schließen"
       },
       "ac_switch": {
-        "name": "A/C-Schalter"
+        "name": "Klima ausschalten"
       },
       "quick_cool": {
-        "name": "Schnelles Kuehlen"
+        "name": "Schnelles Kühlen"
       },
       "quick_heat": {
         "name": "Schnelles Beheizen"
       },
       "windshield_defrost": {
         "name": "Windschutzscheibe auftauen"
+      },
+      "refresh_data": {
+        "name": "Daten aktualisieren"
       }
     },
     "lock": {
@@ -145,20 +191,28 @@
       "location": {
         "name": "Standort"
       }
+    },
+    "number": {
+      "charge_limit_setting": {
+        "name": "Ladelimit einstellen"
+      }
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Leapmotor Optionen",
-        "description": "Zertifikatsmaterial, Fahrzeug-PIN und Aktualisierungsintervall nachtraeglich anpassen. App-Zertifikat/Private-Key sind fuer den Login erforderlich. Ohne PIN bleiben Steuerfunktionen deaktiviert.",
+        "description": "Zertifikatsmaterial, Fahrzeug-PIN und Aktualisierungsintervall nachträglich anpassen. App-Zertifikat/Private-Key sind für den Login erforderlich. Ohne PIN bleiben Steuerfunktionen deaktiviert.",
         "data": {
           "app_cert_file": "App-Zertifikatdatei (erforderlich)",
           "app_key_file": "App-Private-Key-Datei (erforderlich)",
           "app_cert_pem": "App-Zertifikat PEM (Fallback)",
           "app_key_pem": "App-Private-Key PEM (Fallback)",
-          "operation_password": "Fahrzeug-PIN (optional, fuer Steuerung)",
-          "scan_interval": "Aktualisierungsintervall in Minuten"
+          "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
+          "scan_interval": "Aktualisierungsintervall in Minuten",
+          "abrp_enabled": "ABRP Live-Daten aktivieren",
+          "abrp_api_key": "ABRP API-Key",
+          "abrp_token": "ABRP Generic Token"
         }
       }
     }

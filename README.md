@@ -19,12 +19,16 @@ It intentionally does not contain:
 
 - Home Assistant custom integration
 - Read-only vehicle entities
+- Static vehicle image entity from the official vehicle picture package
+- Mileage/energy-history summary sensors
 - Native Home Assistant lock entity
 - Device tracker from vehicle GPS position
 - Remote-control buttons for supported actions
+- Native Home Assistant services for supported remote actions
 - Options flow for vehicle PIN and update interval
 - Redacted diagnostics export
 - Multi-language translations
+- Multi-vehicle support for main-account and shared-car vehicles
 - Single Custom Component package with entity layer and backend/auth layer
 
 ## Important
@@ -52,6 +56,7 @@ Current reality:
 
 - the integration code still supports direct login with local certificate files
 - the internal backend path covers login, vehicle list, status, and remote commands
+- additional read-only calls cover total mileage and charging-plan details
 
 Expected local files inside `custom_components/leapmotor/`:
 
@@ -77,8 +82,47 @@ Without these files, direct authentication fails by design.
 - App certificate and app private key are required, but are not included in this repository
 - Vehicle PIN is optional for setup
 - Without the Vehicle PIN, the integration works in read-only mode
-- Remote-control actions stay unavailable until a Vehicle PIN is configured
+- Most remote-control actions stay unavailable until a Vehicle PIN is configured
+- `send_destination` does not require the Vehicle PIN, matching the observed app flow
 - Remote-control actions have a short cooldown to reduce accidental duplicate commands
+- If multiple vehicles are available, entities are created per VIN and services can target a vehicle by `vin` or a Leapmotor `entity_id`
+
+## Services
+
+The integration exposes these Home Assistant services under `leapmotor.*`:
+
+- `lock`
+- `unlock`
+- `trunk_open`
+- `trunk_close`
+- `find_car`
+- `sunshade_open`
+- `sunshade_close`
+- `battery_preheat`
+- `windows_open`
+- `windows_close`
+- `ac_switch` (climate off)
+- `quick_cool`
+- `quick_heat`
+- `windshield_defrost`
+- `send_destination`
+
+Each service accepts:
+
+- `vin` for direct vehicle targeting
+- `entity_id` as an optional shortcut to resolve the target vehicle from an existing Leapmotor entity
+
+`send_destination` additionally requires `name`, `latitude`, and `longitude`.
+`address` is optional and defaults to `name`.
+
+## Diagnostics
+
+In addition to the regular vehicle entities, the integration exposes:
+
+- redacted config-entry diagnostics for support/export
+- last remote-action status and error details
+- last API update status and error classification
+- optional raw candidate status signals for future mapping work
 
 ## FAQ
 
@@ -105,13 +149,15 @@ Whole kilometer values are exposed as integers so Home Assistant displays
 
 ## Roadmap
 
-1. Validate the single-component public install end-to-end on Home Assistant.
-2. Improve local certificate provisioning without publishing certificate material.
-3. Keep investigating a future login path that does not need local app certificate material.
+- Keep improving status mapping across more Leapmotor models.
+- Keep investigating a future login path that does not need local app certificate material.
+- Add more write features only after the exact app request, safety model, and permission behavior are verified.
 
 ## Legal
 
 This project is not affiliated with or endorsed by Leapmotor.
+See [LEGAL.md](LEGAL.md) and [SECURITY.md](SECURITY.md) before publishing logs,
+diagnostics, or modified builds.
 
 ## License
 

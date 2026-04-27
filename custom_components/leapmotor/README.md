@@ -20,10 +20,13 @@ Available data includes:
 - Battery percentage
 - Remaining range
 - Odometer
+- Static vehicle image from the official picture package (`carpic_for_tripsum.png`)
+- Total mileage summary from the mileage/energy endpoint
 - Vehicle lock as a native Home Assistant lock entity
 - Vehicle state as a readable status sensor
 - Interior and climate target temperatures
 - Charge limit
+- Scheduled charging window and recurrence details
 - Scheduled charging flag as a read-only binary sensor
 - Tire pressures
 - GPS location as a Home Assistant device tracker
@@ -37,6 +40,8 @@ Available data includes:
   - Quick heat
   - Windshield defrost
   - Window action
+- Native Home Assistant service `leapmotor.send_destination` for sending a
+  latitude/longitude destination to the vehicle navigation.
 
 ## Install
 
@@ -83,30 +88,63 @@ normal user install path.
 - App certificate/private key PEM: fallback paste fields if file upload is not
   convenient.
 - Vehicle PIN: optional; leave empty for read-only mode. Remote-control actions
-  require this PIN and stay unavailable without it.
+  usually require this PIN and stay unavailable without it. Sending a
+  destination does not require the PIN, matching the observed app flow.
 - Update interval: default `5` minutes
 
 After setup, the Vehicle PIN and update interval can be changed from the
 integration options without recreating the entry.
+
+## State Freshness
+
+- Lock state is treated conservatively. If the cloud vehicle timestamp is too
+  old, the lock falls back to `unknown` instead of showing a stale unlocked
+  state for hours.
+- Vehicle state and GPS location expose freshness metadata in entity
+  attributes and diagnostics so stale backend data is easier to identify.
+- Each vehicle also gets a `Refresh data` button to trigger an immediate poll
+  outside the normal 5-minute interval.
+- Home Assistant's own `x minutes ago` text often reflects the last state
+  change, not the last successful poll. Use the `Last refresh` sensor to see
+  when the integration actually fetched data successfully.
+
+## ABRP Live Data
+
+ABRP telemetry is optional and disabled by default. If enabled in the
+integration options, the integration sends one Generic Telemetry update after
+each successful Leapmotor poll.
+
+Required ABRP options:
+
+- ABRP API key
+- ABRP Generic token from the ABRP vehicle live-data setup
+
+The submitted telemetry includes state of charge, estimated range, charging
+state, odometer, speed fallback `0`, and GPS coordinates when available and not
+marked stale.
 
 ## Runtime Notes
 
 - Requires `curl` on the Home Assistant host/container.
 - Requires Python packages from `manifest.json`: `cryptography` and `requests`.
 - The integration uses the same API path verified by the reverse-engineered client.
-- Remote-control actions use the verified `operatePassword` flow and require a
-  configured Vehicle PIN.
+- Most remote-control actions use the verified `operatePassword` flow and
+  require a configured Vehicle PIN. `leapmotor.send_destination` uses the
+  observed app flow without `operatePassword`.
 - The account certificate password is derived internally and is no longer asked
   during setup. Known captured values remain as fallback only.
 - The integration exposes Home Assistant diagnostics with secrets redacted:
-  account state, vehicle metadata, raw status codes, last API codes, and last
-  remote-control result.
+  account state, vehicle metadata, raw status codes, mileage summary, vehicle
+  picture availability, last API codes, and last remote-control result.
+- The vehicle image no longer uses the generic `shareBindUrl` CDN fallback. It
+  now downloads the signed vehicle picture package once per picture key and
+  serves the extracted static image from the local Home Assistant cache.
 - A `Last vehicle action` sensor and action attributes show the latest
   remote-control status per VIN.
-- The component includes a local `logo.svg` asset for reuse, but Home Assistant
-  still does not automatically show local custom-integration brand assets in the
-  integration picker. Entity icons are included; the integration logo itself
-  only appears automatically for published brands/HACS-style branding flows.
+- The repository now includes HACS brand assets in `brand/icon.png` and
+  `brand/logo.png`. Home Assistant still does not automatically use arbitrary
+  local integration images in every UI location, so logo visibility depends on
+  the consumer (for example HACS branding vs. Devices & Services UI).
 - The current proof set is strongest on the C10. Main-account and shared-car
   handling are both implemented; feature availability may still vary by model,
   especially for climate, sunshade, trunk, and window actions.

@@ -7,15 +7,30 @@ from typing import Any
 from homeassistant.components.lock import LockEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .api import LeapmotorApiError
 from .const import DOMAIN
 from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name
+from .remote_helpers import RemoteActionSpec, async_execute_remote_action
+
+LOCK_ACTION = RemoteActionSpec(
+    action="lock",
+    translation_key="vehicle_lock",
+    icon="mdi:lock",
+    method_name="lock_vehicle",
+    service_name="lock",
+)
+
+UNLOCK_ACTION = RemoteActionSpec(
+    action="unlock",
+    translation_key="vehicle_lock",
+    icon="mdi:lock-open",
+    method_name="unlock_vehicle",
+    service_name="unlock",
+)
 
 
 async def async_setup_entry(
@@ -35,6 +50,7 @@ class LeapmotorVehicleLock(CoordinatorEntity[LeapmotorDataUpdateCoordinator], Lo
 
     _attr_has_entity_name = True
     _attr_translation_key = "vehicle_lock"
+    _attr_icon = "mdi:car-door-lock"
 
     def __init__(self, coordinator: LeapmotorDataUpdateCoordinator, vin: str) -> None:
         super().__init__(coordinator)
@@ -57,7 +73,7 @@ class LeapmotorVehicleLock(CoordinatorEntity[LeapmotorDataUpdateCoordinator], Lo
     @property
     def available(self) -> bool:
         """Return entity availability."""
-        return super().available and bool(self.vehicle_data["status"].get("is_locked") is not None)
+        return super().available
 
     @property
     def is_locked(self) -> bool | None:
@@ -79,6 +95,8 @@ class LeapmotorVehicleLock(CoordinatorEntity[LeapmotorDataUpdateCoordinator], Lo
             "is_shared": vehicle.get("is_shared"),
             "raw_lock_status_code": self.vehicle_data["status"].get("raw_lock_status_code"),
             "lock_state_source": self.vehicle_data["status"].get("lock_state_source", "cloud"),
+            "lock_state_age_seconds": self.vehicle_data["status"].get("lock_state_age_seconds"),
+            "lock_state_is_stale": self.vehicle_data["status"].get("lock_state_is_stale"),
             "operation_password_configured": bool(self.coordinator.client.operation_password),
             "last_remote_action": remote.get("action"),
             "last_remote_status": remote.get("status"),
@@ -89,52 +107,8 @@ class LeapmotorVehicleLock(CoordinatorEntity[LeapmotorDataUpdateCoordinator], Lo
 
     async def async_lock(self, **kwargs: Any) -> None:
         """Lock the vehicle."""
-        cooldown = self.coordinator.remote_action_cooldown_remaining(self.vin)
-        if cooldown:
-            raise HomeAssistantError(
-                f"Remote action cooldown active. Try again in {cooldown} seconds."
-            )
-        if not self.coordinator.client.operation_password:
-            raise HomeAssistantError(
-                "Vehicle PIN is not configured. Read-only lock state is available, "
-                "but lock control requires the PIN."
-            )
-        try:
-            result = await self.hass.async_add_executor_job(self.coordinator.client.lock_vehicle, self.vin)
-        except LeapmotorApiError as exc:
-            self.coordinator.record_remote_action(
-                self.vin,
-                "lock",
-                success=False,
-                error=str(exc),
-            )
-            raise HomeAssistantError(str(exc)) from exc
-        self.coordinator.record_remote_action(self.vin, "lock", success=True, result=result)
-        self.coordinator.set_lock_state_override(self.vin, True)
-        await self.coordinator.async_request_refresh()
+        await async_execute_remote_action(self.coordinator, self.vin, LOCK_ACTION)
 
     async def async_unlock(self, **kwargs: Any) -> None:
         """Unlock the vehicle."""
-        cooldown = self.coordinator.remote_action_cooldown_remaining(self.vin)
-        if cooldown:
-            raise HomeAssistantError(
-                f"Remote action cooldown active. Try again in {cooldown} seconds."
-            )
-        if not self.coordinator.client.operation_password:
-            raise HomeAssistantError(
-                "Vehicle PIN is not configured. Read-only lock state is available, "
-                "but unlock control requires the PIN."
-            )
-        try:
-            result = await self.hass.async_add_executor_job(self.coordinator.client.unlock_vehicle, self.vin)
-        except LeapmotorApiError as exc:
-            self.coordinator.record_remote_action(
-                self.vin,
-                "unlock",
-                success=False,
-                error=str(exc),
-            )
-            raise HomeAssistantError(str(exc)) from exc
-        self.coordinator.record_remote_action(self.vin, "unlock", success=True, result=result)
-        self.coordinator.set_lock_state_override(self.vin, False)
-        await self.coordinator.async_request_refresh()
+        await async_execute_remote_action(self.coordinator, self.vin, UNLOCK_ACTION)

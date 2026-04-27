@@ -89,6 +89,9 @@ class LeapmotorDeviceTracker(
             "is_shared": vehicle.get("is_shared"),
             "privacy_gps": location.get("privacy_gps"),
             "privacy_data": location.get("privacy_data"),
+            "location_source": location.get("location_source", "cloud"),
+            "location_age_seconds": location.get("location_age_seconds"),
+            "location_is_stale": location.get("location_is_stale"),
         }
 
     @property

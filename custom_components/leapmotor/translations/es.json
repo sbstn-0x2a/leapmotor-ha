@@ -83,8 +83,23 @@
       "charge_limit_percent": {
         "name": "Limite de carga"
       },
+      "charging_planned_start": {
+        "name": "Inicio de carga programada"
+      },
+      "charging_planned_end": {
+        "name": "Fin de carga programada"
+      },
+      "charging_planned_circulation": {
+        "name": "Repeticion de carga programada"
+      },
+      "charging_plan_updated_at": {
+        "name": "Carga programada actualizada"
+      },
       "vehicle_state": {
         "name": "Estado del vehiculo"
+      },
+      "total_mileage_km": {
+        "name": "Kilometraje total"
       },
       "tire_pressure_front_left_bar": {
         "name": "Presion neumatico delantero izquierdo"
@@ -97,14 +112,22 @@
       },
       "tire_pressure_rear_right_bar": {
         "name": "Presion neumatico trasero derecho"
-      },
-      "last_remote_control": {
-        "name": "Ultima accion del vehiculo"
       }
     },
     "binary_sensor": {
+      "is_charging": {
+        "name": "Cargando"
+      },
+      "charging_planned_weekly": {
+        "name": "Carga programada semanal"
+      },
       "charging_planned_enabled": {
         "name": "Carga programada"
+      }
+    },
+    "image": {
+      "vehicle_picture": {
+        "name": "Imagen del vehículo"
       }
     },
     "button": {
@@ -124,7 +147,7 @@
         "name": "Accion de ventanillas"
       },
       "ac_switch": {
-        "name": "Interruptor A/C"
+        "name": "Apagar climatizacion"
       },
       "quick_cool": {
         "name": "Enfriamiento rapido"
@@ -144,6 +167,11 @@
     "device_tracker": {
       "location": {
         "name": "Ubicacion"
+      }
+    },
+    "number": {
+      "charge_limit_setting": {
+        "name": "Ajustar limite de carga"
       }
     }
   },

@@ -25,6 +25,10 @@ _SENSITIVE_KEYS = {
     "signInfo",
     "gigyaSessionToken",
     "gigyaSessionSecret",
+    "car_picture_url",
+    "url",
+    "abrp_api_key",
+    "abrp_token",
 }
 
 
@@ -39,7 +43,10 @@ async def async_get_config_entry_diagnostics(
         for vin, vehicle_data in (coordinator.data.get("vehicles") or {}).items():
             vehicle = vehicle_data.get("vehicle") or {}
             status = vehicle_data.get("status") or {}
+            history = vehicle_data.get("history") or {}
+            media = vehicle_data.get("media") or {}
             remote = vehicle_data.get("remote_control") or {}
+            abrp = vehicle_data.get("abrp") or {}
             vehicles[_redact_vin(vin)] = {
                 "vehicle": {
                     "vin": _redact_vin(vin),
@@ -47,18 +54,38 @@ async def async_get_config_entry_diagnostics(
                     "car_type": vehicle.get("car_type"),
                     "nickname": vehicle.get("nickname"),
                     "is_shared": vehicle.get("is_shared"),
+                    "year": vehicle.get("year"),
+                    "rights": vehicle.get("rights"),
+                    "abilities": vehicle.get("abilities"),
+                    "module_rights": vehicle.get("module_rights"),
                 },
                 "status": {
                     "vehicle_state": status.get("vehicle_state"),
+                    "vehicle_state_source": status.get("vehicle_state_source"),
+                    "vehicle_state_age_seconds": status.get("vehicle_state_age_seconds"),
+                    "vehicle_state_is_stale": status.get("vehicle_state_is_stale"),
                     "is_parked": status.get("is_parked"),
                     "is_locked": status.get("is_locked"),
+                    "lock_state_source": status.get("lock_state_source"),
+                    "lock_state_age_seconds": status.get("lock_state_age_seconds"),
+                    "lock_state_is_stale": status.get("lock_state_is_stale"),
                     "raw_lock_status_code": status.get("raw_lock_status_code"),
                     "raw_charge_status_code": status.get("raw_charge_status_code"),
                     "raw_drive_status_code": status.get("raw_drive_status_code"),
                     "raw_vehicle_state_code": status.get("raw_vehicle_state_code"),
                     "last_vehicle_timestamp": status.get("last_vehicle_timestamp"),
                 },
+                "history": history,
+                "location": {
+                    "location_source": vehicle_data.get("location", {}).get("location_source"),
+                    "location_age_seconds": vehicle_data.get("location", {}).get("location_age_seconds"),
+                    "location_is_stale": vehicle_data.get("location", {}).get("location_is_stale"),
+                    "privacy_gps": vehicle_data.get("location", {}).get("privacy_gps"),
+                    "privacy_data": vehicle_data.get("location", {}).get("privacy_data"),
+                },
+                "media": _redact(media),
                 "remote_control": remote,
+                "abrp": _redact(abrp),
             }
 
     client = getattr(coordinator, "client", None) if coordinator else None
@@ -80,6 +107,7 @@ async def async_get_config_entry_diagnostics(
             "account_p12_password_source": getattr(client, "account_p12_password_source", None),
             "operation_password_configured": bool(getattr(client, "operation_password", None)),
             "last_api_results": getattr(client, "last_api_results", {}),
+            "integration_status": coordinator.integration_status if coordinator else None,
         },
         "vehicles": vehicles,
     }
