@@ -323,11 +323,13 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
                 {
                     "is_parked": status.get("is_parked"),
                     "vehicle_state_source": status.get("vehicle_state_source", "cloud"),
+                    "stale_vehicle_state": status.get("stale_vehicle_state"),
                     "vehicle_state_age_seconds": status.get("vehicle_state_age_seconds"),
                     "vehicle_state_is_stale": status.get("vehicle_state_is_stale"),
                     "raw_charge_status_code": status.get("raw_charge_status_code"),
                     "raw_drive_status_code": status.get("raw_drive_status_code"),
                     "raw_vehicle_state_code": status.get("raw_vehicle_state_code"),
+                    "raw_parked_status_code": status.get("raw_parked_status_code"),
                 }
             )
         if self.entity_description.key == "last_successful_refresh":

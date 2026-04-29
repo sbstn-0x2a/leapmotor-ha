@@ -217,7 +217,10 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
 
             status["vehicle_state_age_seconds"] = age_seconds
             status["vehicle_state_is_stale"] = is_stale
-            if is_stale and status.get("vehicle_state_source") == "raw_signal":
+            if is_stale:
+                status["stale_vehicle_state"] = status.get("vehicle_state")
+                status["vehicle_state"] = None
+                status["is_parked"] = None
                 status["vehicle_state_source"] = "cloud_stale"
 
             location["location_age_seconds"] = age_seconds

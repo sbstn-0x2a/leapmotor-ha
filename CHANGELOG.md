@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.15 - 2026-04-29
+
+- Fix vehicle-state mapping so confirmed fresh `1941=3` / `1944=2` drive
+  states are shown as `driving` even when the older parked flag remains set.
+- Hide stale vehicle-state values instead of showing outdated `parked` or
+  `driving` states as current, while keeping raw status codes in attributes.
+
 ## 0.5.14 - 2026-04-27
 
 - Make the approved logo/icon artwork transparent outside the vehicle graphic.

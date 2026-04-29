@@ -1244,6 +1244,7 @@ def normalize_vehicle(
     charge_plan = config.get("3") or {}
     mileage_data = (mileage_json or {}).get("data") or {}
     picture_data = (picture_json or {}).get("data") or {}
+    vehicle_state = _derive_vehicle_state(signal)
 
     return {
         "vehicle": {
@@ -1264,8 +1265,8 @@ def normalize_vehicle(
             "odometer_km": signal.get("1318"),
             "is_locked": _safe_int(signal.get("47")) == 0 if signal.get("47") is not None else None,
             "raw_lock_status_code": signal.get("47"),
-            "is_parked": _safe_int(signal.get("1298")) == 1 if signal.get("1298") is not None else None,
-            "vehicle_state": _derive_vehicle_state(signal),
+            "is_parked": vehicle_state == "parked" if vehicle_state is not None else None,
+            "vehicle_state": vehicle_state,
             "vehicle_state_source": "raw_signal",
             "raw_charge_status_code": signal.get("1939"),
             "raw_drive_status_code": signal.get("1941"),
@@ -1361,15 +1362,21 @@ def _to_bar(raw: Any) -> float | None:
 
 def _derive_vehicle_state(signal: dict[str, Any]) -> str | None:
     """Return the movement state independent from charging state."""
+    drive_status = _safe_int(signal.get("1941"))
+    vehicle_state = _safe_int(signal.get("1944"))
+
+    # Fresh recorder/app correlations:
+    # - 1941=3 / 1944=2 matched confirmed drives on 2026-04-28 and 2026-04-29.
+    # - `1298` can remain parked and must not override these movement states.
+    if drive_status in (3, 5) or vehicle_state in (2, 4, 5):
+        return "driving"
+    if drive_status in (1, 2, 4) or vehicle_state in (0, 1, 3):
+        return "parked"
+
     parked = _safe_int(signal.get("1298"))
     if parked == 1:
         return "parked"
-
-    drive_status = _safe_int(signal.get("1941"))
-    vehicle_state = _safe_int(signal.get("1944"))
-    if drive_status in (1, 2, 4) or vehicle_state in (0, 1, 3):
-        return "parked"
-    if drive_status in (3, 5) or vehicle_state in (2, 4, 5):
+    if parked == 0:
         return "driving"
 
     return None
