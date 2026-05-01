@@ -34,7 +34,14 @@ from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name
 
 PRESSURE_BAR = "bar"
-WHOLE_KILOMETER_KEYS = {"remaining_range_km", "odometer_km", "total_mileage_km"}
+ENERGY_KWH = "kWh"
+CONSUMPTION_KWH_PER_100KM = "kWh/100 km"
+WHOLE_KILOMETER_KEYS = {
+    "remaining_range_km",
+    "odometer_km",
+    "total_mileage_km",
+    "last_7_days_mileage_km",
+}
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -200,6 +207,79 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         value_fn=lambda data: data["history"].get("total_mileage_km"),
     ),
     LeapmotorSensorEntityDescription(
+        key="total_energy_kwh",
+        name="Gesamtenergieverbrauch",
+        native_unit_of_measurement=ENERGY_KWH,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=0,
+        icon="mdi:lightning-bolt",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["history"].get("total_energy_kwh"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="last_7_days_mileage_km",
+        name="Fahrleistung letzte 7 Tage",
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        device_class=SensorDeviceClass.DISTANCE,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
+        icon="mdi:calendar-week",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["history"].get("last_7_days_mileage_km"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="last_7_days_energy_kwh",
+        name="Energieverbrauch letzte 7 Tage",
+        native_unit_of_measurement=ENERGY_KWH,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        icon="mdi:calendar-week",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["history"].get("last_7_days_energy_kwh"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="average_consumption_6w_kwh_100km",
+        name="Durchschnittsverbrauch 6 Wochen",
+        native_unit_of_measurement=CONSUMPTION_KWH_PER_100KM,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        icon="mdi:chart-bar",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["history"].get("average_consumption_6w_kwh_100km"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="last_week_driving_energy_percent",
+        name="Fahrenergie letzte Woche",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        icon="mdi:car-electric",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["history"].get("last_week_driving_energy_percent"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="last_week_climate_energy_percent",
+        name="Klimaenergie letzte Woche",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        icon="mdi:air-conditioner",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["history"].get("last_week_climate_energy_percent"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="last_week_other_energy_percent",
+        name="Sonstige Energie letzte Woche",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        icon="mdi:lightning-bolt-outline",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["history"].get("last_week_other_energy_percent"),
+    ),
+    LeapmotorSensorEntityDescription(
         key="tire_pressure_front_left_bar",
         name="Reifendruck vorne links",
         native_unit_of_measurement=PRESSURE_BAR,
@@ -341,6 +421,27 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
                     "last_update_error_code": integration.get("last_update_error_code"),
                     "last_update_duration_seconds": integration.get("last_update_duration_seconds"),
                     "update_interval_seconds": integration.get("update_interval_seconds"),
+                }
+            )
+        if self.entity_description.key == "average_consumption_6w_kwh_100km":
+            history = self.vehicle_data["history"]
+            attributes.update(
+                {
+                    "consumption_rank": history.get("consumption_rank"),
+                    "weekly_consumption": history.get("weekly_consumption"),
+                }
+            )
+        if self.entity_description.key in {
+            "last_week_driving_energy_percent",
+            "last_week_climate_energy_percent",
+            "last_week_other_energy_percent",
+        }:
+            history = self.vehicle_data["history"]
+            attributes.update(
+                {
+                    "driving_energy_kwh": history.get("last_week_driving_energy_kwh"),
+                    "climate_energy_kwh": history.get("last_week_climate_energy_kwh"),
+                    "other_energy_kwh": history.get("last_week_other_energy_kwh"),
                 }
             )
         return attributes

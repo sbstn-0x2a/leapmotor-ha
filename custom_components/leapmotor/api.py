@@ -12,8 +12,10 @@ import subprocess
 import tempfile
 import time
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import requests
 import urllib3
@@ -389,6 +391,16 @@ class LeapmotorApiClient:
                 self.get_mileage_energy_detail,
                 vehicle,
             )
+            consumption_rank = self._fetch_optional_read(
+                "consumption weekly rank",
+                self.get_consumption_weekly_rank,
+                vehicle,
+            )
+            consumption_breakdown = self._fetch_optional_read(
+                "consumption last week breakdown",
+                self.get_consumption_last_week_breakdown,
+                vehicle,
+            )
             picture = self._fetch_optional_read(
                 "car picture",
                 self.get_car_picture,
@@ -399,6 +411,8 @@ class LeapmotorApiClient:
                 status,
                 self.user_id,
                 mileage_json=mileage,
+                consumption_rank_json=consumption_rank,
+                consumption_breakdown_json=consumption_breakdown,
                 picture_json=picture,
             )
         return result
@@ -473,7 +487,7 @@ class LeapmotorApiClient:
 
     def get_vehicle_status(self, vehicle: Vehicle) -> dict[str, Any]:
         """Fetch read-only status for one vehicle."""
-        car_type_path = vehicle.car_type.lower()
+        car_type_path = _vehicle_status_car_type_path(vehicle.car_type)
         headers = self._build_signed_headers(vin=vehicle.vin)
         headers.update(self._auth_headers(content_type="application/x-www-form-urlencoded"))
         response = self._post_with_curl(
@@ -486,15 +500,59 @@ class LeapmotorApiClient:
 
     def get_mileage_energy_detail(self, vehicle: Vehicle) -> dict[str, Any]:
         """Fetch read-only mileage and energy history summary."""
-        headers = self._build_signed_headers(vin=vehicle.vin)
+        begintime, endtime = _last_seven_day_window_ms()
+        headers = self._build_mileage_energy_detail_headers(
+            vin=vehicle.vin,
+            begintime=str(begintime),
+            endtime=str(endtime),
+        )
         headers.update(self._auth_headers(content_type="application/x-www-form-urlencoded"))
+        body = (
+            f"endtime={endtime}"
+            f"&begintime={begintime}"
+            f"&vin={requests.utils.quote(vehicle.vin, safe='')}"
+        )
         response = self._post_with_curl(
             path="/carownerservice/oversea/drivingRecord/v1/mileage/energy/detail",
             headers=headers,
-            data=f"vin={requests.utils.quote(vehicle.vin, safe='')}",
+            data=body,
             cert=self.account_cert,
         )
         return self._parse_api_body(response["status_code"], response["body"], "mileage energy detail")
+
+    def get_consumption_weekly_rank(self, vehicle: Vehicle) -> dict[str, Any]:
+        """Fetch read-only six-week energy consumption and ranking data."""
+        headers = self._build_consumption_weekly_rank_headers(carvin=vehicle.vin)
+        headers.update(self._auth_headers(content_type="application/x-www-form-urlencoded"))
+        response = self._post_with_curl(
+            path="/carownerservice/oversea/drivingRecord/v1/getLastNweeks100kmECAndRank",
+            headers=headers,
+            data=f"carvin={requests.utils.quote(vehicle.vin, safe='')}",
+            cert=self.account_cert,
+        )
+        return self._parse_api_body(response["status_code"], response["body"], "consumption weekly rank")
+
+    def get_consumption_last_week_breakdown(self, vehicle: Vehicle) -> dict[str, Any]:
+        """Fetch read-only last-week energy split by driving, A/C, and other."""
+        begintime, endtime = _previous_week_window_seconds()
+        headers = self._build_consumption_last_week_headers(
+            carvin=vehicle.vin,
+            begintime=str(begintime),
+            endtime=str(endtime),
+        )
+        headers.update(self._auth_headers(content_type="application/x-www-form-urlencoded"))
+        body = (
+            f"endtime={endtime}"
+            f"&begintime={begintime}"
+            f"&carvin={requests.utils.quote(vehicle.vin, safe='')}"
+        )
+        response = self._post_with_curl(
+            path="/carownerservice/oversea/drivingRecord/v1/getLastweekEC",
+            headers=headers,
+            data=body,
+            cert=self.account_cert,
+        )
+        return self._parse_api_body(response["status_code"], response["body"], "consumption last week breakdown")
 
     def get_car_picture(self, vehicle: Vehicle) -> dict[str, Any]:
         """Fetch read-only car picture metadata."""
@@ -903,6 +961,100 @@ class LeapmotorApiClient:
             "sign": hmac.new(self.sign_key, sign_input.encode("utf-8"), hashlib.sha256).hexdigest(),
         }
 
+    def _build_consumption_weekly_rank_headers(self, *, carvin: str) -> dict[str, str]:
+        """Build the signature variant used by getLastNweeks100kmECAndRank."""
+        nonce = str(random.randint(100000, 9999999))
+        timestamp = str(int(time.time() * 1000))
+        sign_input = "".join(
+            [
+                DEFAULT_LANGUAGE,
+                carvin,
+                DEFAULT_CHANNEL,
+                self.device_id,
+                DEFAULT_DEVICE_TYPE,
+                nonce,
+                DEFAULT_SOURCE,
+                timestamp,
+                DEFAULT_APP_VERSION,
+            ]
+        )
+        return self._signed_header_dict(nonce=nonce, timestamp=timestamp, sign_input=sign_input)
+
+    def _build_mileage_energy_detail_headers(
+        self,
+        *,
+        vin: str,
+        begintime: str,
+        endtime: str,
+    ) -> dict[str, str]:
+        """Build the signature variant used by mileage/energy/detail with date range."""
+        nonce = str(random.randint(100000, 9999999))
+        timestamp = str(int(time.time() * 1000))
+        sign_input = "".join(
+            [
+                DEFAULT_LANGUAGE,
+                begintime,
+                DEFAULT_CHANNEL,
+                self.device_id,
+                DEFAULT_DEVICE_TYPE,
+                endtime,
+                nonce,
+                DEFAULT_SOURCE,
+                timestamp,
+                DEFAULT_APP_VERSION,
+                vin,
+            ]
+        )
+        return self._signed_header_dict(nonce=nonce, timestamp=timestamp, sign_input=sign_input)
+
+    def _build_consumption_last_week_headers(
+        self,
+        *,
+        carvin: str,
+        begintime: str,
+        endtime: str,
+    ) -> dict[str, str]:
+        """Build the signature variant used by getLastweekEC."""
+        nonce = str(random.randint(100000, 9999999))
+        timestamp = str(int(time.time() * 1000))
+        sign_input = "".join(
+            [
+                DEFAULT_LANGUAGE,
+                begintime,
+                carvin,
+                DEFAULT_CHANNEL,
+                self.device_id,
+                DEFAULT_DEVICE_TYPE,
+                endtime,
+                nonce,
+                DEFAULT_SOURCE,
+                timestamp,
+                DEFAULT_APP_VERSION,
+            ]
+        )
+        return self._signed_header_dict(nonce=nonce, timestamp=timestamp, sign_input=sign_input)
+
+    def _signed_header_dict(
+        self,
+        *,
+        nonce: str,
+        timestamp: str,
+        sign_input: str,
+    ) -> dict[str, str]:
+        """Return common signed app headers for account-certificate requests."""
+        return {
+            "acceptLanguage": DEFAULT_LANGUAGE,
+            "channel": DEFAULT_CHANNEL,
+            "deviceType": DEFAULT_DEVICE_TYPE,
+            "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,
+            "source": DEFAULT_SOURCE,
+            "version": DEFAULT_APP_VERSION,
+            "nonce": nonce,
+            "deviceId": self.device_id,
+            "timestamp": timestamp,
+            "sign": hmac.new(self.sign_key, sign_input.encode("utf-8"), hashlib.sha256).hexdigest(),
+        }
+
     def _build_car_picture_headers(self, *, vin: str) -> dict[str, str]:
         """Build the signature variant used by vehicle/v1/carpicture/key."""
         nonce = str(random.randint(100000, 9999999))
@@ -1235,6 +1387,8 @@ def normalize_vehicle(
     user_id: str | None,
     *,
     mileage_json: dict[str, Any] | None = None,
+    consumption_rank_json: dict[str, Any] | None = None,
+    consumption_breakdown_json: dict[str, Any] | None = None,
     picture_json: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Normalize Leapmotor status payload into Home Assistant-friendly values."""
@@ -1243,8 +1397,15 @@ def normalize_vehicle(
     config = status_data.get("config") or {}
     charge_plan = config.get("3") or {}
     mileage_data = (mileage_json or {}).get("data") or {}
+    rank_data = (consumption_rank_json or {}).get("data") or {}
+    rank_result = rank_data.get("rankResult") or {}
+    weekly_ec = rank_data.get("weeklyEC") or []
+    breakdown_data = (consumption_breakdown_json or {}).get("data") or {}
     picture_data = (picture_json or {}).get("data") or {}
     vehicle_state = _derive_vehicle_state(signal)
+    tire_pressures = _tire_pressures_bar(vehicle.car_type, signal)
+    last_7_days_energy = _sum_detail_field(mileage_data.get("detail"), "accumulatedEnergyConsume")
+    last_week_split = _energy_breakdown_percentages(breakdown_data)
 
     return {
         "vehicle": {
@@ -1302,6 +1463,20 @@ def normalize_vehicle(
             "total_mileage_km": mileage_data.get("totalmileage"),
             "total_mileage_mi": _safe_float(mileage_data.get("totalmileageMile")),
             "delivery_days": mileage_data.get("deliveryDays"),
+            "total_energy_kwh": _safe_float(mileage_data.get("totalEnergy")),
+            "last_7_days_mileage_km": mileage_data.get("totalAccumulatedMileage"),
+            "last_7_days_mileage_mi": _safe_float(mileage_data.get("totalAccumulatedMileageMile")),
+            "last_7_days_energy_kwh": last_7_days_energy,
+            "average_consumption_6w_kwh_100km": _safe_float(rank_result.get("hundredKmEC")),
+            "average_consumption_6w_mi_kwh": _safe_float(rank_result.get("hundredMiKwhEC")),
+            "consumption_rank": rank_result.get("rank"),
+            "weekly_consumption": weekly_ec,
+            "last_week_driving_energy_kwh": _safe_float(breakdown_data.get("driverEC")),
+            "last_week_climate_energy_kwh": _safe_float(breakdown_data.get("acEC")),
+            "last_week_other_energy_kwh": _safe_float(breakdown_data.get("otherEC")),
+            "last_week_driving_energy_percent": last_week_split.get("driving"),
+            "last_week_climate_energy_percent": last_week_split.get("climate"),
+            "last_week_other_energy_percent": last_week_split.get("other"),
         },
         "media": {
             "car_picture_status": "available" if picture_data.get("key") else "unavailable",
@@ -1312,10 +1487,7 @@ def normalize_vehicle(
             "car_picture_whole_present": bool(picture_data.get("whole")),
         },
         "diagnostics": {
-            "tire_pressure_front_left_bar": _to_bar(signal.get("2667")),
-            "tire_pressure_front_right_bar": _to_bar(signal.get("2653")),
-            "tire_pressure_rear_left_bar": _to_bar(signal.get("2646")),
-            "tire_pressure_rear_right_bar": _to_bar(signal.get("2660")),
+            **tire_pressures,
             "raw_signal_1256": signal.get("1256"),
             "raw_signal_1257": signal.get("1257"),
             "raw_signal_1258": signal.get("1258"),
@@ -1328,8 +1500,113 @@ def normalize_vehicle(
             "raw_signal_1694": signal.get("1694"),
             "raw_signal_1695": signal.get("1695"),
             "raw_signal_1696": signal.get("1696"),
+            "raw_signal_1943": signal.get("1943"),
+            "raw_signal_2188": signal.get("2188"),
+            "raw_signal_3257": signal.get("3257"),
+            "raw_signal_6047": signal.get("6047"),
+            "raw_signal_6048": signal.get("6048"),
+            "raw_signal_100003": signal.get("100003"),
+            "raw_signal_100010": signal.get("100010"),
+            "raw_signal_100011": signal.get("100011"),
+            "raw_signal_100012": signal.get("100012"),
+            "raw_signal_100013": signal.get("100013"),
+            "raw_signal_100014": signal.get("100014"),
+            "raw_signal_100015": signal.get("100015"),
+            "raw_signal_100016": signal.get("100016"),
+            "raw_signal_100017": signal.get("100017"),
         },
         "raw_updated_at": time.time(),
+    }
+
+
+def _vehicle_status_car_type_path(car_type: str | None) -> str:
+    """Return the backend status path segment for a vehicle model."""
+    normalized = str(car_type or "C10").strip().lower()
+    if normalized == "b10":
+        # The international backend reports carType=B10 in the vehicle list,
+        # but the status endpoint is shared with C10.
+        return "c10"
+    return normalized or "c10"
+
+
+def _tire_pressures_bar(car_type: str | None, signal: dict[str, Any]) -> dict[str, float | None]:
+    """Return model-specific tire-pressure slot mapping."""
+    if str(car_type or "").strip().upper() == "B10":
+        return {
+            "tire_pressure_front_left_bar": _to_bar(signal.get("2646")),
+            "tire_pressure_front_right_bar": _to_bar(signal.get("2653")),
+            "tire_pressure_rear_left_bar": _to_bar(signal.get("2660")),
+            "tire_pressure_rear_right_bar": _to_bar(signal.get("2667")),
+        }
+    return {
+        "tire_pressure_front_left_bar": _to_bar(signal.get("2667")),
+        "tire_pressure_front_right_bar": _to_bar(signal.get("2653")),
+        "tire_pressure_rear_left_bar": _to_bar(signal.get("2646")),
+        "tire_pressure_rear_right_bar": _to_bar(signal.get("2660")),
+    }
+
+
+def _last_seven_day_window_ms() -> tuple[int, int]:
+    """Return the local app-style window used for 7-day mileage/energy detail."""
+    now = _berlin_now()
+    today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    start = today - timedelta(days=7)
+    end = today + timedelta(days=1) - timedelta(seconds=1)
+    return int(start.timestamp() * 1000), int(end.timestamp() * 1000)
+
+
+def _previous_week_window_seconds() -> tuple[int, int]:
+    """Return the previous Monday-Sunday window used by getLastweekEC."""
+    now = _berlin_now()
+    this_monday = (now - timedelta(days=now.weekday())).replace(
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
+    start = this_monday - timedelta(days=7)
+    end = this_monday - timedelta(seconds=1)
+    return int(start.timestamp()), int(end.timestamp())
+
+
+def _berlin_now() -> datetime:
+    """Return current time in the locale observed in the app traces."""
+    try:
+        return datetime.now(ZoneInfo("Europe/Berlin"))
+    except Exception:
+        return datetime.now().astimezone()
+
+
+def _sum_detail_field(detail: Any, field: str) -> float | None:
+    """Sum one numeric field from an API detail list."""
+    if not isinstance(detail, list):
+        return None
+    total = 0.0
+    found = False
+    for item in detail:
+        if not isinstance(item, dict):
+            continue
+        value = _safe_float(item.get(field))
+        if value is None:
+            continue
+        total += value
+        found = True
+    return total if found else None
+
+
+def _energy_breakdown_percentages(data: dict[str, Any]) -> dict[str, float | None]:
+    """Convert last-week kWh split values to percentages."""
+    values = {
+        "driving": _safe_float(data.get("driverEC")),
+        "climate": _safe_float(data.get("acEC")),
+        "other": _safe_float(data.get("otherEC")),
+    }
+    total = sum(value for value in values.values() if value is not None)
+    if total <= 0:
+        return {key: None for key in values}
+    return {
+        key: round(value * 100 / total, 1) if value is not None else None
+        for key, value in values.items()
     }
 
 

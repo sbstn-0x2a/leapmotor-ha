@@ -22,6 +22,9 @@ Available data includes:
 - Odometer
 - Static vehicle image from the official picture package (`carpic_for_tripsum.png`)
 - Total mileage summary from the mileage/energy endpoint
+- Consumption-screen data from the official app flow:
+  cumulative energy, last-7-days mileage/energy, six-week average consumption,
+  and last-week driving/climate/other energy split
 - Vehicle lock as a native Home Assistant lock entity
 - Vehicle state as a readable status sensor
 - Interior and climate target temperatures

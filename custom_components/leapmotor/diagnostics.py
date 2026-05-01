@@ -72,9 +72,11 @@ async def async_get_config_entry_diagnostics(
                     "raw_charge_status_code": status.get("raw_charge_status_code"),
                     "raw_drive_status_code": status.get("raw_drive_status_code"),
                     "raw_vehicle_state_code": status.get("raw_vehicle_state_code"),
+                    "raw_parked_status_code": status.get("raw_parked_status_code"),
                     "last_vehicle_timestamp": status.get("last_vehicle_timestamp"),
                 },
                 "history": history,
+                "diagnostics": _redact(vehicle_data.get("diagnostics") or {}),
                 "location": {
                     "location_source": vehicle_data.get("location", {}).get("location_source"),
                     "location_age_seconds": vehicle_data.get("location", {}).get("location_age_seconds"),

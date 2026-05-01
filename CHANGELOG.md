@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.17 - 2026-05-01
+
+- Add B10 support by routing `carType=B10` status requests through the
+  backend-compatible `c10` status endpoint.
+- Fix B10 tire-pressure slot mapping based on app Vehicle Health verification.
+- Expose additional B10 raw signal candidates in diagnostics for further
+  community validation.
+- Add verified consumption-screen read-only data from the official app flow:
+  cumulative energy, last-7-days mileage/energy, six-week kWh/100 km average,
+  and last-week driving/climate/other energy split.
+
 ## 0.5.16 - 2026-04-29
 
 - Restore app-aligned vehicle-state precedence: `1298` is the primary
