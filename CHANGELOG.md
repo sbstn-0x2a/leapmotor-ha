@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.18 - 2026-05-01
+
+- Fix the rolling 7-day energy sensor metadata so Home Assistant no longer
+  warns about an invalid `device_class=energy` / `state_class=measurement`
+  combination.
+
 ## 0.5.17 - 2026-05-01
 
 - Add B10 support by routing `carType=B10` status requests through the

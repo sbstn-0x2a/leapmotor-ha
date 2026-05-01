@@ -232,7 +232,6 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         key="last_7_days_energy_kwh",
         name="Energieverbrauch letzte 7 Tage",
         native_unit_of_measurement=ENERGY_KWH,
-        device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
         icon="mdi:calendar-week",
