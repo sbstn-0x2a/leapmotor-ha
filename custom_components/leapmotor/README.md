@@ -107,6 +107,9 @@ This public repository does not ship app certificate material.
 Normal setup path:
 
 - install the Custom Component
+- preferably create a second Leapmotor account and share the vehicle to it,
+  because using the same account in Home Assistant and the official app can log
+  the app out when the integration authenticates
 - provide local files as `/config/leapmotor/app_cert.pem` and
   `/config/leapmotor/app_key.pem`, or upload/paste them during setup/options
 - optionally enable ABRP live data and enter your ABRP Generic token

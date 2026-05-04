@@ -121,6 +121,105 @@
       },
       "tire_pressure_rear_right_bar": {
         "name": "Reifendruck hinten rechts"
+      },
+      "battery_percent_precise": {
+        "name": "Batterie präzise"
+      },
+      "wltp_max_range_km": {
+        "name": "CLTC Restreichweite"
+      },
+      "live_remaining_range_km": {
+        "name": "Live-Reichweite"
+      },
+      "range_mode": {
+        "name": "Reichweitenmodus"
+      },
+      "speed_kmh": {
+        "name": "Geschwindigkeit"
+      },
+      "gear": {
+        "name": "Gang"
+      },
+      "remaining_charge_minutes": {
+        "name": "Restladezeit"
+      },
+      "charging_power_kw": {
+        "name": "Ladeleistung"
+      },
+      "charging_current_a": {
+        "name": "Ladestrom"
+      },
+      "charging_voltage_v": {
+        "name": "Ladespannung"
+      },
+      "charging_connection_state": {
+        "name": "Ladeverbindung"
+      },
+      "battery_min_temp_c": {
+        "name": "Batterie Minimaltemperatur"
+      },
+      "battery_thermal_request": {
+        "name": "Batterie Thermomanagement"
+      },
+      "ptc_power_w": {
+        "name": "PTC-Leistung"
+      },
+      "parking_camera_state": {
+        "name": "Parkkamera-Status"
+      },
+      "climate_mode": {
+        "name": "Klimamodus"
+      },
+      "steering_wheel_heating_remaining_minutes": {
+        "name": "Lenkradheizung Restlaufzeit"
+      },
+      "driver_seat_heating_level": {
+        "name": "Sitzheizung Fahrer Stufe"
+      },
+      "passenger_seat_heating_level": {
+        "name": "Sitzheizung Beifahrer Stufe"
+      },
+      "driver_seat_ventilation_level": {
+        "name": "Sitzlüftung Fahrer Stufe"
+      },
+      "passenger_seat_ventilation_level": {
+        "name": "Sitzlüftung Beifahrer Stufe"
+      },
+      "speed_limit_kmh": {
+        "name": "Geschwindigkeitslimit"
+      },
+      "front_left_window_position_percent": {
+        "name": "Fenster vorne links Position"
+      },
+      "front_right_window_position_percent": {
+        "name": "Fenster vorne rechts Position"
+      },
+      "rear_left_window_position_percent": {
+        "name": "Fenster hinten links Position"
+      },
+      "rear_right_window_position_percent": {
+        "name": "Fenster hinten rechts Position"
+      },
+      "total_energy_kwh": {
+        "name": "Gesamtenergieverbrauch"
+      },
+      "last_7_days_mileage_km": {
+        "name": "Fahrleistung letzte 7 Tage"
+      },
+      "last_7_days_energy_kwh": {
+        "name": "Energieverbrauch letzte 7 Tage"
+      },
+      "average_consumption_6w_kwh_100km": {
+        "name": "Durchschnittsverbrauch 6 Wochen"
+      },
+      "last_week_driving_energy_percent": {
+        "name": "Fahrenergie letzte Woche"
+      },
+      "last_week_climate_energy_percent": {
+        "name": "Klimaenergie letzte Woche"
+      },
+      "last_week_other_energy_percent": {
+        "name": "Sonstige Energie letzte Woche"
       }
     },
     "binary_sensor": {
@@ -132,6 +231,96 @@
       },
       "charging_planned_enabled": {
         "name": "Geplantes Laden"
+      },
+      "is_plugged_in": {
+        "name": "Ladekabel eingesteckt"
+      },
+      "dc_cable_connected": {
+        "name": "DC-Ladekabel eingesteckt"
+      },
+      "remote_session_active": {
+        "name": "Remote-Session aktiv"
+      },
+      "vehicle_security_active": {
+        "name": "Fahrzeugsicherung aktiv"
+      },
+      "battery_heating": {
+        "name": "Batterieheizung"
+      },
+      "driver_door_open": {
+        "name": "Fahrertür"
+      },
+      "passenger_door_open": {
+        "name": "Beifahrertür"
+      },
+      "rear_left_door_open": {
+        "name": "Fondtür Fahrerseite"
+      },
+      "rear_right_door_open": {
+        "name": "Fondtür Beifahrerseite"
+      },
+      "trunk_open": {
+        "name": "Kofferraum"
+      },
+      "front_left_window_open": {
+        "name": "Fenster vorne links"
+      },
+      "front_right_window_open": {
+        "name": "Fenster vorne rechts"
+      },
+      "rear_left_window_open": {
+        "name": "Fenster hinten links"
+      },
+      "rear_right_window_open": {
+        "name": "Fenster hinten rechts"
+      },
+      "skylight_open": {
+        "name": "Panoramadach geöffnet"
+      },
+      "climate_on": {
+        "name": "Klima"
+      },
+      "fast_cooling_active": {
+        "name": "Schnelles Kühlen aktiv"
+      },
+      "fast_heating_active": {
+        "name": "Schnelles Heizen aktiv"
+      },
+      "windshield_defrosting": {
+        "name": "Frontscheibenheizung"
+      },
+      "rear_window_heating": {
+        "name": "Heckscheibenheizung"
+      },
+      "air_recirculation": {
+        "name": "Umluft"
+      },
+      "steering_wheel_heating": {
+        "name": "Lenkradheizung"
+      },
+      "left_mirror_heating": {
+        "name": "Spiegelheizung links"
+      },
+      "right_mirror_heating": {
+        "name": "Spiegelheizung rechts"
+      },
+      "speed_limit_enabled": {
+        "name": "Geschwindigkeitslimit aktiv"
+      },
+      "park_assist_enabled": {
+        "name": "Parkassistent aktiv"
+      },
+      "sentinel_mode": {
+        "name": "Sentinel-Modus"
+      },
+      "parking_photo": {
+        "name": "Parking Photo"
+      },
+      "fully_charged": {
+        "name": "Voll geladen"
+      },
+      "is_regening": {
+        "name": "Rekuperation"
       }
     },
     "image": {

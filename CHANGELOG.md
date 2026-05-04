@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.26 - 2026-05-04
+
+- Keep English entity IDs from the registry migration, but restore localized
+  friendly names by switching sensor and binary-sensor entities to
+  `translation_key` based names.
+- Complete English/German entity translations for all sensor and binary-sensor
+  entities.
+- Document the recommended setup with a second Leapmotor account and shared
+  vehicle to avoid logging the official app out.
+
 ## 0.5.25 - 2026-05-04
 
 - Add an automatic Entity Registry migration for existing Leapmotor entries:

@@ -90,16 +90,16 @@
         "name": "Charge limit"
       },
       "charging_planned_start": {
-        "name": "Scheduled charging start"
+        "name": "Charging schedule start"
       },
       "charging_planned_end": {
-        "name": "Scheduled charging end"
+        "name": "Charging schedule end"
       },
       "charging_planned_circulation": {
-        "name": "Scheduled charging recurrence"
+        "name": "Charging schedule recurrence"
       },
       "charging_plan_updated_at": {
-        "name": "Charging plan updated"
+        "name": "Charging schedule updated"
       },
       "vehicle_state": {
         "name": "Vehicle state"
@@ -111,16 +111,115 @@
         "name": "Total mileage"
       },
       "tire_pressure_front_left_bar": {
-        "name": "Tire pressure front left"
+        "name": "Front left tire pressure"
       },
       "tire_pressure_front_right_bar": {
-        "name": "Tire pressure front right"
+        "name": "Front right tire pressure"
       },
       "tire_pressure_rear_left_bar": {
-        "name": "Tire pressure rear left"
+        "name": "Rear left tire pressure"
       },
       "tire_pressure_rear_right_bar": {
-        "name": "Tire pressure rear right"
+        "name": "Rear right tire pressure"
+      },
+      "battery_percent_precise": {
+        "name": "Precise battery"
+      },
+      "wltp_max_range_km": {
+        "name": "CLTC remaining range"
+      },
+      "live_remaining_range_km": {
+        "name": "Live range"
+      },
+      "range_mode": {
+        "name": "Range mode"
+      },
+      "speed_kmh": {
+        "name": "Speed"
+      },
+      "gear": {
+        "name": "Gear"
+      },
+      "remaining_charge_minutes": {
+        "name": "Remaining charge time"
+      },
+      "charging_power_kw": {
+        "name": "Charging power"
+      },
+      "charging_current_a": {
+        "name": "Charging current"
+      },
+      "charging_voltage_v": {
+        "name": "Charging voltage"
+      },
+      "charging_connection_state": {
+        "name": "Charging connection"
+      },
+      "battery_min_temp_c": {
+        "name": "Battery minimum temperature"
+      },
+      "battery_thermal_request": {
+        "name": "Battery thermal request"
+      },
+      "ptc_power_w": {
+        "name": "PTC power"
+      },
+      "parking_camera_state": {
+        "name": "Parking camera state"
+      },
+      "climate_mode": {
+        "name": "Climate mode"
+      },
+      "steering_wheel_heating_remaining_minutes": {
+        "name": "Steering wheel heating remaining time"
+      },
+      "driver_seat_heating_level": {
+        "name": "Driver seat heating level"
+      },
+      "passenger_seat_heating_level": {
+        "name": "Passenger seat heating level"
+      },
+      "driver_seat_ventilation_level": {
+        "name": "Driver seat ventilation level"
+      },
+      "passenger_seat_ventilation_level": {
+        "name": "Passenger seat ventilation level"
+      },
+      "speed_limit_kmh": {
+        "name": "Speed limit"
+      },
+      "front_left_window_position_percent": {
+        "name": "Front left window position"
+      },
+      "front_right_window_position_percent": {
+        "name": "Front right window position"
+      },
+      "rear_left_window_position_percent": {
+        "name": "Rear left window position"
+      },
+      "rear_right_window_position_percent": {
+        "name": "Rear right window position"
+      },
+      "total_energy_kwh": {
+        "name": "Total energy consumption"
+      },
+      "last_7_days_mileage_km": {
+        "name": "Last 7 days mileage"
+      },
+      "last_7_days_energy_kwh": {
+        "name": "Last 7 days energy"
+      },
+      "average_consumption_6w_kwh_100km": {
+        "name": "6-week average consumption"
+      },
+      "last_week_driving_energy_percent": {
+        "name": "Last week driving energy"
+      },
+      "last_week_climate_energy_percent": {
+        "name": "Last week climate energy"
+      },
+      "last_week_other_energy_percent": {
+        "name": "Last week other energy"
       }
     },
     "binary_sensor": {
@@ -128,10 +227,100 @@
         "name": "Charging"
       },
       "charging_planned_weekly": {
-        "name": "Scheduled charging weekly"
+        "name": "Weekly charging schedule"
       },
       "charging_planned_enabled": {
         "name": "Scheduled charging"
+      },
+      "is_plugged_in": {
+        "name": "Charge cable plugged in"
+      },
+      "is_regening": {
+        "name": "Regenerative braking"
+      },
+      "dc_cable_connected": {
+        "name": "DC charge cable plugged in"
+      },
+      "remote_session_active": {
+        "name": "Remote session active"
+      },
+      "vehicle_security_active": {
+        "name": "Vehicle security active"
+      },
+      "battery_heating": {
+        "name": "Battery heating"
+      },
+      "driver_door_open": {
+        "name": "Driver door"
+      },
+      "passenger_door_open": {
+        "name": "Passenger door"
+      },
+      "rear_left_door_open": {
+        "name": "Rear left door"
+      },
+      "rear_right_door_open": {
+        "name": "Rear right door"
+      },
+      "trunk_open": {
+        "name": "Trunk"
+      },
+      "front_left_window_open": {
+        "name": "Front left window"
+      },
+      "front_right_window_open": {
+        "name": "Front right window"
+      },
+      "rear_left_window_open": {
+        "name": "Rear left window"
+      },
+      "rear_right_window_open": {
+        "name": "Rear right window"
+      },
+      "skylight_open": {
+        "name": "Skylight open"
+      },
+      "climate_on": {
+        "name": "Climate"
+      },
+      "fast_cooling_active": {
+        "name": "Fast cooling active"
+      },
+      "fast_heating_active": {
+        "name": "Fast heating active"
+      },
+      "windshield_defrosting": {
+        "name": "Windshield defrost"
+      },
+      "rear_window_heating": {
+        "name": "Rear window heating"
+      },
+      "air_recirculation": {
+        "name": "Air recirculation"
+      },
+      "steering_wheel_heating": {
+        "name": "Steering wheel heating"
+      },
+      "left_mirror_heating": {
+        "name": "Left mirror heating"
+      },
+      "right_mirror_heating": {
+        "name": "Right mirror heating"
+      },
+      "speed_limit_enabled": {
+        "name": "Speed limit active"
+      },
+      "park_assist_enabled": {
+        "name": "Park assist active"
+      },
+      "sentinel_mode": {
+        "name": "Sentinel mode"
+      },
+      "parking_photo": {
+        "name": "Parking Photo"
+      },
+      "fully_charged": {
+        "name": "Fully charged"
       }
     },
     "image": {

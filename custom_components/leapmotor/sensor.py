@@ -57,7 +57,7 @@ class LeapmotorSensorEntityDescription(SensorEntityDescription):
 SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     LeapmotorSensorEntityDescription(
         key="battery_percent",
-        name="Battery",
+        translation_key="battery_percent",
         native_unit_of_measurement=PERCENTAGE,
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
@@ -65,7 +65,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="battery_percent_precise",
-        name="Precise battery",
+        translation_key="battery_percent_precise",
         native_unit_of_measurement=PERCENTAGE,
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
@@ -75,7 +75,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="remaining_range_km",
-        name="Range",
+        translation_key="remaining_range_km",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         device_class=SensorDeviceClass.DISTANCE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -85,7 +85,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="wltp_max_range_km",
-        name="CLTC remaining range",
+        translation_key="wltp_max_range_km",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         device_class=SensorDeviceClass.DISTANCE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -96,7 +96,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="live_remaining_range_km",
-        name="Live range",
+        translation_key="live_remaining_range_km",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         device_class=SensorDeviceClass.DISTANCE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -107,14 +107,14 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="range_mode",
-        name="Range mode",
+        translation_key="range_mode",
         icon="mdi:map-clock",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["status"].get("range_mode"),
     ),
     LeapmotorSensorEntityDescription(
         key="odometer_km",
-        name="Odometer",
+        translation_key="odometer_km",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         device_class=SensorDeviceClass.DISTANCE,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -124,7 +124,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="speed_kmh",
-        name="Speed",
+        translation_key="speed_kmh",
         native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
         device_class=SensorDeviceClass.SPEED,
         state_class=SensorStateClass.MEASUREMENT,
@@ -135,14 +135,14 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="gear",
-        name="Gear",
+        translation_key="gear",
         icon="mdi:car-shift-pattern",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["status"].get("gear"),
     ),
     LeapmotorSensorEntityDescription(
         key="interior_temp_c",
-        name="Interior temperature",
+        translation_key="interior_temp_c",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -150,7 +150,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="climate_set_temp_left_c",
-        name="Target temperature left",
+        translation_key="climate_set_temp_left_c",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -158,7 +158,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="climate_set_temp_right_c",
-        name="Target temperature right",
+        translation_key="climate_set_temp_right_c",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -166,7 +166,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="charge_limit_percent",
-        name="Charge limit",
+        translation_key="charge_limit_percent",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery-sync",
@@ -174,7 +174,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="remaining_charge_minutes",
-        name="Remaining charge time",
+        translation_key="remaining_charge_minutes",
         native_unit_of_measurement=UnitOfTime.MINUTES,
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.MEASUREMENT,
@@ -183,7 +183,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="charging_power_kw",
-        name="Charging power",
+        translation_key="charging_power_kw",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -193,7 +193,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="charging_current_a",
-        name="Charging current",
+        translation_key="charging_current_a",
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
@@ -203,7 +203,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="charging_voltage_v",
-        name="Charging voltage",
+        translation_key="charging_voltage_v",
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -213,13 +213,13 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="charging_connection_state",
-        name="Charging connection",
+        translation_key="charging_connection_state",
         icon="mdi:ev-plug-type2",
         value_fn=lambda data: data["charging"].get("connection_state"),
     ),
     LeapmotorSensorEntityDescription(
         key="battery_min_temp_c",
-        name="Battery minimum temperature",
+        translation_key="battery_min_temp_c",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -229,7 +229,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="battery_thermal_request",
-        name="Battery thermal request",
+        translation_key="battery_thermal_request",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery-heart",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -237,7 +237,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="ptc_power_w",
-        name="PTC power",
+        translation_key="ptc_power_w",
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -247,55 +247,55 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="parking_camera_state",
-        name="Parking camera state",
+        translation_key="parking_camera_state",
         icon="mdi:camera-rear",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["diagnostics"].get("parking_camera_state"),
     ),
     LeapmotorSensorEntityDescription(
         key="charging_planned_start",
-        name="Charging schedule start",
+        translation_key="charging_planned_start",
         icon="mdi:clock-start",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["charging"].get("charging_planned_start"),
     ),
     LeapmotorSensorEntityDescription(
         key="charging_planned_end",
-        name="Charging schedule end",
+        translation_key="charging_planned_end",
         icon="mdi:clock-end",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["charging"].get("charging_planned_end"),
     ),
     LeapmotorSensorEntityDescription(
         key="charging_planned_circulation",
-        name="Charging schedule recurrence",
+        translation_key="charging_planned_circulation",
         icon="mdi:calendar-sync",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["charging"].get("charging_planned_circulation"),
     ),
     LeapmotorSensorEntityDescription(
         key="charging_plan_updated_at",
-        name="Charging schedule updated",
+        translation_key="charging_plan_updated_at",
         icon="mdi:calendar-edit",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["charging"].get("charging_plan_updated_at"),
     ),
     LeapmotorSensorEntityDescription(
         key="vehicle_state",
-        name="Vehicle state",
+        translation_key="vehicle_state",
         icon="mdi:car-info",
         value_fn=lambda data: data["status"].get("vehicle_state"),
     ),
     LeapmotorSensorEntityDescription(
         key="climate_mode",
-        name="Climate mode",
+        translation_key="climate_mode",
         icon="mdi:air-conditioner",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["diagnostics"].get("climate_mode"),
     ),
     LeapmotorSensorEntityDescription(
         key="steering_wheel_heating_remaining_minutes",
-        name="Steering wheel heating remaining time",
+        translation_key="steering_wheel_heating_remaining_minutes",
         native_unit_of_measurement=UnitOfTime.MINUTES,
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.MEASUREMENT,
@@ -305,7 +305,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="driver_seat_heating_level",
-        name="Driver seat heating level",
+        translation_key="driver_seat_heating_level",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:car-seat-heater",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -313,7 +313,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="passenger_seat_heating_level",
-        name="Passenger seat heating level",
+        translation_key="passenger_seat_heating_level",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:car-seat-heater",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -321,7 +321,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="driver_seat_ventilation_level",
-        name="Driver seat ventilation level",
+        translation_key="driver_seat_ventilation_level",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:car-seat-cooler",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -329,7 +329,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="passenger_seat_ventilation_level",
-        name="Passenger seat ventilation level",
+        translation_key="passenger_seat_ventilation_level",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:car-seat-cooler",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -337,7 +337,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="speed_limit_kmh",
-        name="Speed limit",
+        translation_key="speed_limit_kmh",
         native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
         device_class=SensorDeviceClass.SPEED,
         state_class=SensorStateClass.MEASUREMENT,
@@ -347,7 +347,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="front_left_window_position_percent",
-        name="Front left window position",
+        translation_key="front_left_window_position_percent",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:window-open-variant",
@@ -356,7 +356,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="front_right_window_position_percent",
-        name="Front right window position",
+        translation_key="front_right_window_position_percent",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:window-open-variant",
@@ -365,7 +365,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="rear_left_window_position_percent",
-        name="Rear left window position",
+        translation_key="rear_left_window_position_percent",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:window-open-variant",
@@ -374,7 +374,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="rear_right_window_position_percent",
-        name="Rear right window position",
+        translation_key="rear_right_window_position_percent",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:window-open-variant",
@@ -383,7 +383,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="last_successful_refresh",
-        name="Last refresh",
+        translation_key="last_successful_refresh",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:clock-check-outline",
@@ -393,7 +393,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="total_mileage_km",
-        name="Total mileage",
+        translation_key="total_mileage_km",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         device_class=SensorDeviceClass.DISTANCE,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -404,7 +404,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="total_energy_kwh",
-        name="Total energy consumption",
+        translation_key="total_energy_kwh",
         native_unit_of_measurement=ENERGY_KWH,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -415,7 +415,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="last_7_days_mileage_km",
-        name="Last 7 days mileage",
+        translation_key="last_7_days_mileage_km",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         device_class=SensorDeviceClass.DISTANCE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -426,7 +426,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="last_7_days_energy_kwh",
-        name="Last 7 days energy",
+        translation_key="last_7_days_energy_kwh",
         native_unit_of_measurement=ENERGY_KWH,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
@@ -436,7 +436,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="average_consumption_6w_kwh_100km",
-        name="6-week average consumption",
+        translation_key="average_consumption_6w_kwh_100km",
         native_unit_of_measurement=CONSUMPTION_KWH_PER_100KM,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
@@ -446,7 +446,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="last_week_driving_energy_percent",
-        name="Last week driving energy",
+        translation_key="last_week_driving_energy_percent",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
@@ -456,7 +456,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="last_week_climate_energy_percent",
-        name="Last week climate energy",
+        translation_key="last_week_climate_energy_percent",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
@@ -466,7 +466,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="last_week_other_energy_percent",
-        name="Last week other energy",
+        translation_key="last_week_other_energy_percent",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
@@ -476,7 +476,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="tire_pressure_front_left_bar",
-        name="Front left tire pressure",
+        translation_key="tire_pressure_front_left_bar",
         native_unit_of_measurement=PRESSURE_BAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -485,7 +485,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="tire_pressure_front_right_bar",
-        name="Front right tire pressure",
+        translation_key="tire_pressure_front_right_bar",
         native_unit_of_measurement=PRESSURE_BAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -494,7 +494,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="tire_pressure_rear_left_bar",
-        name="Rear left tire pressure",
+        translation_key="tire_pressure_rear_left_bar",
         native_unit_of_measurement=PRESSURE_BAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -503,7 +503,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
     ),
     LeapmotorSensorEntityDescription(
         key="tire_pressure_rear_right_bar",
-        name="Rear right tire pressure",
+        translation_key="tire_pressure_rear_right_bar",
         native_unit_of_measurement=PRESSURE_BAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,

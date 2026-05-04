@@ -109,6 +109,9 @@ Without these files, direct authentication fails by design.
 
 - Email and password are required
 - App certificate and app private key are required, but are not included in this repository
+- A dedicated second Leapmotor account with the vehicle shared to it is
+  recommended. Using the same account in Home Assistant and the official app
+  can log the app out when the integration authenticates.
 - Vehicle PIN is optional for setup
 - ABRP live data is optional during setup; users only need their ABRP Generic Token
 - Without the Vehicle PIN, the integration works in read-only mode
