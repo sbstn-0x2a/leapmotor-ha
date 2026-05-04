@@ -12,6 +12,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -38,6 +39,13 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[LeapmotorBinarySensorEntityDescription, ...] =
         value_fn=lambda data: data["charging"].get("is_charging"),
     ),
     LeapmotorBinarySensorEntityDescription(
+        key="is_plugged_in",
+        name="Ladekabel eingesteckt",
+        icon="mdi:ev-plug-type2",
+        device_class=BinarySensorDeviceClass.PLUG,
+        value_fn=lambda data: data["charging"].get("is_plugged_in"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
         key="charging_planned_enabled",
         name="Geplantes Laden",
         icon="mdi:calendar-clock",
@@ -48,6 +56,105 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[LeapmotorBinarySensorEntityDescription, ...] =
         name="Ladeplanung wöchentlich",
         icon="mdi:calendar-week",
         value_fn=lambda data: (data["charging"].get("charging_planned_cycles") or "") == "1,1,1,1,1,1,1",
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="remote_session_active",
+        name="Remote-Session aktiv",
+        icon="mdi:remote",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("remote_session_active"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="driver_door_open",
+        name="Fahrertür",
+        device_class=BinarySensorDeviceClass.DOOR,
+        value_fn=lambda data: data["diagnostics"].get("driver_door_open"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="passenger_door_open",
+        name="Beifahrertür",
+        device_class=BinarySensorDeviceClass.DOOR,
+        value_fn=lambda data: data["diagnostics"].get("passenger_door_open"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="rear_left_door_open",
+        name="Fondtür Fahrerseite",
+        device_class=BinarySensorDeviceClass.DOOR,
+        value_fn=lambda data: data["diagnostics"].get("rear_left_door_open"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="rear_right_door_open",
+        name="Fondtür Beifahrerseite",
+        device_class=BinarySensorDeviceClass.DOOR,
+        value_fn=lambda data: data["diagnostics"].get("rear_right_door_open"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="trunk_open",
+        name="Kofferraum",
+        device_class=BinarySensorDeviceClass.OPENING,
+        value_fn=lambda data: data["diagnostics"].get("trunk_open"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="climate_on",
+        name="Klima",
+        icon="mdi:air-conditioner",
+        value_fn=lambda data: data["diagnostics"].get("climate_on"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="fast_cooling_active",
+        name="Schnelles Kühlen aktiv",
+        icon="mdi:snowflake",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("fast_cooling_active"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="fast_heating_active",
+        name="Schnelles Heizen aktiv",
+        icon="mdi:heat-wave",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("fast_heating_active"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="windshield_defrosting",
+        name="Frontscheibenheizung",
+        icon="mdi:car-defrost-front",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("windshield_defrosting"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="rear_window_heating",
+        name="Heckscheibenheizung",
+        icon="mdi:car-defrost-rear",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("rear_window_heating"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="steering_wheel_heating",
+        name="Lenkradheizung",
+        icon="mdi:steering",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("steering_wheel_heating"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="left_mirror_heating",
+        name="Spiegelheizung links",
+        icon="mdi:car-side",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("left_mirror_heating"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="right_mirror_heating",
+        name="Spiegelheizung rechts",
+        icon="mdi:car-side",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("right_mirror_heating"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="speed_limit_enabled",
+        name="Geschwindigkeitslimit aktiv",
+        icon="mdi:speedometer",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("speed_limit_enabled"),
     ),
 )
 

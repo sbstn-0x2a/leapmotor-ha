@@ -21,7 +21,9 @@ It intentionally does not contain:
 - Read-only vehicle entities
 - Static vehicle image entity from the official vehicle picture package
 - Mileage/energy-history summary sensors
-- Native Home Assistant lock entity
+- Native Home Assistant lock entity for remote lock/unlock actions
+- Charge-cable plugged-in state and active-charging state
+- Door and trunk open states
 - Device tracker from vehicle GPS position
 - Remote-control buttons for supported actions
 - Native Home Assistant services for supported remote actions
@@ -111,8 +113,11 @@ Without these files, direct authentication fails by design.
 - Remote-control actions have a short cooldown to reduce accidental duplicate commands
 - If multiple vehicles are available, entities are created per VIN and services can target a vehicle by `vin` or a Leapmotor `entity_id`
 - The charging sensor reports active charging only. Plugged-in but stopped/idle
-  sessions stay `off` because the currently observed API signals do not
-  reliably distinguish plugged-in from unplugged when the car is not charging.
+  sessions stay `off`; use the separate charge-cable sensor for plugged-in
+  state.
+- Current cloud data does not expose a validated lock-state signal. The lock
+  entity remains available for remote lock/unlock commands, but the state is
+  conservative/unknown unless a recent command override is active.
 
 ## Services
 
@@ -156,6 +161,12 @@ In addition to the regular vehicle entities, the integration exposes:
 - last remote-action status and error details
 - last API update status and error classification
 - optional raw candidate status signals for future mapping work
+
+## Special Thanks
+
+Special thanks to [Toxo666](https://github.com/Toxo666) for validating and
+sharing additional Leapmotor raw-signal mappings across charging, doors,
+climate, heating, seating, range, and diagnostics.
 
 ## FAQ
 

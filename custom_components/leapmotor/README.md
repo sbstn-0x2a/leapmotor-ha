@@ -25,9 +25,14 @@ Available data includes:
 - Consumption-screen data from the official app flow:
   cumulative energy, last-7-days mileage/energy, six-week average consumption,
   and last-week driving/climate/other energy split
-- Vehicle lock as a native Home Assistant lock entity
+- Vehicle lock as a native Home Assistant lock entity for remote lock/unlock
+  actions
 - Vehicle state as a readable status sensor
+- Charge-cable plugged-in state and active-charging state
+- Door and trunk open states
 - Interior and climate target temperatures
+- Climate mode and climate/heating activity diagnostics
+- Seat heating/ventilation levels and mirror heating diagnostics
 - Charge limit
 - Scheduled charging window and recurrence details
 - Scheduled charging flag as a read-only binary sensor
@@ -131,9 +136,12 @@ integration options without recreating the entry.
 - Lock state is treated conservatively. If the cloud vehicle timestamp is too
   old, the lock falls back to `unknown` instead of showing a stale unlocked
   state for hours.
+- Current cloud data does not expose a validated lock-state signal. The lock
+  entity remains available for remote lock/unlock commands, but the state is
+  conservative/unknown unless a recent command override is active.
 - The `Lädt` binary sensor represents active charging only. Plugged-in but
-  stopped/idle sessions stay `off`; the currently observed API signals do not
-  reliably distinguish plugged-in from unplugged when the car is not charging.
+  stopped/idle sessions stay `off`; use the separate charge-cable sensor for
+  plugged-in state.
 - Vehicle state and GPS location expose freshness metadata in entity
   attributes and diagnostics so stale backend data is easier to identify.
 - Each vehicle also gets a `Refresh data` button to trigger an immediate poll
@@ -184,3 +192,9 @@ marked stale.
 - The current proof set is strongest on the C10. Main-account and shared-car
   handling are both implemented; feature availability may still vary by model,
   especially for climate, sunshade, trunk, and window actions.
+
+## Special Thanks
+
+Special thanks to [Toxo666](https://github.com/Toxo666) for validating and
+sharing additional Leapmotor raw-signal mappings across charging, doors,
+climate, heating, seating, range, and diagnostics.

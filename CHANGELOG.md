@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.19 - 2026-05-04
+
+- Correct signal `47` to charge-cable plugged-in state instead of lock state.
+- Add newly validated door, trunk, charging, climate, heating, seat, mirror,
+  speed-limit, and precise SOC/range signal entities.
+- Update vehicle-state and active-charging derivation from the latest validated
+  raw signal mapping.
+- Add community credit for Toxo666's signal-mapping work.
+
 ## 0.5.18 - 2026-05-01
 
 - Fix the rolling 7-day energy sensor metadata so Home Assistant no longer
