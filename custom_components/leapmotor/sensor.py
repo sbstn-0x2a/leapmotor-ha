@@ -33,6 +33,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name, load_localized_entity_names
+from .entity_migration import english_entity_slug
 
 PRESSURE_BAR = "bar"
 ENERGY_KWH = "kWh"
@@ -285,6 +286,30 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         translation_key="vehicle_state",
         icon="mdi:car-info",
         value_fn=lambda data: data["status"].get("vehicle_state"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="lock_state_source",
+        translation_key="lock_state_source",
+        icon="mdi:lock-question",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["status"].get("lock_state_source"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="lock_state_age_seconds",
+        translation_key="lock_state_age_seconds",
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        device_class=SensorDeviceClass.DURATION,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:timer-lock",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["status"].get("lock_state_age_seconds"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="raw_lock_status_code",
+        translation_key="raw_lock_status_code",
+        icon="mdi:code-tags",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["status"].get("raw_lock_status_code"),
     ),
     LeapmotorSensorEntityDescription(
         key="climate_mode",
@@ -581,6 +606,10 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
             description.translation_key or description.key,
             description.key.replace("_", " ").capitalize(),
         )
+        self._attr_suggested_object_id = _suggested_object_id(
+            vehicle,
+            english_entity_slug("sensor", description.key) or description.key,
+        )
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, vin)},
             manufacturer="Leapmotor",
@@ -645,6 +674,22 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
                     "raw_parked_status_code": status.get("raw_parked_status_code"),
                 }
             )
+        if self.entity_description.key in {
+            "lock_state_source",
+            "lock_state_age_seconds",
+            "raw_lock_status_code",
+        }:
+            status = self.vehicle_data["status"]
+            attributes.update(
+                {
+                    "is_locked": status.get("is_locked"),
+                    "lock_state_source": status.get("lock_state_source"),
+                    "lock_state_age_seconds": status.get("lock_state_age_seconds"),
+                    "lock_state_is_stale": status.get("lock_state_is_stale"),
+                    "raw_lock_status_code": status.get("raw_lock_status_code"),
+                    "last_vehicle_timestamp": status.get("last_vehicle_timestamp"),
+                }
+            )
         if self.entity_description.key == "last_successful_refresh":
             integration = self.coordinator.integration_status
             attributes.update(
@@ -691,6 +736,13 @@ def _whole_number_if_possible(value: Any) -> Any:
     if numeric.is_integer():
         return int(numeric)
     return value
+
+
+def _suggested_object_id(vehicle: dict[str, Any], slug: str) -> str:
+    """Return a stable English suggested object id independent from UI language."""
+    prefix = str(vehicle.get("car_type") or "leapmotor").strip().lower()
+    prefix = "".join(char if char.isalnum() else "_" for char in prefix).strip("_")
+    return f"{prefix or 'leapmotor'}_{slug}"
 
 
 def _coordinator_timestamp(value: Any) -> datetime | None:

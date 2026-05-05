@@ -15,6 +15,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name
+from .entity_migration import english_entity_slug
 
 
 async def async_setup_entry(
@@ -42,7 +43,11 @@ class LeapmotorDeviceTracker(
         self._attr_unique_id = f"{vin}_location"
         vehicle = self.vehicle_data["vehicle"]
         self._attr_has_entity_name = True
-        self._attr_name = "Location"
+        self._attr_translation_key = "location"
+        self._attr_suggested_object_id = _suggested_object_id(
+            vehicle,
+            english_entity_slug("device_tracker", "location") or "location",
+        )
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, vin)},
             manufacturer="Leapmotor",
@@ -107,3 +112,10 @@ def _to_float(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _suggested_object_id(vehicle: dict[str, Any], slug: str) -> str:
+    """Return a stable English suggested object id independent from UI language."""
+    prefix = str(vehicle.get("car_type") or "leapmotor").strip().lower()
+    prefix = "".join(char if char.isalnum() else "_" for char in prefix).strip("_")
+    return f"{prefix or 'leapmotor'}_{slug}"

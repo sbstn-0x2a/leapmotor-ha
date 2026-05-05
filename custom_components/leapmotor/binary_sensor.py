@@ -21,6 +21,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name, load_localized_entity_names
+from .entity_migration import english_entity_slug
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -300,6 +301,10 @@ class LeapmotorBinarySensor(
             description.translation_key or description.key,
             description.key.replace("_", " ").capitalize(),
         )
+        self._attr_suggested_object_id = _suggested_object_id(
+            vehicle,
+            english_entity_slug("binary_sensor", description.key) or description.key,
+        )
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, vin)},
             manufacturer="Leapmotor",
@@ -336,3 +341,10 @@ class LeapmotorBinarySensor(
             "car_type": vehicle.get("car_type"),
             "is_shared": vehicle.get("is_shared"),
         }
+
+
+def _suggested_object_id(vehicle: dict[str, Any], slug: str) -> str:
+    """Return a stable English suggested object id independent from UI language."""
+    prefix = str(vehicle.get("car_type") or "leapmotor").strip().lower()
+    prefix = "".join(char if char.isalnum() else "_" for char in prefix).strip("_")
+    return f"{prefix or 'leapmotor'}_{slug}"

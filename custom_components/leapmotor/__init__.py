@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from functools import partial
+import json
 import logging
+from pathlib import Path
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
@@ -78,6 +80,12 @@ SEND_DESTINATION_FIELDS = vol.Schema(
     }
 )
 
+EXPORT_DIAGNOSTICS_FIELDS = vol.Schema(
+    {
+        vol.Optional("filename"): str,
+    }
+)
+
 PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
@@ -126,6 +134,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await _async_register_services(hass)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    await async_migrate_entity_registry_to_english(
+        hass,
+        set(coordinator.data.get("vehicles") or {}),
+    )
     return True
 
 
@@ -297,6 +309,42 @@ async def _async_register_services(hass: HomeAssistant) -> None:
         )
         await coordinator.async_request_refresh()
 
+    async def handle_export_diagnostics(call: ServiceCall) -> None:
+        from .diagnostics import async_get_config_entry_diagnostics
+
+        domain_data = hass.data.get(DOMAIN) or {}
+        if not domain_data:
+            raise HomeAssistantError("No Leapmotor config entry is loaded.")
+
+        export: dict[str, object] = {
+            "created_at": datetime.now(UTC).isoformat(),
+            "entries": {},
+        }
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            if entry.entry_id not in domain_data:
+                continue
+            export["entries"][entry.entry_id] = await async_get_config_entry_diagnostics(
+                hass,
+                entry,
+            )
+
+        filename = str(call.data.get("filename") or "").strip()
+        if not filename:
+            timestamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+            filename = f"leapmotor-diagnostics-{timestamp}.json"
+        filename = Path(filename).name
+        if not filename.endswith(".json"):
+            filename = f"{filename}.json"
+
+        export_dir = Path(hass.config.path(STATIC_CERT_STORAGE_DIR))
+        export_path = export_dir / filename
+        await hass.async_add_executor_job(
+            _write_json_export,
+            export_path,
+            export,
+        )
+        _LOGGER.info("Exported redacted Leapmotor diagnostics to %s", export_path)
+
     def make_handler(service_action: str):
         async def _handler(call: ServiceCall) -> None:
             await handle_remote(service_action, call)
@@ -325,6 +373,13 @@ async def _async_register_services(hass: HomeAssistant) -> None:
         schema=SEND_DESTINATION_FIELDS,
     )
     _LOGGER.debug("Registered Leapmotor service %s.%s", DOMAIN, "send_destination")
+    hass.services.async_register(
+        DOMAIN,
+        "export_diagnostics",
+        handle_export_diagnostics,
+        schema=EXPORT_DIAGNOSTICS_FIELDS,
+    )
+    _LOGGER.debug("Registered Leapmotor service %s.%s", DOMAIN, "export_diagnostics")
 
 
 def _async_unregister_services(hass: HomeAssistant) -> None:
@@ -336,3 +391,14 @@ def _async_unregister_services(hass: HomeAssistant) -> None:
         hass.services.async_remove(DOMAIN, "set_charge_limit")
     if hass.services.has_service(DOMAIN, "send_destination"):
         hass.services.async_remove(DOMAIN, "send_destination")
+    if hass.services.has_service(DOMAIN, "export_diagnostics"):
+        hass.services.async_remove(DOMAIN, "export_diagnostics")
+
+
+def _write_json_export(path: Path, payload: object) -> None:
+    """Write a JSON export file from an executor thread."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )

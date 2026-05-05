@@ -16,6 +16,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name
+from .entity_migration import english_entity_slug
 from .remote_helpers import format_remote_error
 
 
@@ -57,6 +58,10 @@ class LeapmotorChargeLimitNumber(
         self.vin = vin
         self._attr_unique_id = f"{vin}_charge_limit_setting"
         vehicle = self.vehicle_data["vehicle"]
+        self._attr_suggested_object_id = _suggested_object_id(
+            vehicle,
+            english_entity_slug("number", "charge_limit_setting") or "charge_limit_setting",
+        )
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, vin)},
             manufacturer="Leapmotor",
@@ -127,3 +132,10 @@ class LeapmotorChargeLimitNumber(
             result=result,
         )
         await self.coordinator.async_request_refresh()
+
+
+def _suggested_object_id(vehicle: dict[str, Any], slug: str) -> str:
+    """Return a stable English suggested object id independent from UI language."""
+    prefix = str(vehicle.get("car_type") or "leapmotor").strip().lower()
+    prefix = "".join(char if char.isalnum() else "_" for char in prefix).strip("_")
+    return f"{prefix or 'leapmotor'}_{slug}"

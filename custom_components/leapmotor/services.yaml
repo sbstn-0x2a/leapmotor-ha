@@ -1,6 +1,6 @@
 lock:
   name: Lock vehicle
-  description: Lock a Leapmotor vehicle.
+  description: Lock a Leapmotor vehicle. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -16,7 +16,7 @@ lock:
         text:
 unlock:
   name: Unlock vehicle
-  description: Unlock a Leapmotor vehicle.
+  description: Unlock a Leapmotor vehicle. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -30,7 +30,7 @@ unlock:
         text:
 trunk_open:
   name: Open trunk
-  description: Open the trunk.
+  description: Open the trunk. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -44,7 +44,7 @@ trunk_open:
         text:
 trunk_close:
   name: Close trunk
-  description: Close the trunk.
+  description: Close the trunk. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -58,7 +58,7 @@ trunk_close:
         text:
 find_car:
   name: Find vehicle
-  description: Trigger the horn/find-vehicle action.
+  description: Trigger the horn/find-vehicle action. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -72,7 +72,7 @@ find_car:
         text:
 sunshade_open:
   name: Open sunshade
-  description: Open the sunshade. Optionally set a partial position from 0 to 10; omit for fully open.
+  description: Open the sunshade. Requires the configured Vehicle PIN. Optionally set a partial position from 0 to 10; omit for fully open.
   fields:
     value:
       name: Position
@@ -96,7 +96,7 @@ sunshade_open:
         text:
 sunshade_close:
   name: Close sunshade
-  description: Close the sunshade. Optionally set a partial position from 0 to 10; omit for fully closed.
+  description: Close the sunshade. Requires the configured Vehicle PIN. Optionally set a partial position from 0 to 10; omit for fully closed.
   fields:
     value:
       name: Position
@@ -120,7 +120,7 @@ sunshade_close:
         text:
 battery_preheat:
   name: Battery preheat
-  description: Trigger the verified battery preheat action.
+  description: Trigger the verified battery preheat action. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -134,7 +134,7 @@ battery_preheat:
         text:
 windows_open:
   name: Open windows
-  description: Open the windows. Optionally set a partial position from 0 to 100; omit for fully open.
+  description: Open the windows. Requires the configured Vehicle PIN. Optionally set a partial position from 0 to 100; omit for fully open.
   fields:
     value:
       name: Position
@@ -158,7 +158,7 @@ windows_open:
         text:
 windows_close:
   name: Close windows
-  description: Close the windows. Optionally set a partial position from 0 to 100; omit for fully closed.
+  description: Close the windows. Requires the configured Vehicle PIN. Optionally set a partial position from 0 to 100; omit for fully closed.
   fields:
     value:
       name: Position
@@ -182,7 +182,7 @@ windows_close:
         text:
 ac_switch:
   name: Climate off
-  description: Turn climate control off with the verified normal profile.
+  description: Turn climate control off with the verified normal profile. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -196,7 +196,7 @@ ac_switch:
         text:
 quick_cool:
   name: Quick cool
-  description: Trigger the verified quick-cool profile.
+  description: Trigger the verified quick-cool profile. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -210,7 +210,7 @@ quick_cool:
         text:
 quick_heat:
   name: Quick heat
-  description: Trigger the verified quick-heat profile.
+  description: Trigger the verified quick-heat profile. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -224,7 +224,7 @@ quick_heat:
         text:
 windshield_defrost:
   name: Windshield defrost
-  description: Trigger the verified windshield-defrost profile.
+  description: Trigger the verified windshield-defrost profile. Requires the configured Vehicle PIN.
   fields:
     vin:
       name: VIN
@@ -238,7 +238,7 @@ windshield_defrost:
         text:
 set_charge_limit:
   name: Set charge limit
-  description: Set the charging upper limit while preserving the current charging schedule from the vehicle.
+  description: Set the charging upper limit while preserving the current charging schedule from the vehicle. Requires the configured Vehicle PIN.
   fields:
     charge_limit_percent:
       name: Charge limit
@@ -262,7 +262,7 @@ set_charge_limit:
         text:
 send_destination:
   name: Send destination
-  description: Send a navigation destination to the vehicle.
+  description: Send a navigation destination to the vehicle. Does not require the Vehicle PIN.
   fields:
     name:
       name: Destination name
@@ -308,3 +308,13 @@ send_destination:
       selector:
         entity:
           integration: leapmotor
+export_diagnostics:
+  name: Export diagnostics
+  description: Write a redacted Leapmotor diagnostics JSON file to /config/leapmotor.
+  fields:
+    filename:
+      name: Filename
+      description: Optional JSON filename. Directory components are ignored.
+      example: leapmotor-diagnostics.json
+      selector:
+        text:

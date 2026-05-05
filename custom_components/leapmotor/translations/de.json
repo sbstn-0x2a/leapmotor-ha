@@ -26,7 +26,9 @@
           "app_cert_pem": "app_cert.pem PEM einfügen (Zertifikat)",
           "app_key_pem": "app_key.pem PEM einfügen (Private Key)",
           "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
-          "scan_interval": "Aktualisierungsintervall in Minuten"
+          "scan_interval": "Aktualisierungsintervall in Minuten",
+          "abrp_enabled": "ABRP Live-Daten aktivieren",
+          "abrp_token": "ABRP Generic Token"
         }
       },
       "certificates": {
@@ -229,6 +231,15 @@
       },
       "last_message_time": {
         "name": "Zeitpunkt letzte Nachricht"
+      },
+      "lock_state_source": {
+        "name": "Verriegelung Quelle"
+      },
+      "lock_state_age_seconds": {
+        "name": "Verriegelung Alter"
+      },
+      "raw_lock_status_code": {
+        "name": "Verriegelung Rohwert"
       }
     },
     "binary_sensor": {

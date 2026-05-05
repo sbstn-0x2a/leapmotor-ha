@@ -26,7 +26,9 @@
           "app_cert_pem": "Paste app_cert.pem PEM (certificate)",
           "app_key_pem": "Paste app_key.pem PEM (private key)",
           "operation_password": "Vehicle PIN (optional, for control)",
-          "scan_interval": "Update interval in minutes"
+          "scan_interval": "Update interval in minutes",
+          "abrp_enabled": "Enable ABRP live data",
+          "abrp_token": "ABRP Generic token"
         }
       },
       "certificates": {
@@ -229,6 +231,15 @@
       },
       "last_message_time": {
         "name": "Last message time"
+      },
+      "lock_state_source": {
+        "name": "Lock state source"
+      },
+      "lock_state_age_seconds": {
+        "name": "Lock state age"
+      },
+      "raw_lock_status_code": {
+        "name": "Raw lock status code"
       }
     },
     "binary_sensor": {

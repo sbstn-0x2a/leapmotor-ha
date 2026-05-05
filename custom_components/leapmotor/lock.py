@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name
+from .entity_migration import english_entity_slug
 from .remote_helpers import RemoteActionSpec, async_execute_remote_action
 
 LOCK_ACTION = RemoteActionSpec(
@@ -57,6 +58,10 @@ class LeapmotorVehicleLock(CoordinatorEntity[LeapmotorDataUpdateCoordinator], Lo
         self.vin = vin
         self._attr_unique_id = f"{vin}_vehicle_lock"
         vehicle = self.vehicle_data["vehicle"]
+        self._attr_suggested_object_id = _suggested_object_id(
+            vehicle,
+            english_entity_slug("lock", "vehicle_lock") or "lock",
+        )
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, vin)},
             manufacturer="Leapmotor",
@@ -112,3 +117,10 @@ class LeapmotorVehicleLock(CoordinatorEntity[LeapmotorDataUpdateCoordinator], Lo
     async def async_unlock(self, **kwargs: Any) -> None:
         """Unlock the vehicle."""
         await async_execute_remote_action(self.coordinator, self.vin, UNLOCK_ACTION)
+
+
+def _suggested_object_id(vehicle: dict[str, Any], slug: str) -> str:
+    """Return a stable English suggested object id independent from UI language."""
+    prefix = str(vehicle.get("car_type") or "leapmotor").strip().lower()
+    prefix = "".join(char if char.isalnum() else "_" for char in prefix).strip("_")
+    return f"{prefix or 'leapmotor'}_{slug}"

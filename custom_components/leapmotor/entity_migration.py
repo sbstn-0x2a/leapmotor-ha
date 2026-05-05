@@ -90,6 +90,9 @@ _ENGLISH_ENTITY_SLUGS: dict[tuple[str, str], str] = {
     ("sensor", "charging_planned_circulation"): "charging_schedule_recurrence",
     ("sensor", "charging_plan_updated_at"): "charging_schedule_updated",
     ("sensor", "vehicle_state"): "vehicle_state",
+    ("sensor", "lock_state_source"): "lock_state_source",
+    ("sensor", "lock_state_age_seconds"): "lock_state_age",
+    ("sensor", "raw_lock_status_code"): "raw_lock_status_code",
     ("sensor", "climate_mode"): "climate_mode",
     ("sensor", "steering_wheel_heating_remaining_minutes"): "steering_wheel_heating_remaining_time",
     ("sensor", "driver_seat_heating_level"): "driver_seat_heating_level",
@@ -120,6 +123,11 @@ _ENGLISH_ENTITY_SLUGS: dict[tuple[str, str], str] = {
 }
 
 
+def english_entity_slug(domain: str, suffix: str) -> str | None:
+    """Return the stable English entity slug for a Leapmotor unique-id suffix."""
+    return _ENGLISH_ENTITY_SLUGS.get((domain, suffix))
+
+
 async def async_migrate_entity_registry_to_english(
     hass: HomeAssistant,
     vins: set[str],
@@ -130,13 +138,13 @@ async def async_migrate_entity_registry_to_english(
         if entry.platform != DOMAIN or not isinstance(entry.unique_id, str):
             continue
 
-        vin, separator, suffix = entry.unique_id.partition("_")
-        if not separator or vin not in vins:
-            continue
         domain, separator, object_id = entry.entity_id.partition(".")
         if not separator:
             continue
-        desired_slug = _ENGLISH_ENTITY_SLUGS.get((domain, suffix))
+        suffix = _unique_id_suffix(entry.unique_id, domain)
+        if suffix is None:
+            continue
+        desired_slug = english_entity_slug(domain, suffix)
         if desired_slug is None:
             continue
 
@@ -170,3 +178,20 @@ async def async_migrate_entity_registry_to_english(
                 desired_entity_id,
                 exc,
             )
+
+
+def _unique_id_suffix(unique_id: str, domain: str) -> str | None:
+    """Return the known suffix from a Leapmotor unique id."""
+    candidates = sorted(
+        (
+            suffix
+            for candidate_domain, suffix in _ENGLISH_ENTITY_SLUGS
+            if candidate_domain == domain
+        ),
+        key=len,
+        reverse=True,
+    )
+    for suffix in candidates:
+        if unique_id.endswith(f"_{suffix}"):
+            return suffix
+    return None

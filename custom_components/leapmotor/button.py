@@ -28,6 +28,7 @@ from .const import (
 )
 from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name
+from .entity_migration import english_entity_slug
 from .remote_helpers import RemoteActionSpec, async_execute_remote_action
 
 
@@ -153,6 +154,10 @@ class LeapmotorActionButton(CoordinatorEntity[LeapmotorDataUpdateCoordinator], B
         self._attr_unique_id = f"{vin}_{spec.action}"
 
         vehicle = self.vehicle_data["vehicle"]
+        self._attr_suggested_object_id = _suggested_object_id(
+            vehicle,
+            english_entity_slug("button", spec.action) or spec.action,
+        )
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, vin)},
             manufacturer="Leapmotor",
@@ -206,6 +211,10 @@ class LeapmotorRefreshButton(CoordinatorEntity[LeapmotorDataUpdateCoordinator], 
         self.vin = vin
         self._attr_unique_id = f"{vin}_refresh_data"
         vehicle = self.vehicle_data["vehicle"]
+        self._attr_suggested_object_id = _suggested_object_id(
+            vehicle,
+            english_entity_slug("button", "refresh_data") or "refresh_data",
+        )
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, vin)},
             manufacturer="Leapmotor",
@@ -235,3 +244,10 @@ class LeapmotorRefreshButton(CoordinatorEntity[LeapmotorDataUpdateCoordinator], 
     async def async_press(self) -> None:
         """Run an on-demand coordinator refresh."""
         await self.coordinator.async_manual_refresh()
+
+
+def _suggested_object_id(vehicle: dict[str, Any], slug: str) -> str:
+    """Return a stable English suggested object id independent from UI language."""
+    prefix = str(vehicle.get("car_type") or "leapmotor").strip().lower()
+    prefix = "".join(char if char.isalnum() else "_" for char in prefix).strip("_")
+    return f"{prefix or 'leapmotor'}_{slug}"

@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.30 - 2026-05-05
+
+- Add `leapmotor.export_diagnostics`, which writes an anonymized support JSON
+  file with interpreted state and raw APK signal values to `/config/leapmotor`.
+- Improve charge-complete detection: a plugged-in vehicle with completed/idle
+  charging now reports `finished` instead of falling back to active charging.
+- Add diagnostic lock-state sensors for source, age, and raw lock signal so
+  stale cloud state and remote-control overrides are easier to identify.
+- Document evcc usage through the Home Assistant entities, including SOC,
+  range, plug state, active charging, and charging-connection interpretation.
+- Expand service documentation with PIN requirements, targeting rules, and
+  Home Assistant automation examples for navigation, climate, windows, charge
+  limit, lock, and diagnostics export.
+- Complete translation coverage for buttons, locks, numbers, image/location
+  entities, and the setup/options config flow in all bundled languages.
+- Improve release/HACS documentation with badges, screenshot checklist, known
+  limitations, and troubleshooting for certificates, HACS setup, stale data,
+  remote actions, and second-account usage.
+- Add a read-only shared-car status fallback: if a shared vehicle returns an
+  empty live-signal payload with `vin` only, retry once with `vin` and `carId`
+  before treating the live status as unavailable.
+
 ## 0.5.29 - 2026-05-05
 
 - Restore localized sensor and binary-sensor display names while keeping the

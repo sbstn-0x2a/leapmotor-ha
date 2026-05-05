@@ -560,15 +560,53 @@ class LeapmotorApiClient:
     def get_vehicle_status(self, vehicle: Vehicle) -> dict[str, Any]:
         """Fetch read-only status for one vehicle."""
         car_type_path = _vehicle_status_car_type_path(vehicle.car_type)
+        body = f"vin={requests.utils.quote(vehicle.vin, safe='')}"
+        status = self._get_vehicle_status_raw(
+            vehicle,
+            car_type_path=car_type_path,
+            body=body,
+            label="vehicle status",
+        )
+        if (
+            vehicle.is_shared
+            and vehicle.car_id
+            and not _status_signal_count(status)
+        ):
+            shared_body = (
+                f"vin={requests.utils.quote(vehicle.vin, safe='')}"
+                f"&carId={requests.utils.quote(vehicle.car_id, safe='')}"
+            )
+            try:
+                shared_status = self._get_vehicle_status_raw(
+                    vehicle,
+                    car_type_path=car_type_path,
+                    body=shared_body,
+                    label="vehicle status shared carId",
+                )
+            except LeapmotorApiError:
+                shared_status = None
+            if shared_status and _status_signal_count(shared_status):
+                return shared_status
+        return status
+
+    def _get_vehicle_status_raw(
+        self,
+        vehicle: Vehicle,
+        *,
+        car_type_path: str,
+        body: str,
+        label: str,
+    ) -> dict[str, Any]:
+        """Fetch read-only status with an explicit form body."""
         headers = self._build_signed_headers(vin=vehicle.vin)
         headers.update(self._auth_headers(content_type="application/x-www-form-urlencoded"))
         response = self._post_with_curl(
             path=f"/carownerservice/oversea/vehicle/v1/status/get/{car_type_path}",
             headers=headers,
-            data=f"vin={requests.utils.quote(vehicle.vin, safe='')}",
+            data=body,
             cert=self.account_cert,
         )
-        return self._parse_api_body(response["status_code"], response["body"], "vehicle status")
+        return self._parse_api_body(response["status_code"], response["body"], label)
 
     def get_mileage_energy_detail(self, vehicle: Vehicle) -> dict[str, Any]:
         """Fetch read-only mileage and energy history summary."""
@@ -1501,6 +1539,8 @@ def normalize_vehicle(
     tire_pressures = _tire_pressures_bar(vehicle.car_type, signal)
     last_7_days_energy = _sum_detail_field(mileage_data.get("detail"), "accumulatedEnergyConsume")
     last_week_split = _energy_breakdown_percentages(breakdown_data)
+    status_endpoint_path = _vehicle_status_car_type_path(vehicle.car_type)
+    status_payload_keys = sorted(str(key) for key in status_data)
 
     return {
         "vehicle": {
@@ -1597,6 +1637,10 @@ def normalize_vehicle(
         },
         "diagnostics": {
             **tire_pressures,
+            "status_endpoint_path": status_endpoint_path,
+            "status_payload_keys": status_payload_keys,
+            "status_signal_count": len(signal),
+            "status_has_config": bool(config),
             "charge_plug_signal": signal.get("47"),
             "raw_signal_47": signal.get("47"),
             "raw_signal_1149": signal.get("1149"),
@@ -1724,6 +1768,12 @@ def _vehicle_status_car_type_path(car_type: str | None) -> str:
         # but the status endpoint is shared with C10.
         return "c10"
     return normalized or "c10"
+
+
+def _status_signal_count(status_json: dict[str, Any]) -> int:
+    """Return how many raw status signals the backend returned."""
+    signal = ((status_json.get("data") or {}).get("signal") or {})
+    return len(signal) if isinstance(signal, dict) else 0
 
 
 def _tire_pressures_bar(car_type: str | None, signal: dict[str, Any]) -> dict[str, float | None]:
@@ -1953,6 +2003,8 @@ def _charging_connection_state(signal: dict[str, Any]) -> str | None:
     """Return the observed charge-connection state."""
     if _is_charging(signal):
         return "charging"
+    if _charge_is_finished(signal):
+        return "finished"
     charging_current_a = _safe_float(signal.get("1178"))
     if charging_current_a is not None and abs(charging_current_a) < 3.0:
         return "plugged_in" if _is_plugged_in(signal) else "unplugged"
@@ -1962,8 +2014,27 @@ def _charging_connection_state(signal: dict[str, Any]) -> str | None:
     if connection_status == 1:
         return "plugged_in"
     if connection_status == 2:
-        return "charging"
+        return "plugged_in" if _is_plugged_in(signal) else "charging"
     return None
+
+
+def _charge_is_finished(signal: dict[str, Any]) -> bool:
+    """Return whether the backend still reports connected while charging is complete."""
+    if _is_charging(signal):
+        return False
+    if not _is_plugged_in(signal):
+        return False
+    if _one_is_on(signal.get("3736")):
+        return True
+    connection_status = _safe_int(signal.get("1149"))
+    if connection_status != 2:
+        return False
+    remaining_charge_minutes = _safe_int(signal.get("1200"))
+    charging_current_a = _safe_float(signal.get("1178"))
+    charging_power_kw = _charging_power_kw(signal)
+    current_idle = charging_current_a is not None and abs(charging_current_a) < 3.0
+    power_idle = charging_power_kw is None or charging_power_kw < 1.0
+    return current_idle and power_idle and remaining_charge_minutes in (None, 0)
 
 
 def _climate_mode(signal: dict[str, Any]) -> str | None:

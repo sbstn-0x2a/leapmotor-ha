@@ -3,48 +3,54 @@
     "step": {
       "user": {
         "title": "Conectar Leapmotor",
-        "description": "Sets up Leapmotor vehicle data. App certificate and app private key are required for login; paste or upload them here, or place them as app_cert.pem and app_key.pem in /config/leapmotor first. The vehicle PIN is optional; without it only read-only data works, not remote control. ABRP live data is optional; use your ABRP Generic token from the ABRP vehicle live-data setup. Unofficial integration: use at your own risk; no liability for account restrictions, API changes, or vehicle consequences.",
+        "description": "Configura los datos del vehiculo Leapmotor. El certificado de la app y la clave privada son obligatorios para iniciar sesion; pegalos o subelos aqui, o colocalos primero como app_cert.pem y app_key.pem en /config/leapmotor. El PIN del vehiculo es opcional; sin el solo funcionan datos de lectura, no el control remoto. Los datos en vivo de ABRP son opcionales; usa tu token Generic de ABRP.",
         "data": {
           "username": "Usuario / e-mail",
           "password": "Contrasena",
-          "app_cert_file": "Upload app_cert.pem (certificate)",
-          "app_key_file": "Upload app_key.pem (private key)",
-          "app_cert_pem": "Paste app_cert.pem PEM (certificate)",
-          "app_key_pem": "Paste app_key.pem PEM (private key)",
+          "app_cert_file": "Subir app_cert.pem (certificado)",
+          "app_key_file": "Subir app_key.pem (clave privada)",
+          "app_cert_pem": "Pegar PEM de app_cert.pem (certificado)",
+          "app_key_pem": "Pegar PEM de app_key.pem (clave privada)",
           "operation_password": "PIN del vehiculo (opcional, para control)",
-          "scan_interval": "Intervalo de actualizacion en minutos"
+          "scan_interval": "Intervalo de actualizacion en minutos",
+          "abrp_enabled": "Activar datos en vivo de ABRP",
+          "abrp_token": "Token Generic de ABRP"
         }
       },
       "init": {
         "title": "Opciones de Leapmotor",
-        "description": "Change certificate material, vehicle PIN, update interval, and optional ABRP live-data forwarding. App certificate/private key are required for login and are stored as /config/leapmotor/app_cert.pem and /config/leapmotor/app_key.pem. Without a PIN, remote-control actions remain disabled.",
+        "description": "Cambia el certificado, la clave privada, el PIN del vehiculo, el intervalo de actualizacion y el envio opcional de datos en vivo a ABRP. El certificado y la clave se guardan como /config/leapmotor/app_cert.pem y /config/leapmotor/app_key.pem. Sin PIN, las acciones de control remoto permanecen desactivadas.",
         "data": {
-          "app_cert_file": "Upload app_cert.pem (certificate)",
-          "app_key_file": "Upload app_key.pem (private key)",
-          "app_cert_pem": "Paste app_cert.pem PEM (certificate)",
-          "app_key_pem": "Paste app_key.pem PEM (private key)",
+          "app_cert_file": "Subir app_cert.pem (certificado)",
+          "app_key_file": "Subir app_key.pem (clave privada)",
+          "app_cert_pem": "Pegar PEM de app_cert.pem (certificado)",
+          "app_key_pem": "Pegar PEM de app_key.pem (clave privada)",
           "operation_password": "PIN del vehiculo (opcional, para control)",
-          "scan_interval": "Intervalo de actualizacion en minutos"
+          "scan_interval": "Intervalo de actualizacion en minutos",
+          "abrp_enabled": "Activar datos en vivo de ABRP",
+          "abrp_token": "Token Generic de ABRP"
         }
       },
       "certificates": {
         "title": "Certificados Leapmotor",
-        "description": "Upload the required app certificate and private key, or paste their PEM contents. They are stored locally as /config/leapmotor/app_cert.pem and /config/leapmotor/app_key.pem and are not included in the public repository.",
+        "description": "Sube el certificado de app y la clave privada requeridos, o pega su contenido PEM. Se guardan localmente como /config/leapmotor/app_cert.pem y /config/leapmotor/app_key.pem y no se incluyen en el repositorio publico.",
         "data": {
-          "app_cert_file": "Upload app_cert.pem (certificate)",
-          "app_key_file": "Upload app_key.pem (private key)",
-          "app_cert_pem": "Paste app_cert.pem PEM (certificate)",
-          "app_key_pem": "Paste app_key.pem PEM (private key)"
+          "app_cert_file": "Subir app_cert.pem (certificado)",
+          "app_key_file": "Subir app_key.pem (clave privada)",
+          "app_cert_pem": "Pegar PEM de app_cert.pem (certificado)",
+          "app_key_pem": "Pegar PEM de app_key.pem (clave privada)"
         }
       },
       "account": {
         "title": "Conectar cuenta Leapmotor",
-        "description": "Introduce tus credenciales de Leapmotor. El PIN del vehiculo es opcional; sin el solo funcionan datos de lectura.",
+        "description": "Introduce tus credenciales de Leapmotor. El PIN del vehiculo es opcional; sin el solo funcionan datos de lectura, no el control remoto. Los datos en vivo de ABRP son opcionales y solo requieren tu token Generic de ABRP.",
         "data": {
           "username": "Usuario / e-mail",
           "password": "Contrasena",
           "operation_password": "PIN del vehiculo (opcional, para control)",
-          "scan_interval": "Intervalo de actualizacion en minutos"
+          "scan_interval": "Intervalo de actualizacion en minutos",
+          "abrp_enabled": "Activar datos en vivo de ABRP",
+          "abrp_token": "Token Generic de ABRP"
         }
       }
     },
@@ -53,8 +59,10 @@
       "account_cert_error": "El inicio de sesion fue correcto, pero no se pudo abrir el certificado de la cuenta.",
       "cannot_connect": "Fallo de conexion o actualizacion de API.",
       "unknown": "Error inesperado.",
-      "missing_app_cert": "Missing app certificate/private key. Paste both PEM values or place app_cert.pem and app_key.pem in /config/leapmotor.",
-      "certificate_import_error": "Error al importar el certificado. Comprueba el certificado PEM y la clave privada."
+      "missing_app_cert": "Falta el certificado o la clave privada de la app. Pega ambos valores PEM o coloca app_cert.pem y app_key.pem en /config/leapmotor.",
+      "certificate_import_error": "Error al importar el certificado. Comprueba el certificado PEM y la clave privada.",
+      "api_refresh_failed": "El inicio de sesion fue correcto, pero fallo la primera actualizacion de datos del vehiculo.",
+      "no_vehicle": "Esta cuenta no tiene ningun vehiculo vinculado."
     },
     "abort": {
       "already_configured": "Esta cuenta ya esta configurada."
@@ -223,6 +231,15 @@
       },
       "last_week_other_energy_percent": {
         "name": "Otra energía semana pasada"
+      },
+      "lock_state_source": {
+        "name": "Fuente de bloqueo"
+      },
+      "lock_state_age_seconds": {
+        "name": "Antigüedad del bloqueo"
+      },
+      "raw_lock_status_code": {
+        "name": "Código bruto de bloqueo"
       }
     },
     "binary_sensor": {
@@ -333,7 +350,7 @@
     },
     "button": {
       "open_trunk": {
-        "name": "Maletero"
+        "name": "Abrir maletero"
       },
       "find_vehicle": {
         "name": "Localizar vehiculo"
@@ -358,6 +375,24 @@
       },
       "windshield_defrost": {
         "name": "Desempanar parabrisas"
+      },
+      "close_trunk": {
+        "name": "Cerrar maletero"
+      },
+      "open_sunshade": {
+        "name": "Abrir persiana solar"
+      },
+      "close_sunshade": {
+        "name": "Cerrar persiana solar"
+      },
+      "open_windows": {
+        "name": "Abrir ventanillas"
+      },
+      "close_windows": {
+        "name": "Cerrar ventanillas"
+      },
+      "refresh_data": {
+        "name": "Actualizar datos"
       }
     },
     "lock": {
@@ -380,14 +415,16 @@
     "step": {
       "init": {
         "title": "Opciones de Leapmotor",
-        "description": "Change certificate material, vehicle PIN, update interval, and optional ABRP live-data forwarding. App certificate/private key are required for login and are stored as /config/leapmotor/app_cert.pem and /config/leapmotor/app_key.pem. Without a PIN, remote-control actions remain disabled.",
+        "description": "Cambia el certificado, la clave privada, el PIN del vehiculo, el intervalo de actualizacion y el envio opcional de datos en vivo a ABRP. El certificado y la clave se guardan como /config/leapmotor/app_cert.pem y /config/leapmotor/app_key.pem. Sin PIN, las acciones de control remoto permanecen desactivadas.",
         "data": {
-          "app_cert_file": "Upload app_cert.pem (certificate)",
-          "app_key_file": "Upload app_key.pem (private key)",
-          "app_cert_pem": "Paste app_cert.pem PEM (certificate)",
-          "app_key_pem": "Paste app_key.pem PEM (private key)",
+          "app_cert_file": "Subir app_cert.pem (certificado)",
+          "app_key_file": "Subir app_key.pem (clave privada)",
+          "app_cert_pem": "Pegar PEM de app_cert.pem (certificado)",
+          "app_key_pem": "Pegar PEM de app_key.pem (clave privada)",
           "operation_password": "PIN del vehiculo (opcional, para control)",
-          "scan_interval": "Intervalo de actualizacion en minutos"
+          "scan_interval": "Intervalo de actualizacion en minutos",
+          "abrp_enabled": "Activar datos en vivo de ABRP",
+          "abrp_token": "Token Generic de ABRP"
         }
       }
     }

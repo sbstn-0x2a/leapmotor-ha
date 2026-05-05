@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Leapmotor verbinden",
-        "description": "Stelt Leapmotor-voertuiggegevens in. Een app-certificaat en app-privésleutel zijn verplicht om in te loggen; plak ze hier of upload ze, of plaats app_cert.pem en app_key.pem eerst in /config/leapmotor. De voertuig-PIN is optioneel; zonder PIN werken alleen leesgegevens, geen afstandsbediening. ABRP live-data is optioneel; gebruik het ABRP Generic-token uit de ABRP-livedatainstellingen. Onofficiële integratie: gebruik op eigen risico; geen aansprakelijkheid voor accountbeperkingen, API-wijzigingen of gevolgen voor het voertuig.",
+        "description": "Stelt Leapmotor-voertuiggegevens in. Een app-certificaat en app-privésleutel zijn verplicht om in te loggen; plak ze hier of upload ze, of plaats ze eerst als app_cert.pem en app_key.pem in /config/leapmotor. De voertuig-PIN is optioneel; zonder PIN werken alleen leesgegevens, geen bediening op afstand. ABRP live-data is optioneel; gebruik je ABRP Generic-token.",
         "data": {
           "username": "Gebruikersnaam / e-mail",
           "password": "Wachtwoord",
@@ -12,24 +12,28 @@
           "app_cert_pem": "app_cert.pem PEM plakken (certificaat)",
           "app_key_pem": "app_key.pem PEM plakken (privésleutel)",
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
-          "scan_interval": "Update-interval in minuten"
+          "scan_interval": "Update-interval in minuten",
+          "abrp_enabled": "ABRP live-data inschakelen",
+          "abrp_token": "ABRP Generic-token"
         }
       },
       "init": {
         "title": "Leapmotor opties",
-        "description": "Wijzig certificaatmateriaal, voertuig-PIN, update-interval en optionele ABRP live-data doorsturen. App-certificaat en privésleutel zijn verplicht voor inloggen en worden opgeslagen als /config/leapmotor/app_cert.pem en /config/leapmotor/app_key.pem. Zonder PIN blijven afstandsbediening-acties uitgeschakeld.",
+        "description": "Wijzig certificaatmateriaal, voertuig-PIN, update-interval en optionele ABRP live-data doorsturen. App-certificaat en privésleutel zijn verplicht om in te loggen en worden opgeslagen als /config/leapmotor/app_cert.pem en /config/leapmotor/app_key.pem. Zonder PIN blijven afstandsbedieningsacties uitgeschakeld.",
         "data": {
           "app_cert_file": "app_cert.pem uploaden (certificaat)",
           "app_key_file": "app_key.pem uploaden (privésleutel)",
           "app_cert_pem": "app_cert.pem PEM plakken (certificaat)",
           "app_key_pem": "app_key.pem PEM plakken (privésleutel)",
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
-          "scan_interval": "Update-interval in minuten"
+          "scan_interval": "Update-interval in minuten",
+          "abrp_enabled": "ABRP live-data inschakelen",
+          "abrp_token": "ABRP Generic-token"
         }
       },
       "certificates": {
         "title": "Leapmotor-certificaten",
-        "description": "Upload het vereiste app-certificaat en de privésleutel, of plak hun PEM-inhoud. Ze worden lokaal opgeslagen als /config/leapmotor/app_cert.pem en /config/leapmotor/app_key.pem en staan niet in de publieke repository.",
+        "description": "Upload het vereiste app-certificaat en de privésleutel, of plak hun PEM-inhoud. Ze worden lokaal opgeslagen als /config/leapmotor/app_cert.pem en /config/leapmotor/app_key.pem en worden niet opgenomen in de publieke repository.",
         "data": {
           "app_cert_file": "app_cert.pem uploaden (certificaat)",
           "app_key_file": "app_key.pem uploaden (privésleutel)",
@@ -39,12 +43,14 @@
       },
       "account": {
         "title": "Leapmotor-account verbinden",
-        "description": "Voer je Leapmotor-accountgegevens in. De voertuig-PIN is optioneel; zonder PIN werken alleen leesgegevens.",
+        "description": "Voer je Leapmotor-accountgegevens in. De voertuig-PIN is optioneel; zonder PIN werken alleen leesgegevens, geen bediening op afstand. ABRP live-data is optioneel en vereist alleen je ABRP Generic-token.",
         "data": {
           "username": "Gebruikersnaam / e-mail",
           "password": "Wachtwoord",
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
-          "scan_interval": "Update-interval in minuten"
+          "scan_interval": "Update-interval in minuten",
+          "abrp_enabled": "ABRP live-data inschakelen",
+          "abrp_token": "ABRP Generic-token"
         }
       }
     },
@@ -54,7 +60,9 @@
       "cannot_connect": "Verbinding of API-update mislukt.",
       "unknown": "Onverwachte fout.",
       "missing_app_cert": "App-certificaat of privésleutel ontbreekt. Plak beide PEM-waarden of plaats app_cert.pem en app_key.pem in /config/leapmotor.",
-      "certificate_import_error": "Certificaatimport mislukt. Controleer het PEM-certificaat en de privesleutel."
+      "certificate_import_error": "Certificaatimport mislukt. Controleer het PEM-certificaat en de privesleutel.",
+      "api_refresh_failed": "Inloggen is gelukt, maar de eerste update van voertuiggegevens is mislukt.",
+      "no_vehicle": "Dit account heeft geen gekoppeld voertuig."
     },
     "abort": {
       "already_configured": "Dit account is al geconfigureerd."
@@ -223,6 +231,15 @@
       },
       "last_week_other_energy_percent": {
         "name": "Overige energie vorige week"
+      },
+      "lock_state_source": {
+        "name": "Vergrendelingsbron"
+      },
+      "lock_state_age_seconds": {
+        "name": "Leeftijd vergrendelingsstatus"
+      },
+      "raw_lock_status_code": {
+        "name": "Ruwe vergrendelingscode"
       }
     },
     "binary_sensor": {
@@ -333,7 +350,7 @@
     },
     "button": {
       "open_trunk": {
-        "name": "Kofferbak"
+        "name": "Kofferbak openen"
       },
       "find_vehicle": {
         "name": "Voertuig vinden"
@@ -358,6 +375,24 @@
       },
       "windshield_defrost": {
         "name": "Voorruit ontdooien"
+      },
+      "close_trunk": {
+        "name": "Kofferbak sluiten"
+      },
+      "open_sunshade": {
+        "name": "Zonnescherm openen"
+      },
+      "close_sunshade": {
+        "name": "Zonnescherm sluiten"
+      },
+      "open_windows": {
+        "name": "Ramen openen"
+      },
+      "close_windows": {
+        "name": "Ramen sluiten"
+      },
+      "refresh_data": {
+        "name": "Gegevens vernieuwen"
       }
     },
     "lock": {
@@ -380,14 +415,16 @@
     "step": {
       "init": {
         "title": "Leapmotor opties",
-        "description": "Wijzig certificaatmateriaal, voertuig-PIN, update-interval en optionele ABRP live-data doorsturen. App-certificaat en privésleutel zijn verplicht voor inloggen en worden opgeslagen als /config/leapmotor/app_cert.pem en /config/leapmotor/app_key.pem. Zonder PIN blijven afstandsbediening-acties uitgeschakeld.",
+        "description": "Wijzig certificaatmateriaal, voertuig-PIN, update-interval en optionele ABRP live-data doorsturen. App-certificaat en privésleutel zijn verplicht om in te loggen en worden opgeslagen als /config/leapmotor/app_cert.pem en /config/leapmotor/app_key.pem. Zonder PIN blijven afstandsbedieningsacties uitgeschakeld.",
         "data": {
           "app_cert_file": "app_cert.pem uploaden (certificaat)",
           "app_key_file": "app_key.pem uploaden (privésleutel)",
           "app_cert_pem": "app_cert.pem PEM plakken (certificaat)",
           "app_key_pem": "app_key.pem PEM plakken (privésleutel)",
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
-          "scan_interval": "Update-interval in minuten"
+          "scan_interval": "Update-interval in minuten",
+          "abrp_enabled": "ABRP live-data inschakelen",
+          "abrp_token": "ABRP Generic-token"
         }
       }
     }

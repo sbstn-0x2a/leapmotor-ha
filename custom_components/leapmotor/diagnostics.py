@@ -46,12 +46,13 @@ async def async_get_config_entry_diagnostics(
             media = vehicle_data.get("media") or {}
             remote = vehicle_data.get("remote_control") or {}
             abrp = vehicle_data.get("abrp") or {}
+            diagnostics = vehicle_data.get("diagnostics") or {}
             vehicles[_redact_vin(vin)] = {
                 "vehicle": {
                     "vin": _redact_vin(vin),
-                    "car_id": vehicle.get("car_id"),
+                    "car_id": _redact_identifier(vehicle.get("car_id")),
                     "car_type": vehicle.get("car_type"),
-                    "nickname": vehicle.get("nickname"),
+                    "nickname": _REDACTED if vehicle.get("nickname") else None,
                     "is_shared": vehicle.get("is_shared"),
                     "year": vehicle.get("year"),
                     "rights": vehicle.get("rights"),
@@ -78,7 +79,8 @@ async def async_get_config_entry_diagnostics(
                     "last_vehicle_timestamp": status.get("last_vehicle_timestamp"),
                 },
                 "history": history,
-                "diagnostics": _redact(vehicle_data.get("diagnostics") or {}),
+                "raw_signals": _raw_signals_from_diagnostics(diagnostics),
+                "diagnostics": _redact(diagnostics),
                 "location": {
                     "location_source": vehicle_data.get("location", {}).get("location_source"),
                     "location_age_seconds": vehicle_data.get("location", {}).get("location_age_seconds"),
@@ -133,3 +135,25 @@ def _redact_vin(vin: str) -> str:
     if not vin:
         return ""
     return f"***{str(vin)[-6:]}"
+
+
+def _redact_identifier(value: Any) -> str | None:
+    """Redact an identifier while keeping a short suffix for support correlation."""
+    if value in (None, ""):
+        return None
+    text = str(value)
+    return f"***{text[-6:]}"
+
+
+def _raw_signals_from_diagnostics(diagnostics: dict[str, Any]) -> dict[str, Any]:
+    """Return raw APK signal values keyed by signal id."""
+    signals: dict[str, Any] = {}
+    for key, value in diagnostics.items():
+        if key.startswith("raw_signal_"):
+            signals[key.removeprefix("raw_signal_")] = value
+    return dict(
+        sorted(
+            signals.items(),
+            key=lambda item: int(item[0]) if item[0].isdigit() else item[0],
+        )
+    )

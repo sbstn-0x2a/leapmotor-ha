@@ -1,5 +1,8 @@
 # Leapmotor Home Assistant Integration
 
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/)
+[![Open your Home Assistant instance and add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kerniger&repository=leapmotor-ha&category=integration)
+
 Custom integration for Leapmotor vehicle data and the verified remote-control path.
 
 ## Disclaimer
@@ -57,6 +60,12 @@ Available data includes:
 ## Install
 
 ### HACS
+
+Fast path:
+
+[![Open your Home Assistant instance and add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kerniger&repository=leapmotor-ha&category=integration)
+
+Manual HACS path:
 
 1. Open HACS in Home Assistant.
 2. Open the three-dot menu and choose `Custom repositories`.
@@ -146,9 +155,14 @@ integration options without recreating the entry.
   state for hours.
 - Lock state follows the app home-screen state using validated signal `1298`
   (`1=locked`, `0=unlocked`). Signal `47` is not used for lock state.
+- Diagnostic lock-state sensors expose the source, age, and raw signal code so
+  stale cloud data and temporary remote-control overrides are visible without
+  opening the entity attributes.
 - The `Lädt` binary sensor represents active charging only. Plugged-in but
   stopped/idle sessions stay `off`; use the separate charge-cable sensor for
-  plugged-in state.
+  plugged-in state. The charging-connection sensor can additionally report
+  `finished` when the backend still marks the cable as connected after charging
+  has completed.
 - Vehicle state and GPS location expose freshness metadata in entity
   attributes and diagnostics so stale backend data is easier to identify.
 - Each vehicle also gets a `Refresh data` button to trigger an immediate poll
@@ -174,6 +188,97 @@ The submitted telemetry includes state of charge, estimated range, charging
 state, odometer, speed fallback `0`, and GPS coordinates when available and not
 marked stale.
 
+## evcc
+
+evcc can consume the Leapmotor data through Home Assistant entities. No
+Leapmotor-specific evcc adapter is required for the basic vehicle data.
+
+Recommended entities:
+
+- `sensor.<vehicle>_battery`: state of charge
+- `sensor.<vehicle>_range` or `sensor.<vehicle>_live_range`: remaining range
+- `binary_sensor.<vehicle>_charge_cable_plugged_in`: cable/plug state
+- `binary_sensor.<vehicle>_charging`: active charging only
+- `sensor.<vehicle>_charging_connection`: `unplugged`, `plugged_in`,
+  `charging`, or `finished`
+- `sensor.<vehicle>_charging_power`: charging power
+- `sensor.<vehicle>_charging_current` and
+  `sensor.<vehicle>_charging_voltage`: raw electrical values
+- `sensor.<vehicle>_odometer`: mileage
+
+For automation logic:
+
+- Charging `on` means confirmed active charging.
+- Cable plugged in `on` plus charging `off` means plugged in but idle/stopped.
+- Charging connection `finished` means the cable is still connected and the
+  vehicle/backend reports completed or idle charging.
+- Check the `Last refresh` sensor when decisions depend on freshness.
+
+The Leapmotor backend is cloud-polled. For fast load control, use evcc or the
+wallbox as the real-time electrical source and use Leapmotor mainly for SOC,
+range, plug state, and vehicle diagnostics.
+
+## Service Automation Examples
+
+All vehicle-targeted services accept `vin` or a Leapmotor `entity_id`. Services
+that physically control the vehicle require the Vehicle PIN except
+`leapmotor.send_destination`, which follows the observed app flow without the
+PIN.
+
+Send a navigation destination:
+
+```yaml
+action: leapmotor.send_destination
+data:
+  entity_id: device_tracker.c10_location
+  name: Bern Bahnhof
+  address: Bahnhofplatz, Bern, Schweiz
+  latitude: 46.94809
+  longitude: 7.43914
+```
+
+Set charge limit:
+
+```yaml
+action: leapmotor.set_charge_limit
+data:
+  entity_id: number.c10_set_charge_limit
+  charge_limit_percent: 85
+```
+
+Start quick climate heating:
+
+```yaml
+action: leapmotor.quick_heat
+data:
+  entity_id: sensor.c10_battery
+```
+
+Partially open windows:
+
+```yaml
+action: leapmotor.windows_open
+data:
+  entity_id: sensor.c10_battery
+  value: 30
+```
+
+Lock the vehicle from an automation:
+
+```yaml
+action: leapmotor.lock
+data:
+  entity_id: lock.c10_lock
+```
+
+Export redacted diagnostics:
+
+```yaml
+action: leapmotor.export_diagnostics
+data:
+  filename: leapmotor-diagnostics.json
+```
+
 ## Runtime Notes
 
 - Requires `curl` on the Home Assistant host/container.
@@ -189,8 +294,11 @@ marked stale.
 - The account certificate password is derived internally and is no longer asked
   during setup. Known captured values remain as fallback only.
 - The integration exposes Home Assistant diagnostics with secrets redacted:
-  account state, vehicle metadata, raw status codes, mileage summary, vehicle
-  picture availability, last API codes, and last remote-control result.
+  account state, anonymized vehicle metadata, raw status codes, raw APK signal
+  values, mileage summary, vehicle picture availability, last API codes, and
+  last remote-control result.
+- `leapmotor.export_diagnostics` writes the same anonymized support data to a
+  JSON file under `/config/leapmotor`.
 - The vehicle image no longer uses the generic `shareBindUrl` CDN fallback. It
   now downloads the signed vehicle picture package once per picture key and
   serves the extracted static image from the local Home Assistant cache.
@@ -203,6 +311,36 @@ marked stale.
 - The current proof set is strongest on the C10. Main-account and shared-car
   handling are both implemented; feature availability may still vary by model,
   especially for climate, sunshade, trunk, and window actions.
+
+## Known Limitations
+
+- Unofficial cloud integration; Leapmotor can change authentication, endpoints,
+  rate limits, or signal meanings at any time.
+- User-provided app certificate material is required. The integration does not
+  generate, bundle, fetch, or download backend-trusted certificates.
+- The backend is polled, not streamed. Use `Last refresh` and diagnostic age
+  attributes when automations depend on freshness.
+- A second shared Leapmotor account is recommended because using the same
+  account in Home Assistant and the official app can log the app out.
+- Remote-control support depends on model, account rights, shared-car
+  permissions, vehicle state, and backend policy.
+
+## Troubleshooting
+
+- HACS install: add the repository as type `Integration`, install `Leapmotor`,
+  restart Home Assistant, then add the integration from Devices & services.
+- HACS `No manifest.json`: verify the custom repository URL is
+  `https://github.com/kerniger/leapmotor-ha` and not a subfolder or extracted
+  ZIP path.
+- Certificate errors: upload/paste both `app_cert.pem` and `app_key.pem`, or
+  store them as `/config/leapmotor/app_cert.pem` and
+  `/config/leapmotor/app_key.pem`.
+- Do not rely on certificate files inside `custom_components/leapmotor`; HACS
+  can replace that folder during updates.
+- App logout: use a second Leapmotor account and share the vehicle to it.
+- Stale or unavailable entities: press `Refresh data`, check `Last refresh`,
+  then run `leapmotor.export_diagnostics` and inspect the JSON under
+  `/config/leapmotor`.
 
 ## Certificate Retrieval
 
