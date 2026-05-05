@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.31 - 2026-05-05
+
+- Fix HACS release metadata so HACS downloads `leapmotor-ha.zip` from GitHub
+  releases instead of trying to infer the integration path from the repository.
+- Fix the GitHub validation workflow so documentation that explains PEM marker
+  text is not treated as a leaked certificate.
+
 ## 0.5.30 - 2026-05-05
 
 - Add `leapmotor.export_diagnostics`, which writes an anonymized support JSON
