@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.32 - 2026-05-05
+
+- Improve low-current AC charging detection for B10 vehicles that charge around
+  2.5 A, while keeping C10 plugged-idle snapshots around 1.5 A from being
+  reported as active charging.
+- Keep completed charging detection tied to true idle current so plugged-in
+  vehicles with residual current are shown as connected rather than finished.
+
 ## 0.5.31 - 2026-05-05
 
 - Fix HACS release metadata so HACS downloads `leapmotor-ha.zip` from GitHub

@@ -1960,8 +1960,15 @@ def _is_charging(signal: dict[str, Any]) -> bool:
         # Confirmed charging sessions show a clearly non-zero current
         # (typically negative while energy flows into the pack). After
         # charge completion the backend can keep 1149=2 while current is 0.
-        if abs(charging_current_a) < 3.0:
+        if abs(charging_current_a) < 1.0:
             return False
+        # B10 can actively AC-charge around 2.5 A. C10 plugged-idle snapshots
+        # can sit around 1.5 A, so the grey zone needs an extra confirmation.
+        if abs(charging_current_a) < 3.0:
+            return remaining_charge_minutes is not None and (
+                remaining_charge_minutes > 0
+                or (charging_power_kw is not None and charging_power_kw >= 1.0)
+            )
         return remaining_charge_minutes is not None or (
             charging_power_kw is not None and charging_power_kw >= 1.0
         )
@@ -2006,7 +2013,7 @@ def _charging_connection_state(signal: dict[str, Any]) -> str | None:
     if _charge_is_finished(signal):
         return "finished"
     charging_current_a = _safe_float(signal.get("1178"))
-    if charging_current_a is not None and abs(charging_current_a) < 3.0:
+    if charging_current_a is not None and abs(charging_current_a) < 1.0:
         return "plugged_in" if _is_plugged_in(signal) else "unplugged"
     connection_status = _safe_int(signal.get("1149"))
     if connection_status == 0:
@@ -2032,7 +2039,7 @@ def _charge_is_finished(signal: dict[str, Any]) -> bool:
     remaining_charge_minutes = _safe_int(signal.get("1200"))
     charging_current_a = _safe_float(signal.get("1178"))
     charging_power_kw = _charging_power_kw(signal)
-    current_idle = charging_current_a is not None and abs(charging_current_a) < 3.0
+    current_idle = charging_current_a is not None and abs(charging_current_a) < 1.0
     power_idle = charging_power_kw is None or charging_power_kw < 1.0
     return current_idle and power_idle and remaining_charge_minutes in (None, 0)
 
@@ -2053,7 +2060,15 @@ def _charging_power_kw(signal: dict[str, Any]) -> float | None:
     voltage = _safe_float(signal.get("1177"))
     if current is None or voltage is None:
         return None
-    # The C10 plugged-idle snapshot shows about 1.5A without active charging.
-    if abs(current) < 3.0:
+    abs_current = abs(current)
+    raw_power_kw = abs(current * voltage) / 1000.0
+    if abs_current < 1.0:
         return None
-    return round(abs(current * voltage) / 1000.0, 3)
+    # The C10 plugged-idle snapshot shows about 1.5 A without active charging,
+    # while B10 can actively AC-charge around 2.5 A. In this grey zone, require
+    # either remaining charge time or a clearly non-trivial calculated power.
+    if abs_current < 3.0:
+        remaining_charge_minutes = _safe_int(signal.get("1200"))
+        if remaining_charge_minutes is None and raw_power_kw < 1.0:
+            return None
+    return round(raw_power_kw, 3)
