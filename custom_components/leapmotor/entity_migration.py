@@ -186,7 +186,10 @@ async def async_migrate_entity_registry_to_english(
             if prefix:
                 vin_prefix_map[vin] = prefix
 
-    # Pass 2: rename registry entries that still use non-English slugs.
+    # Pass 2: rename registry entries to the canonical full-prefix English slug.
+    # This handles both German-named entities AND entities that were previously
+    # migrated with a truncated prefix (e.g. leapmotor_battery instead of
+    # leapmotor_b10_2025_ss_shared_battery).
     for entry in list(registry.entities.values()):
         if entry.platform != DOMAIN or not isinstance(entry.unique_id, str):
             continue
@@ -199,9 +202,6 @@ async def async_migrate_entity_registry_to_english(
             continue
         desired_slug = english_entity_slug(domain, suffix)
         if desired_slug is None:
-            continue
-
-        if object_id.endswith(f"_{desired_slug}"):
             continue
 
         vin_for_entry = next((v for v in vins if entry.unique_id.startswith(v)), None)
