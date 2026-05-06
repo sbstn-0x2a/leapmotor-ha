@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os.path
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -149,6 +150,43 @@ async def async_migrate_entity_registry_to_english(
 ) -> None:
     """Rename existing Leapmotor registry entries to English entity IDs."""
     registry = er.async_get(hass)
+
+    # Pass 1: derive the full object-id prefix for each VIN.
+    # Primary strategy: find a correctly-named entity and extract its prefix.
+    # Fallback: longest common prefix of all object-ids for the same VIN.
+    vin_prefix_from_good: dict[str, str] = {}
+    vin_all_object_ids: dict[str, list[str]] = {v: [] for v in vins}
+
+    for entry in registry.entities.values():
+        if entry.platform != DOMAIN or not isinstance(entry.unique_id, str):
+            continue
+        vin_for_entry = next((v for v in vins if entry.unique_id.startswith(v)), None)
+        if vin_for_entry is None:
+            continue
+        domain_part, separator, object_id = entry.entity_id.partition(".")
+        if not separator:
+            continue
+        vin_all_object_ids[vin_for_entry].append(object_id)
+
+        if vin_for_entry in vin_prefix_from_good:
+            continue
+        suffix = _unique_id_suffix(entry.unique_id, domain_part)
+        desired_slug = english_entity_slug(domain_part, suffix) if suffix else None
+        if desired_slug and object_id.endswith(f"_{desired_slug}"):
+            prefix = object_id[: -(len(desired_slug) + 1)]
+            if prefix:
+                vin_prefix_from_good[vin_for_entry] = prefix
+
+    vin_prefix_map: dict[str, str] = {}
+    for vin in vins:
+        if vin in vin_prefix_from_good:
+            vin_prefix_map[vin] = vin_prefix_from_good[vin]
+        elif len(vin_all_object_ids.get(vin, [])) >= 2:
+            prefix = os.path.commonprefix(vin_all_object_ids[vin]).rstrip("_")
+            if prefix:
+                vin_prefix_map[vin] = prefix
+
+    # Pass 2: rename registry entries that still use non-English slugs.
     for entry in list(registry.entities.values()):
         if entry.platform != DOMAIN or not isinstance(entry.unique_id, str):
             continue
@@ -165,7 +203,12 @@ async def async_migrate_entity_registry_to_english(
 
         if object_id.endswith(f"_{desired_slug}"):
             continue
-        vehicle_prefix = object_id.split("_", 1)[0] or "leapmotor"
+
+        vin_for_entry = next((v for v in vins if entry.unique_id.startswith(v)), None)
+        vehicle_prefix = (
+            vin_prefix_map.get(vin_for_entry) if vin_for_entry else None
+        ) or object_id.split("_", 1)[0] or "leapmotor"
+
         desired_entity_id = f"{domain}.{vehicle_prefix}_{desired_slug}"
         if desired_entity_id == entry.entity_id:
             continue
