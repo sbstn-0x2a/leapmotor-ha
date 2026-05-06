@@ -163,6 +163,8 @@ async def async_migrate_entity_registry_to_english(
         if desired_slug is None:
             continue
 
+        if object_id.endswith(f"_{desired_slug}"):
+            continue
         vehicle_prefix = object_id.split("_", 1)[0] or "leapmotor"
         desired_entity_id = f"{domain}.{vehicle_prefix}_{desired_slug}"
         if desired_entity_id == entry.entity_id:
