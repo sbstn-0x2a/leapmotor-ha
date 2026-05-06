@@ -1841,6 +1841,10 @@ def _named_status_to_signal(status_data: dict[str, Any]) -> dict[str, Any]:
         charge_state = _safe_int(status_data.get("chargeState"))
         mapped["1149"] = charge_state
         mapped["47"] = 1 if charge_state in (1, 2) else 0
+    if status_data.get("collectTime") is not None:
+        mapped["sts"] = status_data["collectTime"]
+    elif status_data.get("collectTimeMs") is not None:
+        mapped["sts"] = status_data["collectTimeMs"]
     return mapped
 
 

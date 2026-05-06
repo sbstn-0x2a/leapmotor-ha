@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.35 - 2026-05-06
+
+- Add `collectTime` / `collectTimeMs` as a timestamp fallback for T03 status
+  payloads without numeric signal timestamps.
+- Expand diagnostics exports with the complete normalized `status` and
+  `charging` sections so remaining T03 gaps can be identified from support
+  exports.
+
 ## 0.5.34 - 2026-05-06
 
 - Add a T03 compatibility fallback for status payloads that expose named fields
