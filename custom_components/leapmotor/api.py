@@ -1526,9 +1526,9 @@ def normalize_vehicle(
 ) -> dict[str, Any]:
     """Normalize Leapmotor status payload into Home Assistant-friendly values."""
     status_data = status_json.get("data") or {}
-    signal = status_data.get("signal") or {}
+    signal = _status_data_signal(status_data)
     config = status_data.get("config") or {}
-    charge_plan = config.get("3") or {}
+    charge_plan = config.get("3") or _charge_plan_from_named_status(status_data)
     mileage_data = (mileage_json or {}).get("data") or {}
     rank_data = (consumption_rank_json or {}).get("data") or {}
     rank_result = rank_data.get("rankResult") or {}
@@ -1770,9 +1770,97 @@ def _vehicle_status_car_type_path(car_type: str | None) -> str:
     return normalized or "c10"
 
 
+def _status_data_signal(status_data: dict[str, Any]) -> dict[str, Any]:
+    """Return the numeric signal map, including fallback values from named fields."""
+    raw_signal = status_data.get("signal") or {}
+    signal = dict(raw_signal) if isinstance(raw_signal, dict) else {}
+    named_signal = _named_status_to_signal(status_data)
+    for key, value in named_signal.items():
+        signal.setdefault(key, value)
+    return signal
+
+
+def _named_status_to_signal(status_data: dict[str, Any]) -> dict[str, Any]:
+    """Map legacy/named T03-style status fields to the APK numeric signal IDs."""
+    mapped: dict[str, Any] = {}
+    field_map = {
+        "soc": "1204",
+        "chargeRemainTime": "1200",
+        "batteryCurrent": "1178",
+        "batteryVoltage": "1177",
+        "dcInputFastCharge": "1197",
+        "expectedMileage": "3260",
+        "speed": "1319",
+        "totalMileage": "1318",
+        "gearStatus": "1010",
+        "latitude": "3725",
+        "longitude": "3724",
+        "acSwitch": "1938",
+        "acSetting": "2183",
+        "leftFrontWindowPercent": "3727",
+        "rightFrontWindowPercent": "3728",
+        "leftRearWindowPercent": "1879",
+        "rightRearWindowPercent": "1880",
+        "leftFrontTirePressure": "2667",
+        "rightFrontTirePressure": "2653",
+        "leftRearTirePressure": "2646",
+        "rightRearTirePressure": "2660",
+        "leftFrontTirePressureState": "2641",
+        "rightFrontTirePressureState": "2648",
+        "leftRearTirePressureState": "2655",
+        "rightRearTirePressureState": "2662",
+    }
+    for source, target in field_map.items():
+        if status_data.get(source) is not None:
+            mapped[target] = status_data[source]
+
+    if status_data.get("expectedMileage") is not None:
+        mapped["2188"] = status_data["expectedMileage"]
+    if status_data.get("acSetting") is not None:
+        mapped["2184"] = status_data["acSetting"]
+
+    bool_map = {
+        "driverDoorLockStatus": "1298",
+        "lbcmDriverDoorStatus": "1277",
+        "rbcmDriverDoorStatus": "1278",
+        "lbcmLeftRearDoorStatus": "1279",
+        "rbcmRightRearDoorStatus": "1280",
+        "bbcmBackDoorStatus": "1281",
+        "driverWindowStatus": "1693",
+        "rightFrontWindowStatus": "1694",
+        "leftRearWindowStatus": "1695",
+        "rightRearWindowStatus": "1696",
+        "bcmKeyPositionOn1": "1256",
+        "bcmKeyPositionOn3": "1258",
+    }
+    for source, target in bool_map.items():
+        if status_data.get(source) is not None:
+            mapped[target] = 1 if bool(status_data[source]) else 0
+
+    if status_data.get("chargeState") is not None:
+        charge_state = _safe_int(status_data.get("chargeState"))
+        mapped["1149"] = charge_state
+        mapped["47"] = 1 if charge_state in (1, 2) else 0
+    return mapped
+
+
+def _charge_plan_from_named_status(status_data: dict[str, Any]) -> dict[str, Any]:
+    """Return a charge-plan-like dict from flat status fields when config is absent."""
+    charge_limit = status_data.get("chargesocSetting")
+    charge_time = status_data.get("chargeTimeSetting")
+    if charge_limit is None and charge_time is None:
+        return {}
+    plan: dict[str, Any] = {}
+    if charge_limit is not None:
+        plan["percent"] = charge_limit
+    if charge_time is not None:
+        plan["beginTime"] = charge_time
+    return plan
+
+
 def _status_signal_count(status_json: dict[str, Any]) -> int:
     """Return how many raw status signals the backend returned."""
-    signal = ((status_json.get("data") or {}).get("signal") or {})
+    signal = _status_data_signal(status_json.get("data") or {})
     return len(signal) if isinstance(signal, dict) else 0
 
 
@@ -1935,6 +2023,13 @@ def _derive_vehicle_state(signal: dict[str, Any]) -> str | None:
         return "parked"
     if drive_status in (3, 5) or vehicle_state in (5,):
         return "driving"
+
+    speed = _safe_float(signal.get("1319"))
+    if speed is not None:
+        return "driving" if speed > 0 else "parked"
+    gear = _safe_int(signal.get("1010"))
+    if gear is not None:
+        return "parked" if gear == 0 else "driving"
 
     return None
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.34 - 2026-05-06
+
+- Add a T03 compatibility fallback for status payloads that expose named fields
+  directly under `data` instead of the newer numeric `data.signal` map.
+- Map safe T03 named fields for SOC, range, mileage, speed, gear, location,
+  charge state, charge current/voltage/time, DC charge flag, lock, doors,
+  windows, climate setpoint, and tire pressure.
+- Derive parked/driving state from speed or gear when model-specific drive-state
+  signals are absent.
+
 ## 0.5.33 - 2026-05-05
 
 - Fix the HACS release archive layout. The release ZIP now contains the
