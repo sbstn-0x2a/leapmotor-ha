@@ -166,6 +166,17 @@
       "charging_connection_state": {
         "name": "Connessione di carica"
       },
+      "charging_finish_time": {
+        "name": "Orario stimato di fine carica"
+      },
+      "evcc_status": {
+        "name": "Stato di carica EVCC",
+        "state": {
+          "A": "Disconnesso",
+          "B": "Connesso",
+          "C": "In carica"
+        }
+      },
       "battery_min_temp_c": {
         "name": "Temperatura minima batteria"
       },

@@ -23,6 +23,33 @@ from .coordinator import LeapmotorDataUpdateCoordinator
 from .entity_helpers import build_vehicle_display_name, load_localized_entity_names
 from .entity_migration import english_entity_slug
 
+OPTIONAL_BINARY_SENSOR_PATHS = {
+    "charging_planned_enabled": "charging.charging_planned_enabled",
+    "charging_planned_weekly": "charging.charging_planned_cycles",
+    "remote_session_active": "diagnostics.remote_session_active",
+    "vehicle_security_active": "diagnostics.vehicle_security_active",
+    "battery_heating": "diagnostics.battery_heating",
+    "skylight_open": "diagnostics.skylight_open",
+    "fast_cooling_active": "diagnostics.fast_cooling_active",
+    "fast_heating_active": "diagnostics.fast_heating_active",
+    "windshield_defrosting": "diagnostics.windshield_defrosting",
+    "rear_window_heating": "diagnostics.rear_window_heating",
+    "air_recirculation": "diagnostics.air_recirculation",
+    "climate_temp_mode": "diagnostics.climate_temp_mode",
+    "steering_wheel_heating": "diagnostics.steering_wheel_heating",
+    "left_mirror_heating": "diagnostics.left_mirror_heating",
+    "right_mirror_heating": "diagnostics.right_mirror_heating",
+    "speed_limit_enabled": "diagnostics.speed_limit_enabled",
+    "park_assist_enabled": "diagnostics.park_assist_enabled",
+    "sentinel_mode": "diagnostics.sentinel_mode",
+    "parking_photo": "diagnostics.parking_photo",
+    "fully_charged": "diagnostics.fully_charged",
+    "bluetooth_enabled": "diagnostics.bluetooth_enabled",
+    "hotspot_enabled": "diagnostics.hotspot_enabled",
+    "windows_remote_supported": "diagnostics.windows_remote_supported",
+    "door_control_allowed": "diagnostics.door_control_allowed",
+}
+
 
 @dataclass(frozen=True, kw_only=True)
 class LeapmotorBinarySensorEntityDescription(BinarySensorEntityDescription):
@@ -303,10 +330,11 @@ async def async_setup_entry(
         "binary_sensor",
     )
     entities: list[LeapmotorBinarySensor] = []
-    for vin in coordinator.data.get("vehicles", {}):
+    for vin, vehicle_data in coordinator.data.get("vehicles", {}).items():
         entities.extend(
             LeapmotorBinarySensor(coordinator, vin, description, localized_names)
             for description in BINARY_SENSOR_DESCRIPTIONS
+            if _should_create_binary_sensor(vehicle_data, description.key)
         )
     async_add_entities(entities)
 
@@ -383,3 +411,21 @@ def _suggested_object_id(vehicle: dict[str, Any], slug: str) -> str:
     prefix = str(vehicle.get("car_type") or "leapmotor").strip().lower()
     prefix = "".join(char if char.isalnum() else "_" for char in prefix).strip("_")
     return f"{prefix or 'leapmotor'}_{slug}"
+
+
+def _should_create_binary_sensor(vehicle_data: dict[str, Any], key: str) -> bool:
+    """Return whether a binary sensor is supported by the current vehicle payload."""
+    path = OPTIONAL_BINARY_SENSOR_PATHS.get(key)
+    if path is None:
+        return True
+    return _path_value(vehicle_data, path) is not None
+
+
+def _path_value(data: dict[str, Any], path: str) -> Any:
+    """Read a dotted path from nested dictionaries."""
+    current: Any = data
+    for part in path.split("."):
+        if not isinstance(current, dict):
+            return None
+        current = current.get(part)
+    return current

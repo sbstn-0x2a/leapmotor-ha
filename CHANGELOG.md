@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.37 - 2026-05-06
+
+- Create optional diagnostic entities only when the first vehicle payload
+  actually contains the corresponding raw value. Existing entity-registry
+  entries are not removed automatically.
+- Add EVCC helper sensors: `evcc_status` with IEC 61851 `A`/`B`/`C` mapping
+  and `charging_finish_time` from the remaining charge time.
+- Return the charge-limit number as an integer so Home Assistant accepts values
+  like `90` without requiring `90.0`.
+- Keep the English entity-ID migration enabled; localized display names remain
+  language-specific.
+
 ## 0.5.36 - 2026-05-06
 
 - Improve T03 named-payload coverage using fields also modeled by LeapConnect:

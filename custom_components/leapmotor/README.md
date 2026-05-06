@@ -199,8 +199,11 @@ Recommended entities:
 - `sensor.<vehicle>_range` or `sensor.<vehicle>_live_range`: remaining range
 - `binary_sensor.<vehicle>_charge_cable_plugged_in`: cable/plug state
 - `binary_sensor.<vehicle>_charging`: active charging only
+- `sensor.<vehicle>_evcc_status`: IEC 61851 `A`/`B`/`C`
 - `sensor.<vehicle>_charging_connection`: `unplugged`, `plugged_in`,
   `charging`, or `finished`
+- `sensor.<vehicle>_charging_finish_time`: target-time helper while
+  actively charging
 - `sensor.<vehicle>_charging_power`: charging power
 - `sensor.<vehicle>_charging_current` and
   `sensor.<vehicle>_charging_voltage`: raw electrical values

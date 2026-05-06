@@ -295,8 +295,12 @@ Recommended Home Assistant entities:
 - `sensor.<vehicle>_range` or `sensor.<vehicle>_live_range` for remaining range
 - `binary_sensor.<vehicle>_charge_cable_plugged_in` for cable/plug state
 - `binary_sensor.<vehicle>_charging` for active charging only
+- `sensor.<vehicle>_evcc_status` for IEC 61851 pilot states:
+  `A` = unplugged, `B` = connected/idle/finished, `C` = charging
 - `sensor.<vehicle>_charging_connection` for detailed state:
   `unplugged`, `plugged_in`, `charging`, `finished`
+- `sensor.<vehicle>_charging_finish_time` for target-time logic
+  while actively charging
 - `sensor.<vehicle>_charging_power` for charging power
 - `sensor.<vehicle>_charging_current` and `sensor.<vehicle>_charging_voltage`
   for raw electrical values

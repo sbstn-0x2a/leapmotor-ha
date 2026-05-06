@@ -166,6 +166,17 @@
       "charging_connection_state": {
         "name": "Laadverbinding"
       },
+      "charging_finish_time": {
+        "name": "Geschatte laadeindtijd"
+      },
+      "evcc_status": {
+        "name": "EVCC laadstatus",
+        "state": {
+          "A": "Ontkoppeld",
+          "B": "Verbonden",
+          "C": "Aan het laden"
+        }
+      },
       "battery_min_temp_c": {
         "name": "Minimale accutemperatuur"
       },

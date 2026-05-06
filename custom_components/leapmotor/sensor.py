@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -45,6 +45,44 @@ WHOLE_KILOMETER_KEYS = {
     "odometer_km",
     "total_mileage_km",
     "last_7_days_mileage_km",
+}
+OPTIONAL_SENSOR_PATHS = {
+    "battery_percent_precise": "status.battery_percent_precise",
+    "wltp_max_range_km": "status.wltp_max_range_km",
+    "live_remaining_range_km": "status.live_remaining_range_km",
+    "range_mode": "status.range_mode",
+    "interior_temp_c": "status.interior_temp_c",
+    "climate_set_temp_left_c": "status.climate_set_temp_left_c",
+    "climate_set_temp_right_c": "status.climate_set_temp_right_c",
+    "battery_min_temp_c": "diagnostics.battery_min_temp_c",
+    "battery_thermal_request": "diagnostics.battery_thermal_request",
+    "ptc_power_w": "diagnostics.ptc_power_w",
+    "ptc_state": "diagnostics.ptc_state",
+    "ptc_power_setting_value": "diagnostics.ptc_power_setting_value",
+    "available_energy_kwh": "diagnostics.available_energy_kwh",
+    "parking_camera_state": "diagnostics.parking_camera_state",
+    "charging_planned_start": "charging.charging_planned_start",
+    "charging_planned_end": "charging.charging_planned_end",
+    "charging_planned_circulation": "charging.charging_planned_circulation",
+    "charging_plan_updated_at": "charging.charging_plan_updated_at",
+    "lock_state_age_seconds": "status.lock_state_age_seconds",
+    "raw_lock_status_code": "status.raw_lock_status_code",
+    "climate_mode": "diagnostics.climate_mode",
+    "outdoor_temp_c": "diagnostics.outdoor_temp_c",
+    "climate_fan_volume": "diagnostics.climate_fan_volume",
+    "climate_fan_volume_setting": "diagnostics.climate_fan_volume_setting",
+    "climate_air_direction": "diagnostics.climate_air_direction",
+    "climate_cooling_heating_mode": "diagnostics.climate_cooling_heating_mode",
+    "climate_min_single_temp_c": "diagnostics.climate_min_single_temp_c",
+    "sunshade_position": "diagnostics.sunshade_position",
+    "steering_wheel_heating_remaining_minutes": (
+        "diagnostics.steering_wheel_heating_remaining_minutes"
+    ),
+    "driver_seat_heating_level": "diagnostics.driver_seat_heating_level",
+    "passenger_seat_heating_level": "diagnostics.passenger_seat_heating_level",
+    "driver_seat_ventilation_level": "diagnostics.driver_seat_ventilation_level",
+    "passenger_seat_ventilation_level": "diagnostics.passenger_seat_ventilation_level",
+    "speed_limit_kmh": "diagnostics.speed_limit_kmh",
 }
 
 
@@ -183,6 +221,15 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         value_fn=lambda data: data["charging"].get("remaining_charge_minutes"),
     ),
     LeapmotorSensorEntityDescription(
+        key="charging_finish_time",
+        translation_key="charging_finish_time",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        icon="mdi:battery-clock",
+        value_fn=lambda data: _charging_finish_time(
+            data["charging"].get("remaining_charge_minutes")
+        ),
+    ),
+    LeapmotorSensorEntityDescription(
         key="charging_power_kw",
         translation_key="charging_power_kw",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
@@ -217,6 +264,18 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         translation_key="charging_connection_state",
         icon="mdi:ev-plug-type2",
         value_fn=lambda data: data["charging"].get("connection_state"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="evcc_status",
+        translation_key="evcc_status",
+        icon="mdi:ev-station",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: {
+            "unplugged": "A",
+            "plugged_in": "B",
+            "charging": "C",
+            "finished": "B",
+        }.get(data["charging"].get("connection_state")),
     ),
     LeapmotorSensorEntityDescription(
         key="battery_min_temp_c",
@@ -656,10 +715,11 @@ async def async_setup_entry(
         "sensor",
     )
     entities: list[LeapmotorSensor] = []
-    for vin in coordinator.data.get("vehicles", {}):
+    for vin, vehicle_data in coordinator.data.get("vehicles", {}).items():
         entities.extend(
             LeapmotorSensor(coordinator, vin, description, localized_names)
             for description in SENSOR_DESCRIPTIONS
+            if _should_create_sensor(vehicle_data, description.key)
         )
     async_add_entities(entities)
 
@@ -713,7 +773,7 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
         """Return entity availability."""
         if not super().available:
             return False
-        if self.entity_description.key == "remaining_charge_minutes":
+        if self.entity_description.key in {"remaining_charge_minutes", "charging_finish_time"}:
             return bool(self.vehicle_data["charging"].get("is_charging"))
         return True
 
@@ -818,6 +878,24 @@ def _whole_number_if_possible(value: Any) -> Any:
     return value
 
 
+def _should_create_sensor(vehicle_data: dict[str, Any], key: str) -> bool:
+    """Return whether a sensor is supported by the current vehicle payload."""
+    path = OPTIONAL_SENSOR_PATHS.get(key)
+    if path is None:
+        return True
+    return _path_value(vehicle_data, path) is not None
+
+
+def _path_value(data: dict[str, Any], path: str) -> Any:
+    """Read a dotted path from nested dictionaries."""
+    current: Any = data
+    for part in path.split("."):
+        if not isinstance(current, dict):
+            return None
+        current = current.get(part)
+    return current
+
+
 def _suggested_object_id(vehicle: dict[str, Any], slug: str) -> str:
     """Return a stable English suggested object id independent from UI language."""
     prefix = str(vehicle.get("car_type") or "leapmotor").strip().lower()
@@ -854,3 +932,14 @@ def _message_timestamp(value: Any) -> datetime | None:
         return datetime.fromtimestamp(numeric, tz=UTC)
     except (OSError, ValueError):
         return None
+
+
+def _charging_finish_time(remaining_minutes: Any) -> datetime | None:
+    """Return estimated charging finish time based on remaining charge minutes."""
+    try:
+        minutes = int(remaining_minutes)
+    except (TypeError, ValueError):
+        return None
+    if minutes <= 0:
+        return None
+    return datetime.now(tz=UTC) + timedelta(minutes=minutes)
