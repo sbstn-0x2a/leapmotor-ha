@@ -197,6 +197,13 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[LeapmotorBinarySensorEntityDescription, ...] =
         value_fn=lambda data: data["diagnostics"].get("air_recirculation"),
     ),
     LeapmotorBinarySensorEntityDescription(
+        key="climate_temp_mode",
+        translation_key="climate_temp_mode",
+        icon="mdi:thermometer-auto",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("climate_temp_mode"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
         key="steering_wheel_heating",
         translation_key="steering_wheel_heating",
         icon="mdi:steering",
@@ -251,6 +258,34 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[LeapmotorBinarySensorEntityDescription, ...] =
         icon="mdi:battery-check",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["diagnostics"].get("fully_charged"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="bluetooth_enabled",
+        translation_key="bluetooth_enabled",
+        icon="mdi:bluetooth",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("bluetooth_enabled"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="hotspot_enabled",
+        translation_key="hotspot_enabled",
+        icon="mdi:wifi",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("hotspot_enabled"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="windows_remote_supported",
+        translation_key="windows_remote_supported",
+        icon="mdi:window-open-variant",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("windows_remote_supported"),
+    ),
+    LeapmotorBinarySensorEntityDescription(
+        key="door_control_allowed",
+        translation_key="door_control_allowed",
+        icon="mdi:car-door",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["diagnostics"].get("door_control_allowed"),
     ),
 )
 

@@ -240,6 +240,36 @@
       },
       "raw_lock_status_code": {
         "name": "Verriegelung Rohwert"
+      },
+      "ptc_state": {
+        "name": "PTC-Status"
+      },
+      "ptc_power_setting_value": {
+        "name": "PTC-Leistungseinstellung"
+      },
+      "available_energy_kwh": {
+        "name": "Verfuegbare Energie"
+      },
+      "outdoor_temp_c": {
+        "name": "Aussentemperatur"
+      },
+      "climate_fan_volume": {
+        "name": "Klima Luefterstufe"
+      },
+      "climate_fan_volume_setting": {
+        "name": "Klima Lueftereinstellung"
+      },
+      "climate_air_direction": {
+        "name": "Klima Luftverteilung"
+      },
+      "climate_cooling_heating_mode": {
+        "name": "Klima Kuehl-/Heizmodus"
+      },
+      "climate_min_single_temp_c": {
+        "name": "Klima minimale Einzeltemperatur"
+      },
+      "sunshade_position": {
+        "name": "Sonnenrollo Position"
       }
     },
     "binary_sensor": {
@@ -341,6 +371,21 @@
       },
       "is_regening": {
         "name": "Rekuperation"
+      },
+      "climate_temp_mode": {
+        "name": "Klima Temperaturmodus"
+      },
+      "bluetooth_enabled": {
+        "name": "Bluetooth"
+      },
+      "hotspot_enabled": {
+        "name": "Hotspot"
+      },
+      "windows_remote_supported": {
+        "name": "Fenster-Fernsteuerung unterstuetzt"
+      },
+      "door_control_allowed": {
+        "name": "Tuersteuerung erlaubt"
       }
     },
     "image": {

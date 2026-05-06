@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.36 - 2026-05-06
+
+- Improve T03 named-payload coverage using fields also modeled by LeapConnect:
+  available energy, outdoor temperature, climate fan/air-direction raw values,
+  PTC state/settings, sunshade position, Bluetooth/hotspot state, door-control
+  permission, and window remote-control support.
+- Add dedicated diagnostic entities for these T03 fields instead of mapping
+  them onto unrelated C10/B10-specific signals.
+- Report charging power as `0.0 kW` when current and voltage are present but
+  current is below the active-charging threshold.
+
 ## 0.5.35 - 2026-05-06
 
 - Add `collectTime` / `collectTimeMs` as a timestamp fallback for T03 status

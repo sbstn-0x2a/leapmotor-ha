@@ -1653,22 +1653,39 @@ def normalize_vehicle(
             "rear_right_door_open": _one_is_on(signal.get("1280")),
             "trunk_open": _one_is_on(signal.get("1281")),
             "ptc_power_w": _safe_int(signal.get("1348")),
+            "ptc_state": _safe_int(status_data.get("ptcState")),
+            "ptc_power_setting_value": _safe_int(status_data.get("ptcPowerSettingValue")),
             "parking_camera_state": signal.get("1480"),
             "battery_min_temp_c": _safe_int(signal.get("1182")),
             "battery_thermal_request": _safe_int(signal.get("1186")),
             "battery_heating": _safe_int(signal.get("1186")) == 4 if signal.get("1186") is not None else None,
+            "available_energy_kwh": _wh_to_kwh(status_data.get("dumpEnergy")),
             "front_left_window_open": _not_zero(signal.get("1693")),
             "front_right_window_open": _not_zero(signal.get("1694")),
             "rear_left_window_open": _not_zero(signal.get("1695")),
             "rear_right_window_open": _not_zero(signal.get("1696")),
             "skylight_open": _not_zero(signal.get("1724")),
+            "sunshade_position": _safe_int(status_data.get("sunShade")),
+            "windows_remote_supported": _safe_bool(status_data.get("isSupportWindowsRemoteControl")),
             "front_left_window_position_percent": _safe_int(signal.get("3727")),
             "front_right_window_position_percent": _safe_int(signal.get("3728")),
             "rear_left_window_position_percent": _safe_int(signal.get("1879")),
             "rear_right_window_position_percent": _safe_int(signal.get("1880")),
             "climate_on": _one_is_on(signal.get("1938")),
             "climate_mode": _climate_mode(signal),
-            "air_recirculation": _not_zero(signal.get("1943")),
+            "outdoor_temp_c": _safe_float(status_data.get("outdoorTemp")),
+            "climate_fan_volume": _safe_int(status_data.get("acAirVolume")),
+            "climate_fan_volume_setting": _safe_int(status_data.get("acAirVolumeSetting")),
+            "climate_air_direction": _safe_int(status_data.get("acWindDirection")),
+            "climate_temp_mode": _safe_bool(status_data.get("acTempMode")),
+            "climate_cooling_heating_mode": _safe_int(status_data.get("acCoolingAndHeating")),
+            "climate_min_single_temp_c": _safe_float(status_data.get("minSingleTemp")),
+            "air_recirculation": _safe_bool(status_data.get("acCircleMode"))
+            if status_data.get("acCircleMode") is not None
+            else _not_zero(signal.get("1943")),
+            "bluetooth_enabled": _safe_bool(status_data.get("bluetoothState")),
+            "hotspot_enabled": _safe_bool(status_data.get("hotspotState")),
+            "door_control_allowed": _safe_bool(status_data.get("bcmDoorCtrlAllow")),
             "fast_cooling_active": _two_is_on(signal.get("2669")),
             "fast_heating_active": _two_is_on(signal.get("2681")),
             "windshield_defrosting": _two_is_on(signal.get("1945")),
@@ -2003,6 +2020,29 @@ def _positive_int(raw: Any) -> bool | None:
     return value > 0
 
 
+def _safe_bool(raw: Any) -> bool | None:
+    """Return a bool for backend bool/int/string flags."""
+    if raw is None:
+        return None
+    if isinstance(raw, bool):
+        return raw
+    if isinstance(raw, (int, float)):
+        return raw != 0
+    normalized = str(raw).strip().lower()
+    if normalized in ("1", "true", "yes", "on"):
+        return True
+    if normalized in ("0", "false", "no", "off"):
+        return False
+    return None
+
+
+def _wh_to_kwh(raw: Any) -> float | None:
+    value = _safe_float(raw)
+    if value is None:
+        return None
+    return round(value / 1000.0, 2)
+
+
 def _gear_state(signal: dict[str, Any]) -> str | None:
     return {
         0: "P",
@@ -2162,7 +2202,7 @@ def _charging_power_kw(signal: dict[str, Any]) -> float | None:
     abs_current = abs(current)
     raw_power_kw = abs(current * voltage) / 1000.0
     if abs_current < 1.0:
-        return None
+        return 0.0
     # The C10 plugged-idle snapshot shows about 1.5 A without active charging,
     # while B10 can actively AC-charge around 2.5 A. In this grey zone, require
     # either remaining charge time or a clearly non-trivial calculated power.
