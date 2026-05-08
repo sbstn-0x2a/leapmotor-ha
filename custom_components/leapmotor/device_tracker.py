@@ -97,6 +97,9 @@ class LeapmotorDeviceTracker(
             "location_source": location.get("location_source", "cloud"),
             "location_age_seconds": location.get("location_age_seconds"),
             "location_is_stale": location.get("location_is_stale"),
+            "raw_latitude": location.get("raw_latitude"),
+            "latitude_corrected": location.get("latitude_corrected"),
+            "latitude_correction_source": location.get("latitude_correction_source"),
         }
 
     @property

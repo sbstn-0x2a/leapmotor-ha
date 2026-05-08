@@ -111,6 +111,7 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
         }
         self._stabilize_vehicle_states(data)
         self._apply_state_freshness(data)
+        self._normalize_locations(data)
         await self._async_push_abrp(data)
         self._apply_lock_state_overrides(data)
         self._apply_remote_results(data)
@@ -227,6 +228,28 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
             location["location_is_stale"] = is_stale
             if location.get("location_source") is None:
                 location["location_source"] = "cloud_stale" if is_stale else "cloud"
+
+    def _normalize_locations(self, data: dict[str, Any]) -> None:
+        """Correct known backend GPS sign issues using the HA home location as guard."""
+        home_latitude = _safe_float(getattr(self.hass.config, "latitude", None))
+        home_longitude = _safe_float(getattr(self.hass.config, "longitude", None))
+        for vehicle_data in (data.get("vehicles") or {}).values():
+            location = vehicle_data.get("location") or {}
+            latitude = _safe_float(location.get("latitude"))
+            longitude = _safe_float(location.get("longitude"))
+            location["raw_latitude"] = location.get("latitude")
+            if not _should_flip_southern_latitude(
+                latitude,
+                longitude,
+                home_latitude,
+                home_longitude,
+            ):
+                location["latitude_corrected"] = False
+                continue
+
+            location["latitude"] = -abs(latitude)
+            location["latitude_corrected"] = True
+            location["latitude_correction_source"] = "home_assistant_southern_hemisphere"
 
     async def _async_push_abrp(self, data: dict[str, Any]) -> None:
         """Push vehicle telemetry to ABRP when configured."""
@@ -352,3 +375,55 @@ def _state_age_seconds(raw_timestamp: Any) -> int | None:
         return None
     age = int(time.time() - event_ts)
     return max(age, 0)
+
+
+def _should_flip_southern_latitude(
+    latitude: float | None,
+    longitude: float | None,
+    home_latitude: float | None,
+    home_longitude: float | None,
+) -> bool:
+    """Return true when a positive API latitude is likely missing the southern sign."""
+    if latitude is None or longitude is None or home_latitude is None or home_longitude is None:
+        return False
+    if latitude <= 0 or home_latitude >= 0:
+        return False
+    if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
+        return False
+    if not (-90 <= home_latitude <= 90 and -180 <= home_longitude <= 180):
+        return False
+
+    longitude_delta = _longitude_delta_degrees(longitude, home_longitude)
+    if longitude_delta > 50:
+        return False
+
+    as_reported_distance = _coordinate_distance_score(latitude, longitude, home_latitude, home_longitude)
+    flipped_distance = _coordinate_distance_score(-abs(latitude), longitude, home_latitude, home_longitude)
+    return flipped_distance + 1 < as_reported_distance
+
+
+def _coordinate_distance_score(
+    latitude: float,
+    longitude: float,
+    home_latitude: float,
+    home_longitude: float,
+) -> float:
+    """Return a cheap distance score in degrees, sufficient for hemisphere guards."""
+    longitude_delta = _longitude_delta_degrees(longitude, home_longitude)
+    return (latitude - home_latitude) ** 2 + longitude_delta**2
+
+
+def _longitude_delta_degrees(left: float, right: float) -> float:
+    """Return the shortest absolute longitude delta in degrees."""
+    delta = abs(left - right) % 360
+    return min(delta, 360 - delta)
+
+
+def _safe_float(value: Any) -> float | None:
+    """Return value as float or None."""
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None

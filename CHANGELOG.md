@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.38 - 2026-05-08
+
+- Correct positive latitude values for southern-hemisphere Home Assistant
+  installations when the mirrored negative latitude is clearly closer to the
+  configured HA home location. This fixes backend GPS sign issues reported by
+  Australian users without hard-coding a country list.
+- Expose GPS correction diagnostics on the device tracker via `raw_latitude`,
+  `latitude_corrected`, and `latitude_correction_source`.
+- Update community credit from `Toxo666` to `sbstn-0x2a`.
+
 ## 0.5.37 - 2026-05-06
 
 - Create optional diagnostic entities only when the first vehicle payload

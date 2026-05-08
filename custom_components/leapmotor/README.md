@@ -358,6 +358,6 @@ material is acceptable for their setup.
 
 ## Special Thanks
 
-Special thanks to [Toxo666](https://github.com/Toxo666) for validating and
+Special thanks to [sbstn-0x2a](https://github.com/sbstn-0x2a) for validating and
 sharing additional Leapmotor raw-signal mappings across charging, doors,
 climate, heating, seating, range, and diagnostics.
