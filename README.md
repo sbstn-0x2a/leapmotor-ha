@@ -100,8 +100,9 @@ integration from `Settings -> Devices & services`.
   Home Assistant language where translations are available.
 - Existing unavailable entities from older versions are not removed
   automatically. Remove/re-add the integration if you want a clean entity set.
-- Southern-hemisphere GPS sign issues are corrected only when the mirrored
-  latitude is clearly closer to the configured Home Assistant home location.
+- GPS sign issues are corrected only when the mirrored coordinate is clearly
+  closer to the configured Home Assistant home location. This covers known
+  southern-latitude and western-longitude backend sign issues.
 - Optional eco polling never wakes or controls the vehicle. It only changes how
   often the cloud backend is polled while the current vehicle state is clearly
   quiet.

@@ -292,18 +292,30 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
             latitude = _safe_float(location.get("latitude"))
             longitude = _safe_float(location.get("longitude"))
             location["raw_latitude"] = location.get("latitude")
-            if not _should_flip_southern_latitude(
+            location["raw_longitude"] = location.get("longitude")
+            if _should_flip_southern_latitude(
                 latitude,
                 longitude,
                 home_latitude,
                 home_longitude,
             ):
+                location["latitude"] = -abs(latitude)
+                location["latitude_corrected"] = True
+                location["latitude_correction_source"] = "home_assistant_southern_hemisphere"
+            else:
                 location["latitude_corrected"] = False
-                continue
 
-            location["latitude"] = -abs(latitude)
-            location["latitude_corrected"] = True
-            location["latitude_correction_source"] = "home_assistant_southern_hemisphere"
+            if _should_flip_western_longitude(
+                latitude,
+                longitude,
+                home_latitude,
+                home_longitude,
+            ):
+                location["longitude"] = -abs(longitude)
+                location["longitude_corrected"] = True
+                location["longitude_correction_source"] = "home_assistant_western_hemisphere"
+            else:
+                location["longitude_corrected"] = False
 
     async def _async_push_abrp(self, data: dict[str, Any]) -> None:
         """Push vehicle telemetry to ABRP when configured."""
@@ -473,6 +485,27 @@ def _should_flip_southern_latitude(
     as_reported_distance = _coordinate_distance_score(latitude, longitude, home_latitude, home_longitude)
     flipped_distance = _coordinate_distance_score(-abs(latitude), longitude, home_latitude, home_longitude)
     return flipped_distance + 1 < as_reported_distance
+
+
+def _should_flip_western_longitude(
+    latitude: float | None,
+    longitude: float | None,
+    home_latitude: float | None,
+    home_longitude: float | None,
+) -> bool:
+    """Return true when a positive API longitude is likely missing the western sign."""
+    if latitude is None or longitude is None or home_latitude is None or home_longitude is None:
+        return False
+    if longitude <= 0 or home_longitude >= 0:
+        return False
+    if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
+        return False
+    if not (-90 <= home_latitude <= 90 and -180 <= home_longitude <= 180):
+        return False
+
+    as_reported_distance = _coordinate_distance_score(latitude, longitude, home_latitude, home_longitude)
+    flipped_distance = _coordinate_distance_score(latitude, -abs(longitude), home_latitude, home_longitude)
+    return flipped_distance * 2 < as_reported_distance
 
 
 def _coordinate_distance_score(

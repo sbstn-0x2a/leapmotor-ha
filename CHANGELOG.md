@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.1 - 2026-05-09
+
+- Correct positive longitude values for western-hemisphere Home Assistant
+  installations when the mirrored negative longitude is clearly closer to the
+  configured Home Assistant home location. This fixes GPS placement for regions
+  west of Greenwich without hard-coding countries.
+- Expose longitude correction diagnostics on the device tracker via
+  `raw_longitude`, `longitude_corrected`, and `longitude_correction_source`.
+
 ## 0.6.0 - 2026-05-09
 
 - Start the 0.6 internal API-layer split by moving API exceptions, vehicle
