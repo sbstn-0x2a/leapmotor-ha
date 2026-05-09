@@ -102,7 +102,10 @@ integration from `Settings -> Devices & services`.
 ## Services
 
 The integration exposes services under `leapmotor.*`. Vehicle-targeted services
-accept either `vin` or an existing Leapmotor `entity_id`.
+accept either `vin` or an existing Leapmotor `entity_id`. Services that
+physically control the vehicle require the configured Vehicle PIN. Availability
+can still depend on model, vehicle state, account rights, and shared-car
+permissions.
 
 | Service | PIN required | Purpose |
 |---|---:|---|
@@ -120,7 +123,20 @@ accept either `vin` or an existing Leapmotor `entity_id`.
 | `leapmotor.send_destination` | no | Send destination to navigation |
 | `leapmotor.export_diagnostics` | no | Write redacted support JSON |
 
-Example:
+`windows_open` / `windows_close` accept optional `value` from `0` to `100`.
+`sunshade_open` / `sunshade_close` accept optional `value` from `0` to `10`.
+`set_charge_limit` requires `charge_limit_percent`. `send_destination` requires
+`name`, `latitude`, and `longitude`; `address` is optional.
+
+Unlock the charging connector:
+
+```yaml
+action: leapmotor.unlock_charger
+data:
+  entity_id: sensor.c10_battery
+```
+
+Send a destination:
 
 ```yaml
 action: leapmotor.send_destination

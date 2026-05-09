@@ -258,6 +258,9 @@ data:
   entity_id: sensor.c10_battery
 ```
 
+This requires the configured Vehicle PIN and uses the app-verified dedicated
+charger-unlock command, not the normal vehicle door-unlock command.
+
 Start quick climate heating:
 
 ```yaml
@@ -370,3 +373,15 @@ material is acceptable for their setup.
 Special thanks to [sbstn-0x2a](https://github.com/sbstn-0x2a) for validating and
 sharing additional Leapmotor raw-signal mappings across charging, doors,
 climate, heating, seating, range, and diagnostics.
+
+Special thanks to [Marco Ceri](https://github.com/markoceri) for the public
+Leapmotor API and certificate research that helped cross-check this integration.
+
+## Legal
+
+See [LEGAL.md](../../LEGAL.md) and [SECURITY.md](../../SECURITY.md) before
+publishing logs, diagnostics, or modified builds.
+
+## License
+
+MIT. See [LICENSE](../../LICENSE).
