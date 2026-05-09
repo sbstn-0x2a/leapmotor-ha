@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.2 - 2026-05-09
+
+- Remove the energy device class from the rolling 7-day energy sensor because
+  Home Assistant does not allow `device_class: energy` with
+  `state_class: measurement`.
+
 ## 0.6.1 - 2026-05-09
 
 - Correct positive longitude values for western-hemisphere Home Assistant
