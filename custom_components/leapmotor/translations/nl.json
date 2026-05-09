@@ -13,8 +13,14 @@
           "app_key_pem": "app_key.pem PEM plakken (privésleutel)",
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
           "scan_interval": "Update-interval in minuten",
+          "eco_polling_enabled": "Eco-polling inschakelen wanneer geparkeerd",
+          "eco_scan_interval": "Eco-update-interval in minuten",
           "abrp_enabled": "ABRP live-data inschakelen",
           "abrp_token": "ABRP Generic-token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Gebruik het langzamere eco-interval alleen wanneer alle voertuigen duidelijk vergrendeld, geparkeerd en niet aangesloten zijn.",
+          "eco_scan_interval": "Pollinginterval in eco-modus. Dit wordt automatisch minimaal gelijk aan het normale update-interval gezet."
         }
       },
       "init": {
@@ -27,6 +33,8 @@
           "app_key_pem": "app_key.pem PEM plakken (privésleutel)",
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
           "scan_interval": "Update-interval in minuten",
+          "eco_polling_enabled": "Eco-polling inschakelen wanneer geparkeerd",
+          "eco_scan_interval": "Eco-update-interval in minuten",
           "abrp_enabled": "ABRP live-data inschakelen",
           "abrp_token": "ABRP Generic-token"
         }
@@ -49,8 +57,14 @@
           "password": "Wachtwoord",
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
           "scan_interval": "Update-interval in minuten",
+          "eco_polling_enabled": "Eco-polling inschakelen wanneer geparkeerd",
+          "eco_scan_interval": "Eco-update-interval in minuten",
           "abrp_enabled": "ABRP live-data inschakelen",
           "abrp_token": "ABRP Generic-token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Gebruik het langzamere eco-interval alleen wanneer alle voertuigen duidelijk vergrendeld, geparkeerd en niet aangesloten zijn.",
+          "eco_scan_interval": "Pollinginterval in eco-modus. Dit wordt automatisch minimaal gelijk aan het normale update-interval gezet."
         }
       }
     },
@@ -232,7 +246,10 @@
         "name": "Energieverbruik laatste 7 dagen"
       },
       "average_consumption_6w_kwh_100km": {
-        "name": "Gemiddeld verbruik 6 weken"
+        "name": "Gemiddeld verbruik 6 weken (kWh/100 km)"
+      },
+      "average_consumption_6w_mi_kwh": {
+        "name": "Gemiddeld verbruik 6 weken (mi/kWh)"
       },
       "last_week_driving_energy_percent": {
         "name": "Rij-energie vorige week"
@@ -482,8 +499,14 @@
           "app_key_pem": "app_key.pem PEM plakken (privésleutel)",
           "operation_password": "Voertuig-PIN (optioneel, voor bediening)",
           "scan_interval": "Update-interval in minuten",
+          "eco_polling_enabled": "Eco-polling inschakelen wanneer geparkeerd",
+          "eco_scan_interval": "Eco-update-interval in minuten",
           "abrp_enabled": "ABRP live-data inschakelen",
           "abrp_token": "ABRP Generic-token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Gebruik het langzamere eco-interval alleen wanneer alle voertuigen duidelijk vergrendeld, geparkeerd en niet aangesloten zijn.",
+          "eco_scan_interval": "Pollinginterval in eco-modus. Dit wordt automatisch minimaal gelijk aan het normale update-interval gezet."
         }
       }
     }

@@ -13,7 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .abrp import build_abrp_telemetry, send_abrp_telemetry
-from .api import LeapmotorApiClient, LeapmotorApiError
+from .api import LeapmotorApiClient
 from .const import (
     CONF_ABRP_ENABLED,
     CONF_ABRP_TOKEN,
@@ -22,6 +22,7 @@ from .const import (
     DOMAIN,
     REMOTE_ACTION_COOLDOWN_SECONDS,
 )
+from .leap_api import LeapmotorApiError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +37,8 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
         config_entry: ConfigEntry,
         client: LeapmotorApiClient,
         update_interval: timedelta,
+        eco_polling_enabled: bool = False,
+        eco_update_interval: timedelta | None = None,
     ) -> None:
         super().__init__(
             hass,
@@ -45,6 +48,10 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
             update_interval=update_interval,
         )
         self.client = client
+        self._normal_update_interval = update_interval
+        self._eco_polling_enabled = eco_polling_enabled
+        self._eco_update_interval = eco_update_interval or update_interval
+        self._polling_mode = "normal"
         self._lock_state_overrides: dict[str, tuple[bool, float]] = {}
         self._last_remote_results: dict[str, dict[str, Any]] = {}
         self._last_abrp_results: dict[str, dict[str, Any]] = {}
@@ -60,6 +67,10 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
             "last_update_duration_seconds": None,
             "last_update_reason": "startup",
             "update_interval_seconds": int(update_interval.total_seconds()),
+            "normal_update_interval_seconds": int(update_interval.total_seconds()),
+            "eco_update_interval_seconds": int(self._eco_update_interval.total_seconds()),
+            "eco_polling_enabled": self._eco_polling_enabled,
+            "polling_mode": self._polling_mode,
             "vehicle_count": 0,
         }
         self._pending_update_reason = "startup"
@@ -92,10 +103,20 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
                 "last_successful_update_at": self._integration_status.get("last_successful_update_at"),
                 "last_update_duration_seconds": round(time.time() - started_at, 3),
                 "last_update_reason": update_reason,
-                "update_interval_seconds": self._integration_status.get("update_interval_seconds"),
+                "update_interval_seconds": int(self.update_interval.total_seconds())
+                if self.update_interval
+                else self._integration_status.get("update_interval_seconds"),
+                "normal_update_interval_seconds": int(self._normal_update_interval.total_seconds()),
+                "eco_update_interval_seconds": int(self._eco_update_interval.total_seconds()),
+                "eco_polling_enabled": self._eco_polling_enabled,
+                "polling_mode": self._polling_mode,
                 "vehicle_count": self._integration_status.get("vehicle_count", 0),
             }
             raise UpdateFailed(str(exc)) from exc
+        self._stabilize_vehicle_states(data)
+        self._apply_state_freshness(data)
+        self._normalize_locations(data)
+        self._update_polling_interval(data)
         self._integration_status = {
             "last_update_status": "ok",
             "last_update_success": True,
@@ -106,17 +127,27 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
             "last_successful_update_at": time.time(),
             "last_update_duration_seconds": round(time.time() - started_at, 3),
             "last_update_reason": update_reason,
-            "update_interval_seconds": self._integration_status.get("update_interval_seconds"),
+            "update_interval_seconds": int(self.update_interval.total_seconds())
+            if self.update_interval
+            else None,
+            "normal_update_interval_seconds": int(self._normal_update_interval.total_seconds()),
+            "eco_update_interval_seconds": int(self._eco_update_interval.total_seconds()),
+            "eco_polling_enabled": self._eco_polling_enabled,
+            "polling_mode": self._polling_mode,
             "vehicle_count": len((data.get("vehicles") or {})),
         }
-        self._stabilize_vehicle_states(data)
-        self._apply_state_freshness(data)
-        self._normalize_locations(data)
         await self._async_push_abrp(data)
         self._apply_lock_state_overrides(data)
         self._apply_remote_results(data)
         self._apply_abrp_results(data)
         self._apply_integration_status(data)
+        _LOGGER.debug(
+            "Leapmotor update completed: reason=%s vehicles=%s polling_mode=%s duration=%ss",
+            update_reason,
+            self._integration_status.get("vehicle_count"),
+            self._polling_mode,
+            self._integration_status.get("last_update_duration_seconds"),
+        )
         return data
 
     @property
@@ -198,6 +229,29 @@ class LeapmotorDataUpdateCoordinator(DataUpdateCoordinator[dict]):
     def _apply_integration_status(self, data: dict[str, Any]) -> None:
         """Expose the current update status inside the coordinator payload."""
         data["_integration"] = dict(self._integration_status)
+
+    def _update_polling_interval(self, data: dict[str, Any]) -> None:
+        """Switch to slower polling only when every vehicle is clearly idle."""
+        if not self._eco_polling_enabled:
+            self.update_interval = self._normal_update_interval
+            self._polling_mode = "normal"
+            return
+
+        target_interval = (
+            self._eco_update_interval
+            if _all_vehicles_quiet(data)
+            else self._normal_update_interval
+        )
+        previous_mode = self._polling_mode
+        self.update_interval = target_interval
+        self._polling_mode = "eco" if target_interval == self._eco_update_interval else "normal"
+        if self._polling_mode != previous_mode:
+            _LOGGER.debug(
+                "Leapmotor polling mode changed from %s to %s (interval=%ss)",
+                previous_mode,
+                self._polling_mode,
+                int(target_interval.total_seconds()),
+            )
 
     def _apply_state_freshness(self, data: dict[str, Any]) -> None:
         """Mark critical states as stale when the cloud timestamp is too old."""
@@ -375,6 +429,25 @@ def _state_age_seconds(raw_timestamp: Any) -> int | None:
         return None
     age = int(time.time() - event_ts)
     return max(age, 0)
+
+
+def _all_vehicles_quiet(data: dict[str, Any]) -> bool:
+    """Return true when every vehicle is safe for slower cloud polling."""
+    vehicles = (data.get("vehicles") or {}).values()
+    seen_vehicle = False
+    for vehicle_data in vehicles:
+        seen_vehicle = True
+        status = vehicle_data.get("status") or {}
+        charging = vehicle_data.get("charging") or {}
+        if status.get("is_locked") is not True:
+            return False
+        if status.get("is_parked") is not True:
+            return False
+        if charging.get("is_charging") is True:
+            return False
+        if charging.get("is_plugged_in") is not False:
+            return False
+    return seen_vehicle
 
 
 def _should_flip_southern_latitude(

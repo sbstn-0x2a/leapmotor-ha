@@ -9,8 +9,8 @@ from typing import Any
 
 from homeassistant.exceptions import HomeAssistantError
 
-from .api import LeapmotorApiError, LeapmotorMissingAppCertError
 from .coordinator import LeapmotorDataUpdateCoordinator
+from .leap_api import LeapmotorApiError, LeapmotorMissingAppCertError
 
 
 @dataclass(frozen=True, slots=True)

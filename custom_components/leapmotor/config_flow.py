@@ -15,8 +15,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import selector
 
 from .api import (
-    LeapmotorAccountCertError,
     LeapmotorApiClient,
+)
+from .leap_api import (
+    LeapmotorAccountCertError,
     LeapmotorApiError,
     LeapmotorAuthError,
     LeapmotorMissingAppCertError,
@@ -29,8 +31,11 @@ from .const import (
     CONF_APP_CERT_PEM,
     CONF_APP_KEY_FILE,
     CONF_APP_KEY_PEM,
+    CONF_ECO_POLLING_ENABLED,
+    CONF_ECO_SCAN_INTERVAL,
     CONF_OPERATION_PASSWORD,
     CONF_SCAN_INTERVAL,
+    DEFAULT_ECO_SCAN_INTERVAL_MINUTES,
     DEFAULT_SCAN_INTERVAL_MINUTES,
     DOMAIN,
     STATIC_APP_CERT,
@@ -47,6 +52,11 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL_MINUTES): vol.All(
             vol.Coerce(int),
             vol.Range(min=1, max=120),
+        ),
+        vol.Optional(CONF_ECO_POLLING_ENABLED, default=False): bool,
+        vol.Optional(CONF_ECO_SCAN_INTERVAL, default=DEFAULT_ECO_SCAN_INTERVAL_MINUTES): vol.All(
+            vol.Coerce(int),
+            vol.Range(min=5, max=240),
         ),
         vol.Optional(CONF_ABRP_ENABLED, default=False): bool,
         vol.Optional(CONF_ABRP_TOKEN, default=""): str,
@@ -268,6 +278,8 @@ class LeapmotorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_PASSWORD: user_input[CONF_PASSWORD],
                     CONF_OPERATION_PASSWORD: user_input.get(CONF_OPERATION_PASSWORD) or "",
                     CONF_SCAN_INTERVAL: user_input[CONF_SCAN_INTERVAL],
+                    CONF_ECO_POLLING_ENABLED: bool(user_input.get(CONF_ECO_POLLING_ENABLED)),
+                    CONF_ECO_SCAN_INTERVAL: user_input[CONF_ECO_SCAN_INTERVAL],
                     CONF_ABRP_ENABLED: bool(user_input.get(CONF_ABRP_ENABLED)),
                     CONF_ABRP_TOKEN: user_input.get(CONF_ABRP_TOKEN) or "",
                 }
@@ -312,6 +324,8 @@ class LeapmotorOptionsFlow(config_entries.OptionsFlow):
                 data={
                     CONF_OPERATION_PASSWORD: user_input.get(CONF_OPERATION_PASSWORD) or "",
                     CONF_SCAN_INTERVAL: user_input[CONF_SCAN_INTERVAL],
+                    CONF_ECO_POLLING_ENABLED: bool(user_input.get(CONF_ECO_POLLING_ENABLED)),
+                    CONF_ECO_SCAN_INTERVAL: user_input[CONF_ECO_SCAN_INTERVAL],
                     CONF_ABRP_ENABLED: bool(user_input.get(CONF_ABRP_ENABLED)),
                     CONF_ABRP_TOKEN: user_input.get(CONF_ABRP_TOKEN) or "",
                 },
@@ -337,6 +351,10 @@ class LeapmotorOptionsFlow(config_entries.OptionsFlow):
             CONF_SCAN_INTERVAL,
             self._config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES),
         )
+        eco_scan_interval = self._config_entry.options.get(
+            CONF_ECO_SCAN_INTERVAL,
+            self._config_entry.data.get(CONF_ECO_SCAN_INTERVAL, DEFAULT_ECO_SCAN_INTERVAL_MINUTES),
+        )
         return vol.Schema(
             {
                 vol.Optional(CONF_APP_CERT_FILE): selector.FileSelector(
@@ -355,6 +373,19 @@ class LeapmotorOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(CONF_SCAN_INTERVAL, default=scan_interval): vol.All(
                     vol.Coerce(int),
                     vol.Range(min=1, max=120),
+                ),
+                vol.Optional(
+                    CONF_ECO_POLLING_ENABLED,
+                    default=bool(
+                        self._config_entry.options.get(
+                            CONF_ECO_POLLING_ENABLED,
+                            self._config_entry.data.get(CONF_ECO_POLLING_ENABLED, False),
+                        )
+                    ),
+                ): bool,
+                vol.Optional(CONF_ECO_SCAN_INTERVAL, default=eco_scan_interval): vol.All(
+                    vol.Coerce(int),
+                    vol.Range(min=5, max=240),
                 ),
                 vol.Optional(
                     CONF_ABRP_ENABLED,

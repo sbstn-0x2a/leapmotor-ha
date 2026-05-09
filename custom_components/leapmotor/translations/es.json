@@ -13,8 +13,14 @@
           "app_key_pem": "Pegar PEM de app_key.pem (clave privada)",
           "operation_password": "PIN del vehiculo (opcional, para control)",
           "scan_interval": "Intervalo de actualizacion en minutos",
+          "eco_polling_enabled": "Activar sondeo eco cuando esta aparcado",
+          "eco_scan_interval": "Intervalo eco de actualizacion en minutos",
           "abrp_enabled": "Activar datos en vivo de ABRP",
           "abrp_token": "Token Generic de ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Usa el intervalo eco mas lento solo cuando todos los vehiculos estan claramente cerrados, aparcados y desconectados.",
+          "eco_scan_interval": "Intervalo de sondeo en modo eco. Se ajusta automaticamente como minimo al intervalo normal de actualizacion."
         }
       },
       "init": {
@@ -27,6 +33,8 @@
           "app_key_pem": "Pegar PEM de app_key.pem (clave privada)",
           "operation_password": "PIN del vehiculo (opcional, para control)",
           "scan_interval": "Intervalo de actualizacion en minutos",
+          "eco_polling_enabled": "Activar sondeo eco cuando esta aparcado",
+          "eco_scan_interval": "Intervalo eco de actualizacion en minutos",
           "abrp_enabled": "Activar datos en vivo de ABRP",
           "abrp_token": "Token Generic de ABRP"
         }
@@ -49,8 +57,14 @@
           "password": "Contrasena",
           "operation_password": "PIN del vehiculo (opcional, para control)",
           "scan_interval": "Intervalo de actualizacion en minutos",
+          "eco_polling_enabled": "Activar sondeo eco cuando esta aparcado",
+          "eco_scan_interval": "Intervalo eco de actualizacion en minutos",
           "abrp_enabled": "Activar datos en vivo de ABRP",
           "abrp_token": "Token Generic de ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Usa el intervalo eco mas lento solo cuando todos los vehiculos estan claramente cerrados, aparcados y desconectados.",
+          "eco_scan_interval": "Intervalo de sondeo en modo eco. Se ajusta automaticamente como minimo al intervalo normal de actualizacion."
         }
       }
     },
@@ -232,7 +246,10 @@
         "name": "Energía últimos 7 días"
       },
       "average_consumption_6w_kwh_100km": {
-        "name": "Consumo medio 6 semanas"
+        "name": "Consumo medio 6 semanas (kWh/100 km)"
+      },
+      "average_consumption_6w_mi_kwh": {
+        "name": "Consumo medio 6 semanas (mi/kWh)"
       },
       "last_week_driving_energy_percent": {
         "name": "Energía conducción semana pasada"
@@ -482,8 +499,14 @@
           "app_key_pem": "Pegar PEM de app_key.pem (clave privada)",
           "operation_password": "PIN del vehiculo (opcional, para control)",
           "scan_interval": "Intervalo de actualizacion en minutos",
+          "eco_polling_enabled": "Activar sondeo eco cuando esta aparcado",
+          "eco_scan_interval": "Intervalo eco de actualizacion en minutos",
           "abrp_enabled": "Activar datos en vivo de ABRP",
           "abrp_token": "Token Generic de ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Usa el intervalo eco mas lento solo cuando todos los vehiculos estan claramente cerrados, aparcados y desconectados.",
+          "eco_scan_interval": "Intervalo de sondeo en modo eco. Se ajusta automaticamente como minimo al intervalo normal de actualizacion."
         }
       }
     }

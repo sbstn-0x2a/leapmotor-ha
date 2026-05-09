@@ -38,6 +38,7 @@ from .entity_migration import english_entity_slug
 PRESSURE_BAR = "bar"
 ENERGY_KWH = "kWh"
 CONSUMPTION_KWH_PER_100KM = "kWh/100 km"
+CONSUMPTION_MI_PER_KWH = "mi/kWh"
 WHOLE_KILOMETER_KEYS = {
     "remaining_range_km",
     "cltc_range_km",
@@ -83,6 +84,7 @@ OPTIONAL_SENSOR_PATHS = {
     "driver_seat_ventilation_level": "diagnostics.driver_seat_ventilation_level",
     "passenger_seat_ventilation_level": "diagnostics.passenger_seat_ventilation_level",
     "speed_limit_kmh": "diagnostics.speed_limit_kmh",
+    "average_consumption_6w_mi_kwh": "history.average_consumption_6w_mi_kwh",
 }
 
 
@@ -592,6 +594,7 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         key="last_7_days_energy_kwh",
         translation_key="last_7_days_energy_kwh",
         native_unit_of_measurement=ENERGY_KWH,
+        device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
         icon="mdi:calendar-week",
@@ -607,6 +610,16 @@ SENSOR_DESCRIPTIONS: tuple[LeapmotorSensorEntityDescription, ...] = (
         icon="mdi:chart-bar",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data["history"].get("average_consumption_6w_kwh_100km"),
+    ),
+    LeapmotorSensorEntityDescription(
+        key="average_consumption_6w_mi_kwh",
+        translation_key="average_consumption_6w_mi_kwh",
+        native_unit_of_measurement=CONSUMPTION_MI_PER_KWH,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        icon="mdi:chart-bar",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data["history"].get("average_consumption_6w_mi_kwh"),
     ),
     LeapmotorSensorEntityDescription(
         key="last_week_driving_energy_percent",
@@ -839,9 +852,20 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
                     "last_update_error_code": integration.get("last_update_error_code"),
                     "last_update_duration_seconds": integration.get("last_update_duration_seconds"),
                     "update_interval_seconds": integration.get("update_interval_seconds"),
+                    "polling_mode": integration.get("polling_mode"),
+                    "eco_polling_enabled": integration.get("eco_polling_enabled"),
+                    "normal_update_interval_seconds": integration.get(
+                        "normal_update_interval_seconds"
+                    ),
+                    "eco_update_interval_seconds": integration.get(
+                        "eco_update_interval_seconds"
+                    ),
                 }
             )
-        if self.entity_description.key == "average_consumption_6w_kwh_100km":
+        if self.entity_description.key in {
+            "average_consumption_6w_kwh_100km",
+            "average_consumption_6w_mi_kwh",
+        }:
             history = self.vehicle_data["history"]
             attributes.update(
                 {

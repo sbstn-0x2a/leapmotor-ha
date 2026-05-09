@@ -13,8 +13,14 @@
           "app_key_pem": "Paste app_key.pem PEM (private key)",
           "operation_password": "Vehicle PIN (optional, for control)",
           "scan_interval": "Update interval in minutes",
+          "eco_polling_enabled": "Enable eco polling when parked",
+          "eco_scan_interval": "Eco update interval in minutes",
           "abrp_enabled": "Enable ABRP live data",
           "abrp_token": "ABRP Generic token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Use the slower eco interval only while every vehicle is clearly locked, parked, and unplugged.",
+          "eco_scan_interval": "Polling interval used in eco mode. It is automatically clamped to at least the normal update interval."
         }
       },
       "init": {
@@ -27,6 +33,8 @@
           "app_key_pem": "Paste app_key.pem PEM (private key)",
           "operation_password": "Vehicle PIN (optional, for control)",
           "scan_interval": "Update interval in minutes",
+          "eco_polling_enabled": "Enable eco polling when parked",
+          "eco_scan_interval": "Eco update interval in minutes",
           "abrp_enabled": "Enable ABRP live data",
           "abrp_token": "ABRP Generic token"
         }
@@ -49,8 +57,14 @@
           "password": "Password",
           "operation_password": "Vehicle PIN (optional, for control)",
           "scan_interval": "Update interval in minutes",
+          "eco_polling_enabled": "Enable eco polling when parked",
+          "eco_scan_interval": "Eco update interval in minutes",
           "abrp_enabled": "Enable ABRP live data",
           "abrp_token": "ABRP Generic token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Use the slower eco interval only while every vehicle is clearly locked, parked, and unplugged.",
+          "eco_scan_interval": "Polling interval used in eco mode. It is automatically clamped to at least the normal update interval."
         }
       }
     },
@@ -223,7 +237,10 @@
         "name": "Last 7 days energy consumption"
       },
       "average_consumption_6w_kwh_100km": {
-        "name": "6 week average consumption"
+        "name": "6 week average consumption (kWh/100 km)"
+      },
+      "average_consumption_6w_mi_kwh": {
+        "name": "6 week average consumption (mi/kWh)"
       },
       "last_week_driving_energy_percent": {
         "name": "Last week driving energy"
@@ -482,8 +499,14 @@
           "app_key_pem": "Paste app_key.pem PEM (private key)",
           "operation_password": "Vehicle PIN (optional, for control)",
           "scan_interval": "Update interval in minutes",
+          "eco_polling_enabled": "Enable eco polling when parked",
+          "eco_scan_interval": "Eco update interval in minutes",
           "abrp_enabled": "Enable ABRP live data",
           "abrp_token": "ABRP Generic token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Use the slower eco interval only while every vehicle is clearly locked, parked, and unplugged.",
+          "eco_scan_interval": "Polling interval used in eco mode. It is automatically clamped to at least the normal update interval."
         }
       }
     }

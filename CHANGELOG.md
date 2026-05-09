@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0 - 2026-05-09
+
+- Start the 0.6 internal API-layer split by moving API exceptions, vehicle
+  models, remote-command payloads, operatePassword crypto helpers, and the
+  curl transport into `custom_components/leapmotor/leap_api`.
+- Add optional eco polling. When enabled, the integration switches to a slower
+  polling interval only while every vehicle is clearly locked, parked, and
+  unplugged; otherwise it keeps the normal interval.
+- Expose polling mode and normal/eco intervals in integration diagnostics.
+- Add a compact redacted `support_summary` to diagnostics exports for easier
+  issue triage without sharing the full payload.
+- Tighten unit metadata for energy sensors and expose the API-provided
+  `mi/kWh` average consumption value as an optional diagnostic sensor for
+  imperial-unit users.
+
 ## 0.5.39 - 2026-05-09
 
 - Add a dedicated charger-unlock button and `leapmotor.unlock_charger`

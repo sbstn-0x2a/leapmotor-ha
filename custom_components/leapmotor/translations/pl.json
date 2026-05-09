@@ -13,8 +13,14 @@
           "app_key_pem": "Wklej PEM app_key.pem (klucz prywatny)",
           "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
           "scan_interval": "Interwal aktualizacji w minutach",
+          "eco_polling_enabled": "Wlacz polling eco podczas postoju",
+          "eco_scan_interval": "Interwal aktualizacji eco w minutach",
           "abrp_enabled": "Wlacz dane live ABRP",
           "abrp_token": "Token Generic ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Uzywa wolniejszego interwalu eco tylko gdy wszystkie pojazdy sa jednoznacznie zamkniete, zaparkowane i odlaczone.",
+          "eco_scan_interval": "Interwal odpytywania w trybie eco. Jest automatycznie ograniczany co najmniej do normalnego interwalu aktualizacji."
         }
       },
       "init": {
@@ -27,6 +33,8 @@
           "app_key_pem": "Wklej PEM app_key.pem (klucz prywatny)",
           "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
           "scan_interval": "Interwal aktualizacji w minutach",
+          "eco_polling_enabled": "Wlacz polling eco podczas postoju",
+          "eco_scan_interval": "Interwal aktualizacji eco w minutach",
           "abrp_enabled": "Wlacz dane live ABRP",
           "abrp_token": "Token Generic ABRP"
         }
@@ -49,8 +57,14 @@
           "password": "Haslo",
           "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
           "scan_interval": "Interwal aktualizacji w minutach",
+          "eco_polling_enabled": "Wlacz polling eco podczas postoju",
+          "eco_scan_interval": "Interwal aktualizacji eco w minutach",
           "abrp_enabled": "Wlacz dane live ABRP",
           "abrp_token": "Token Generic ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Uzywa wolniejszego interwalu eco tylko gdy wszystkie pojazdy sa jednoznacznie zamkniete, zaparkowane i odlaczone.",
+          "eco_scan_interval": "Interwal odpytywania w trybie eco. Jest automatycznie ograniczany co najmniej do normalnego interwalu aktualizacji."
         }
       }
     },
@@ -232,7 +246,10 @@
         "name": "Energia z ostatnich 7 dni"
       },
       "average_consumption_6w_kwh_100km": {
-        "name": "Średnie zużycie 6 tygodni"
+        "name": "Średnie zużycie 6 tygodni (kWh/100 km)"
+      },
+      "average_consumption_6w_mi_kwh": {
+        "name": "Średnie zużycie 6 tygodni (mi/kWh)"
       },
       "last_week_driving_energy_percent": {
         "name": "Energia jazdy w zeszłym tygodniu"
@@ -482,8 +499,14 @@
           "app_key_pem": "Wklej PEM app_key.pem (klucz prywatny)",
           "operation_password": "PIN pojazdu (opcjonalny, do sterowania)",
           "scan_interval": "Interwal aktualizacji w minutach",
+          "eco_polling_enabled": "Wlacz polling eco podczas postoju",
+          "eco_scan_interval": "Interwal aktualizacji eco w minutach",
           "abrp_enabled": "Wlacz dane live ABRP",
           "abrp_token": "Token Generic ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Uzywa wolniejszego interwalu eco tylko gdy wszystkie pojazdy sa jednoznacznie zamkniete, zaparkowane i odlaczone.",
+          "eco_scan_interval": "Interwal odpytywania w trybie eco. Jest automatycznie ograniczany co najmniej do normalnego interwalu aktualizacji."
         }
       }
     }

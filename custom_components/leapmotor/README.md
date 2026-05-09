@@ -57,6 +57,8 @@ Available data includes:
 - Native Home Assistant service `leapmotor.send_destination` for sending a
   latitude/longitude destination to the vehicle navigation.
 - Optional ABRP Generic Telemetry live-data push after successful vehicle polls.
+- Native HA unit metadata for standard measurements; EV consumption is exposed
+  as `kWh/100 km` plus optional `mi/kWh` when the API provides it.
 
 ## Install
 
@@ -143,11 +145,14 @@ normal user install path.
   usually require this PIN and stay unavailable without it. Sending a
   destination does not require the PIN, matching the observed app flow.
 - Update interval: default `5` minutes
+- Eco polling: optional; when enabled, polling switches to the slower eco
+  interval only while every vehicle is locked, parked, and unplugged.
+- Eco update interval: default `15` minutes
 - ABRP live data: optional
 - ABRP Generic token: optional; only required when ABRP live data is enabled
 
-After setup, the Vehicle PIN and update interval can be changed from the
-integration options without recreating the entry.
+After setup, the Vehicle PIN, update interval, eco polling, and ABRP options can
+be changed from the integration options without recreating the entry.
 
 ## State Freshness
 
@@ -168,6 +173,10 @@ integration options without recreating the entry.
   attributes and diagnostics so stale backend data is easier to identify.
 - Each vehicle also gets a `Refresh data` button to trigger an immediate poll
   outside the normal 5-minute interval.
+- Optional eco polling can switch to a slower interval when all vehicles are
+  clearly locked, parked, and unplugged. It switches back to the normal interval
+  as soon as a vehicle is not clearly quiet, for example when plugged in,
+  charging, unlocked, or moving.
 - Home Assistant's own `x minutes ago` text often reflects the last state
   change, not the last successful poll. Use the `Last refresh` sensor to see
   when the integration actually fetched data successfully.
@@ -314,6 +323,12 @@ data:
   last remote-control result.
 - `leapmotor.export_diagnostics` writes the same anonymized support data to a
   JSON file under `/config/leapmotor`.
+- Diagnostics include a compact redacted `support_summary` with vehicle count,
+  model, endpoint path, signal count, charging connection state, polling mode,
+  and last API result labels.
+- The internal API primitives now live under `custom_components/leapmotor/leap_api`
+  so Home Assistant entities are less coupled to auth, crypto, transport, and
+  remote-command payload definitions.
 - The vehicle image no longer uses the generic `shareBindUrl` CDN fallback. It
   now downloads the signed vehicle picture package once per picture key and
   serves the extracted static image from the local Home Assistant cache.
@@ -356,6 +371,24 @@ data:
 - Stale or unavailable entities: press `Refresh data`, check `Last refresh`,
   then run `leapmotor.export_diagnostics` and inspect the JSON under
   `/config/leapmotor`.
+
+## Debug Logging
+
+For troubleshooting, enable Home Assistant debug logging for the integration:
+
+```yaml
+logger:
+  default: info
+  logs:
+    custom_components.leapmotor: debug
+```
+
+Restart Home Assistant after changing `configuration.yaml`. Debug logs are
+intended to show sanitized API status codes, polling mode changes, update
+reasons, and integration flow details. Do not publish full Home Assistant logs
+without checking them for account data, VINs, locations, tokens, or certificate
+material first. For public issues, prefer `leapmotor.export_diagnostics`, which
+redacts secrets and includes a compact `support_summary`.
 
 ## Certificate Retrieval
 

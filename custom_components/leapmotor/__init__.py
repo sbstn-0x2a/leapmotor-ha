@@ -18,9 +18,12 @@ from .api import LeapmotorApiClient
 from .button import BUTTON_SPECS
 from .const import (
     CONF_ACCOUNT_P12_PASSWORD,
+    CONF_ECO_POLLING_ENABLED,
+    CONF_ECO_SCAN_INTERVAL,
     CONF_OPERATION_PASSWORD,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL_MINUTES,
+    DEFAULT_ECO_SCAN_INTERVAL_MINUTES,
     DOMAIN,
     STATIC_CERT_STORAGE_DIR,
 )
@@ -105,6 +108,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES),
         )
     )
+    eco_scan_interval = int(
+        entry.options.get(
+            CONF_ECO_SCAN_INTERVAL,
+            entry.data.get(CONF_ECO_SCAN_INTERVAL, DEFAULT_ECO_SCAN_INTERVAL_MINUTES),
+        )
+    )
     operation_password = (
         entry.options[CONF_OPERATION_PASSWORD]
         if CONF_OPERATION_PASSWORD in entry.options
@@ -122,6 +131,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         config_entry=entry,
         client=client,
         update_interval=timedelta(minutes=scan_interval),
+        eco_polling_enabled=bool(
+            entry.options.get(
+                CONF_ECO_POLLING_ENABLED,
+                entry.data.get(CONF_ECO_POLLING_ENABLED, False),
+            )
+        ),
+        eco_update_interval=timedelta(minutes=max(eco_scan_interval, scan_interval)),
     )
     await coordinator.async_config_entry_first_refresh()
     await async_migrate_entity_registry_to_english(

@@ -79,7 +79,13 @@ async def async_get_config_entry_diagnostics(
     client = getattr(coordinator, "client", None) if coordinator else None
     static_cert = getattr(client, "static_cert", None)
     static_key = getattr(client, "static_key", None)
+    integration_status = coordinator.integration_status if coordinator else None
     return {
+        "support_summary": _support_summary(
+            vehicles=vehicles,
+            integration_status=integration_status,
+            client=client,
+        ),
         "entry": _redact(
             {
                 "title": entry.title,
@@ -95,9 +101,45 @@ async def async_get_config_entry_diagnostics(
             "account_p12_password_source": getattr(client, "account_p12_password_source", None),
             "operation_password_configured": bool(getattr(client, "operation_password", None)),
             "last_api_results": getattr(client, "last_api_results", {}),
-            "integration_status": coordinator.integration_status if coordinator else None,
+            "integration_status": integration_status,
         },
         "vehicles": vehicles,
+    }
+
+
+def _support_summary(
+    *,
+    vehicles: dict[str, Any],
+    integration_status: dict[str, Any] | None,
+    client: Any,
+) -> dict[str, Any]:
+    """Return a compact, safe summary suitable for support issue comments."""
+    return {
+        "vehicle_count": len(vehicles),
+        "vehicles": [
+            {
+                "vin": vin,
+                "car_type": (vehicle_data.get("vehicle") or {}).get("car_type"),
+                "is_shared": (vehicle_data.get("vehicle") or {}).get("is_shared"),
+                "status_endpoint_path": (
+                    vehicle_data.get("diagnostics") or {}
+                ).get("status_endpoint_path"),
+                "status_signal_count": (
+                    vehicle_data.get("diagnostics") or {}
+                ).get("status_signal_count"),
+                "charging_connection": (
+                    vehicle_data.get("charging") or {}
+                ).get("connection_state"),
+                "vehicle_state": (vehicle_data.get("status") or {}).get("vehicle_state"),
+            }
+            for vin, vehicle_data in vehicles.items()
+        ],
+        "integration": integration_status or {},
+        "last_api_result_labels": sorted(
+            (getattr(client, "last_api_results", {}) or {}).keys()
+        )
+        if client
+        else [],
     }
 
 

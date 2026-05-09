@@ -13,8 +13,14 @@
           "app_key_pem": "app_key.pem PEM einfügen (Private Key)",
           "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten",
+          "eco_polling_enabled": "Eco-Polling im geparkten Zustand aktivieren",
+          "eco_scan_interval": "Eco-Aktualisierungsintervall in Minuten",
           "abrp_enabled": "ABRP Live-Daten aktivieren",
           "abrp_token": "ABRP Generic Token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Das langsamere Eco-Intervall nur verwenden, wenn alle Fahrzeuge eindeutig verriegelt, geparkt und nicht angesteckt sind.",
+          "eco_scan_interval": "Polling-Intervall im Eco-Modus. Es wird automatisch mindestens auf das normale Aktualisierungsintervall begrenzt."
         }
       },
       "init": {
@@ -27,6 +33,8 @@
           "app_key_pem": "app_key.pem PEM einfügen (Private Key)",
           "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten",
+          "eco_polling_enabled": "Eco-Polling im geparkten Zustand aktivieren",
+          "eco_scan_interval": "Eco-Aktualisierungsintervall in Minuten",
           "abrp_enabled": "ABRP Live-Daten aktivieren",
           "abrp_token": "ABRP Generic Token"
         }
@@ -49,8 +57,14 @@
           "password": "Passwort",
           "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten",
+          "eco_polling_enabled": "Eco-Polling im geparkten Zustand aktivieren",
+          "eco_scan_interval": "Eco-Aktualisierungsintervall in Minuten",
           "abrp_enabled": "ABRP Live-Daten aktivieren",
           "abrp_token": "ABRP Generic Token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Das langsamere Eco-Intervall nur verwenden, wenn alle Fahrzeuge eindeutig verriegelt, geparkt und nicht angesteckt sind.",
+          "eco_scan_interval": "Polling-Intervall im Eco-Modus. Es wird automatisch mindestens auf das normale Aktualisierungsintervall begrenzt."
         }
       }
     },
@@ -223,7 +237,10 @@
         "name": "Energieverbrauch letzte 7 Tage"
       },
       "average_consumption_6w_kwh_100km": {
-        "name": "Durchschnittsverbrauch 6 Wochen"
+        "name": "Durchschnittsverbrauch 6 Wochen (kWh/100 km)"
+      },
+      "average_consumption_6w_mi_kwh": {
+        "name": "Durchschnittsverbrauch 6 Wochen (mi/kWh)"
       },
       "last_week_driving_energy_percent": {
         "name": "Fahrenergie letzte Woche"
@@ -482,8 +499,14 @@
           "app_key_pem": "app_key.pem PEM einfügen (Private Key)",
           "operation_password": "Fahrzeug-PIN (optional, für Steuerung)",
           "scan_interval": "Aktualisierungsintervall in Minuten",
+          "eco_polling_enabled": "Eco-Polling im geparkten Zustand aktivieren",
+          "eco_scan_interval": "Eco-Aktualisierungsintervall in Minuten",
           "abrp_enabled": "ABRP Live-Daten aktivieren",
           "abrp_token": "ABRP Generic Token"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Das langsamere Eco-Intervall nur verwenden, wenn alle Fahrzeuge eindeutig verriegelt, geparkt und nicht angesteckt sind.",
+          "eco_scan_interval": "Polling-Intervall im Eco-Modus. Es wird automatisch mindestens auf das normale Aktualisierungsintervall begrenzt."
         }
       }
     }

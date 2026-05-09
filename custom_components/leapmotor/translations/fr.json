@@ -13,8 +13,14 @@
           "app_key_pem": "Coller le PEM app_key.pem (cle privee)",
           "operation_password": "PIN vehicule (optionnel, pour le controle)",
           "scan_interval": "Intervalle de mise a jour en minutes",
+          "eco_polling_enabled": "Activer le polling eco quand le vehicule est gare",
+          "eco_scan_interval": "Intervalle eco de mise a jour en minutes",
           "abrp_enabled": "Activer les donnees live ABRP",
           "abrp_token": "Token Generic ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Utilise l intervalle eco plus lent uniquement lorsque tous les vehicules sont clairement verrouilles, gares et non branches.",
+          "eco_scan_interval": "Intervalle de polling en mode eco. Il est automatiquement limite au minimum a l intervalle normal de mise a jour."
         }
       },
       "init": {
@@ -27,6 +33,8 @@
           "app_key_pem": "Coller le PEM app_key.pem (cle privee)",
           "operation_password": "PIN vehicule (optionnel, pour le controle)",
           "scan_interval": "Intervalle de mise a jour en minutes",
+          "eco_polling_enabled": "Activer le polling eco quand le vehicule est gare",
+          "eco_scan_interval": "Intervalle eco de mise a jour en minutes",
           "abrp_enabled": "Activer les donnees live ABRP",
           "abrp_token": "Token Generic ABRP"
         }
@@ -49,8 +57,14 @@
           "password": "Mot de passe",
           "operation_password": "PIN vehicule (optionnel, pour le controle)",
           "scan_interval": "Intervalle de mise a jour en minutes",
+          "eco_polling_enabled": "Activer le polling eco quand le vehicule est gare",
+          "eco_scan_interval": "Intervalle eco de mise a jour en minutes",
           "abrp_enabled": "Activer les donnees live ABRP",
           "abrp_token": "Token Generic ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Utilise l intervalle eco plus lent uniquement lorsque tous les vehicules sont clairement verrouilles, gares et non branches.",
+          "eco_scan_interval": "Intervalle de polling en mode eco. Il est automatiquement limite au minimum a l intervalle normal de mise a jour."
         }
       }
     },
@@ -232,7 +246,10 @@
         "name": "Énergie des 7 derniers jours"
       },
       "average_consumption_6w_kwh_100km": {
-        "name": "Consommation moyenne 6 semaines"
+        "name": "Consommation moyenne 6 semaines (kWh/100 km)"
+      },
+      "average_consumption_6w_mi_kwh": {
+        "name": "Consommation moyenne 6 semaines (mi/kWh)"
       },
       "last_week_driving_energy_percent": {
         "name": "Énergie conduite semaine dernière"
@@ -482,8 +499,14 @@
           "app_key_pem": "Coller le PEM app_key.pem (cle privee)",
           "operation_password": "PIN vehicule (optionnel, pour le controle)",
           "scan_interval": "Intervalle de mise a jour en minutes",
+          "eco_polling_enabled": "Activer le polling eco quand le vehicule est gare",
+          "eco_scan_interval": "Intervalle eco de mise a jour en minutes",
           "abrp_enabled": "Activer les donnees live ABRP",
           "abrp_token": "Token Generic ABRP"
+        },
+        "data_description": {
+          "eco_polling_enabled": "Utilise l intervalle eco plus lent uniquement lorsque tous les vehicules sont clairement verrouilles, gares et non branches.",
+          "eco_scan_interval": "Intervalle de polling en mode eco. Il est automatiquement limite au minimum a l intervalle normal de mise a jour."
         }
       }
     }

@@ -21,6 +21,8 @@ research logs, or reverse-engineering workfiles.
 - Optional ABRP Generic Telemetry push and EVCC helper sensors.
 - Multi-vehicle support for main-account and shared vehicles.
 - Redacted diagnostics export for support.
+- Native HA unit metadata for standard measurements; EV consumption is exposed
+  as `kWh/100 km` plus optional `mi/kWh` when the API provides it.
 - HACS-ready release ZIP, translations, and brand assets.
 
 ## Important
@@ -84,6 +86,8 @@ integration from `Settings -> Devices & services`.
 - Vehicle PIN is optional for setup; without it the integration stays read-only.
 - ABRP live data is optional and only needs the ABRP Generic Token.
 - Update interval is configurable.
+- Optional eco polling can slow cloud polling when every vehicle is clearly
+  locked, parked, and unplugged.
 - If multiple vehicles are available, entities are created per VIN and services
   can target a vehicle by `vin` or a Leapmotor `entity_id`.
 
@@ -98,6 +102,9 @@ integration from `Settings -> Devices & services`.
   automatically. Remove/re-add the integration if you want a clean entity set.
 - Southern-hemisphere GPS sign issues are corrected only when the mirrored
   latitude is clearly closer to the configured Home Assistant home location.
+- Optional eco polling never wakes or controls the vehicle. It only changes how
+  often the cloud backend is polled while the current vehicle state is clearly
+  quiet.
 
 ## Services
 
@@ -169,6 +176,23 @@ charging power/current/voltage, odometer, and `charging_finish_time`.
   `leapmotor.export_diagnostics`.
 - Remote-control issues: configure the Vehicle PIN and check account/shared-car
   permissions.
+
+### Debug Logging
+
+For troubleshooting, enable Home Assistant debug logging for the integration:
+
+```yaml
+logger:
+  default: info
+  logs:
+    custom_components.leapmotor: debug
+```
+
+Restart Home Assistant after changing `configuration.yaml`. Debug logs are
+intended to show sanitized API status codes, polling mode changes, update
+reasons, and integration flow details. Do not publish full Home Assistant logs
+without checking them for account data, VINs, locations, tokens, or certificate
+material first. For public issues, prefer `leapmotor.export_diagnostics`.
 
 ## Screenshots
 

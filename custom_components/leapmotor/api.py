@@ -1,4 +1,4 @@
-"""Leapmotor cloud API client."""
+"""Compatibility entrypoint for the internal Leapmotor cloud API client."""
 
 from __future__ import annotations
 
@@ -8,10 +8,8 @@ import hmac
 import json
 import logging
 import random
-import subprocess
 import tempfile
 import time
-from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -20,8 +18,6 @@ from zoneinfo import ZoneInfo
 import requests
 import urllib3
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives import padding
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.serialization import pkcs12
 
@@ -32,8 +28,6 @@ from .const import (
     DEFAULT_DEVICE_ID,
     DEFAULT_DEVICE_TYPE,
     DEFAULT_LANGUAGE,
-    DEFAULT_OPERPWD_AES_IV,
-    DEFAULT_OPERPWD_AES_KEY,
     DEFAULT_P12_ENC_ALG,
     DEFAULT_SOURCE,
     KNOWN_ACCOUNT_P12_PASSWORDS,
@@ -58,6 +52,18 @@ from .const import (
     STATIC_APP_CERT,
     STATIC_APP_KEY,
 )
+from .leap_api import (
+    REMOTE_ACTION_SPECS,
+    CurlTransport,
+    LeapmotorAccountCertError,
+    LeapmotorApiError,
+    LeapmotorAuthError,
+    LeapmotorMissingAppCertError,
+    LeapmotorNoVehicleError,
+    Vehicle,
+    derive_operate_password,
+    derive_session_device_id,
+)
 from .p12 import derive_account_p12_password
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -65,84 +71,12 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _LOGGER = logging.getLogger(__name__)
 
 
-class LeapmotorApiError(Exception):
-    """Base Leapmotor API error."""
-
-
-class LeapmotorAuthError(LeapmotorApiError):
-    """Leapmotor authentication failed."""
-
-
-class LeapmotorAccountCertError(LeapmotorAuthError):
-    """Leapmotor account certificate could not be opened."""
-
-
-class LeapmotorMissingAppCertError(LeapmotorAuthError):
-    """Local app certificate material is missing."""
-
-
-class LeapmotorNoVehicleError(LeapmotorApiError):
-    """The account login worked, but no vehicle is linked to the account."""
-
-
-@dataclass(slots=True)
-class Vehicle:
-    """Vehicle metadata from the vehicle list."""
-
-    vin: str
-    car_id: str | None
-    car_type: str
-    nickname: str | None
-    is_shared: bool
-    year: int | None = None
-    rights: str | None = None
-    abilities: list[str] | None = None
-    module_rights: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class RemoteActionSpec:
-    """Verified remote-control action payload."""
-
-    cmd_id: str
-    cmd_content: str
-
-
-REMOTE_ACTION_SPECS: dict[str, RemoteActionSpec] = {
-    REMOTE_CTL_UNLOCK: RemoteActionSpec(cmd_id="110", cmd_content='{"value":"unlock"}'),
-    REMOTE_CTL_LOCK: RemoteActionSpec(cmd_id="110", cmd_content='{"value":"lock"}'),
-    REMOTE_CTL_UNLOCK_CHARGER: RemoteActionSpec(
-        cmd_id="192",
-        cmd_content='{"operation":"unlock"}',
-    ),
-    REMOTE_CTL_TRUNK: RemoteActionSpec(cmd_id="130", cmd_content='{"value":"true"}'),
-    REMOTE_CTL_TRUNK_OPEN: RemoteActionSpec(cmd_id="130", cmd_content='{"value":"true"}'),
-    REMOTE_CTL_TRUNK_CLOSE: RemoteActionSpec(cmd_id="130", cmd_content='{"value":"false"}'),
-    REMOTE_CTL_FIND_CAR: RemoteActionSpec(cmd_id="120", cmd_content='{"value":"true"}'),
-    REMOTE_CTL_SUNSHADE: RemoteActionSpec(cmd_id="240", cmd_content='{"value":"10"}'),
-    REMOTE_CTL_SUNSHADE_OPEN: RemoteActionSpec(cmd_id="240", cmd_content='{"value":"10"}'),
-    REMOTE_CTL_SUNSHADE_CLOSE: RemoteActionSpec(cmd_id="240", cmd_content='{"value":"0"}'),
-    REMOTE_CTL_BATTERY_PREHEAT: RemoteActionSpec(cmd_id="160", cmd_content='{"value":"ptcon"}'),
-    REMOTE_CTL_WINDOWS: RemoteActionSpec(cmd_id="230", cmd_content='{"value":"2"}'),
-    REMOTE_CTL_WINDOWS_OPEN: RemoteActionSpec(cmd_id="230", cmd_content='{"value":"2"}'),
-    REMOTE_CTL_WINDOWS_CLOSE: RemoteActionSpec(cmd_id="230", cmd_content='{"value":"0"}'),
-    REMOTE_CTL_AC_SWITCH: RemoteActionSpec(
-        cmd_id="170",
-        cmd_content='{"circle":"out","mode":"nohotcold","operate":"manual","position":"all","temperature":"24","windlevel":"4","wshld":"1"}',
-    ),
-    REMOTE_CTL_QUICK_COOL: RemoteActionSpec(
-        cmd_id="170",
-        cmd_content='{"circle":"in","mode":"cold","operate":"manual","position":"all","temperature":"18","windlevel":"7","wshld":"1"}',
-    ),
-    REMOTE_CTL_QUICK_HEAT: RemoteActionSpec(
-        cmd_id="170",
-        cmd_content='{"circle":"in","mode":"hot","operate":"manual","position":"all","temperature":"32","windlevel":"7","wshld":"1"}',
-    ),
-    REMOTE_CTL_WINDSHIELD_DEFROST: RemoteActionSpec(
-        cmd_id="170",
-        cmd_content='{"circle":"in","mode":"hot","operate":"manual","position":"all","temperature":"32","windlevel":"7","wshld":"2"}',
-    ),
-}
+def _redact_vin_for_log(vin: str | None) -> str:
+    """Keep logs useful without writing full VINs."""
+    if not vin:
+        return "unknown"
+    vin_text = str(vin)
+    return f"***{vin_text[-4:]}" if len(vin_text) > 4 else "***"
 
 
 class LeapmotorApiClient:
@@ -163,6 +97,7 @@ class LeapmotorApiClient:
         self.operation_password = operation_password.strip() if operation_password else None
         self.account_p12_password = account_p12_password
         self.base_url = base_url.rstrip("/")
+        self.transport = CurlTransport(self.base_url)
         self.session = requests.Session()
         self.device_id = DEFAULT_DEVICE_ID
         self.user_id: str | None = None
@@ -526,7 +461,7 @@ class LeapmotorApiClient:
         login_data = data.get("data") or {}
         self.user_id = str(login_data.get("id"))
         self.token = str(login_data.get("token"))
-        self.device_id = self._derive_session_device_id(self.token)
+        self.device_id = derive_session_device_id(self.token)
         self.sign_ikm = str(login_data.get("signIkm"))
         self.sign_salt = str(login_data.get("signSalt"))
         self.sign_info = str(login_data.get("signInfo"))
@@ -740,7 +675,11 @@ class LeapmotorApiClient:
         vehicle: Vehicle | None = None,
     ) -> dict[str, Any]:
         """Execute one raw remote-control command with the verified write flow."""
-        _LOGGER.info("Starting Leapmotor remote action %s for VIN %s", action_label, vin)
+        _LOGGER.debug(
+            "Starting Leapmotor remote action %s for VIN %s",
+            action_label,
+            _redact_vin_for_log(vin),
+        )
         if not self.token:
             self.login()
         if not self.operation_password:
@@ -751,7 +690,7 @@ class LeapmotorApiClient:
         if vehicle is None:
             vehicle = self._find_vehicle_by_vin(vin)
 
-        operate_password = self._derive_operate_password(self.operation_password)
+        operate_password = derive_operate_password(self.operation_password, self.token)
         self._ensure_remote_cert_sync()
 
         verify_headers = self._build_operpwd_verify_headers(vin=vin, operation_password=operate_password)
@@ -766,11 +705,10 @@ class LeapmotorApiClient:
             data=verify_body,
             cert=self.account_cert,
         )
-        _LOGGER.info(
-            "Leapmotor remote verify response for %s: HTTP %s %s",
+        _LOGGER.debug(
+            "Leapmotor remote verify response for %s: HTTP %s",
             action_label,
             verify_response["status_code"],
-            verify_response["body"],
         )
         self._parse_api_body(verify_response["status_code"], verify_response["body"], "remote verify")
 
@@ -793,11 +731,10 @@ class LeapmotorApiClient:
             data=body,
             cert=self.account_cert,
         )
-        _LOGGER.info(
-            "Leapmotor remote ctl response for %s: HTTP %s %s",
+        _LOGGER.debug(
+            "Leapmotor remote ctl response for %s: HTTP %s",
             action_label,
             response["status_code"],
-            response["body"],
         )
         result = self._parse_api_body(
             response["status_code"],
@@ -825,7 +762,11 @@ class LeapmotorApiClient:
         action_label: str,
     ) -> dict[str, Any]:
         """Execute a remote-control command that does not use operatePassword."""
-        _LOGGER.info("Starting Leapmotor remote action %s for VIN %s", action_label, vin)
+        _LOGGER.debug(
+            "Starting Leapmotor remote action %s for VIN %s",
+            action_label,
+            _redact_vin_for_log(vin),
+        )
         if not self.token:
             self.login()
 
@@ -846,11 +787,10 @@ class LeapmotorApiClient:
             data=body,
             cert=self.account_cert,
         )
-        _LOGGER.info(
-            "Leapmotor remote ctl response for %s: HTTP %s %s",
+        _LOGGER.debug(
+            "Leapmotor remote ctl response for %s: HTTP %s",
             action_label,
             response["status_code"],
-            response["body"],
         )
         return self._parse_api_body(
             response["status_code"],
@@ -917,48 +857,6 @@ class LeapmotorApiClient:
             if vehicle.vin == vin:
                 return vehicle
         raise LeapmotorApiError(f"Vehicle not found for VIN {vin}")
-
-    def _derive_operate_password(self, pin: str) -> str:
-        """Derive operatePassword from the vehicle PIN using the current session token."""
-        key_text, iv_text = self._derive_operpwd_key_iv()
-        padder = padding.PKCS7(128).padder()
-        padded = padder.update(pin.encode("utf-8")) + padder.finalize()
-        cipher = Cipher(
-            algorithms.AES(key_text.encode("utf-8")),
-            modes.CBC(iv_text.encode("utf-8")),
-        )
-        encryptor = cipher.encryptor()
-        ciphertext = encryptor.update(padded) + encryptor.finalize()
-        return base64.b64encode(ciphertext).decode("ascii")
-
-    def _derive_operpwd_key_iv(self) -> tuple[str, str]:
-        """Mirror MD5Util.getEncryptPassword with token-derived AES key/IV."""
-        if not self.token:
-            return DEFAULT_OPERPWD_AES_KEY, DEFAULT_OPERPWD_AES_IV
-        if len(self.token) < 64:
-            raise LeapmotorAuthError("Access token is too short for operatePassword derivation.")
-        key_source = self.token[:32]
-        iv_source = self.token[32:64]
-        key_text = hashlib.md5(key_source.encode("utf-8")).hexdigest()[8:24]
-        iv_text = hashlib.md5(iv_source.encode("utf-8")).hexdigest()[8:24]
-        return key_text, iv_text
-
-    @staticmethod
-    def _derive_session_device_id(token: str | None) -> str:
-        """Extract the session deviceId from the JWT payload."""
-        if not token:
-            return DEFAULT_DEVICE_ID
-        try:
-            payload_b64 = token.split(".")[1]
-            payload_b64 += "=" * (-len(payload_b64) % 4)
-            payload = json.loads(base64.urlsafe_b64decode(payload_b64.encode("ascii")))
-            user_name = str(payload.get("user_name") or "")
-            parts = user_name.split(",")
-            if len(parts) >= 4 and parts[2]:
-                return parts[2]
-        except Exception:  # noqa: BLE001
-            pass
-        return DEFAULT_DEVICE_ID
 
     def _load_account_cert(self, login_data: dict[str, Any]) -> None:
         base64_cert = str(login_data.get("base64Cert", ""))
@@ -1429,6 +1327,13 @@ class LeapmotorApiClient:
             "message": message,
             "updated_at": time.time(),
         }
+        _LOGGER.debug(
+            "Leapmotor API result for %s: HTTP %s code=%s message=%s",
+            label,
+            status_code,
+            code,
+            message,
+        )
 
     def _post_with_curl(
         self,
@@ -1438,43 +1343,8 @@ class LeapmotorApiClient:
         data: str,
         cert: tuple[str, str],
     ) -> dict[str, Any]:
-        """Send a POST with curl, matching the verified reverse-engineered client."""
-        url = f"{self.base_url}/{path.lstrip('/')}"
-        with tempfile.NamedTemporaryFile() as header_file, tempfile.NamedTemporaryFile() as body_file:
-            cmd = [
-                "curl",
-                "--silent",
-                "--show-error",
-                "--insecure",
-                "-X",
-                "POST",
-                url,
-                "-D",
-                header_file.name,
-                "-o",
-                body_file.name,
-                "--cert",
-                cert[0],
-                "--key",
-                cert[1],
-            ]
-            for key, value in headers.items():
-                cmd.extend(["-H", f"{key}: {value}"])
-            cmd.extend(["--data", data])
-
-            result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-            body_text = Path(body_file.name).read_text(encoding="utf-8", errors="replace")
-            header_text = Path(header_file.name).read_text(encoding="utf-8", errors="replace")
-            if result.returncode != 0:
-                raise LeapmotorApiError(f"curl request failed: {result.stderr.strip()}")
-
-        status_code = 0
-        for line in header_text.splitlines():
-            if line.startswith("HTTP/"):
-                parts = line.split()
-                if len(parts) >= 2 and parts[1].isdigit():
-                    status_code = int(parts[1])
-        return {"status_code": status_code, "body": body_text, "headers": header_text}
+        """Send a POST with the configured API transport."""
+        return self.transport.post(path=path, headers=headers, data=data, cert=cert)
 
     def _post_binary_with_curl(
         self,
@@ -1484,43 +1354,8 @@ class LeapmotorApiClient:
         data: str,
         cert: tuple[str, str],
     ) -> dict[str, Any]:
-        """Send a POST with curl and return the raw response body bytes."""
-        url = f"{self.base_url}/{path.lstrip('/')}"
-        with tempfile.NamedTemporaryFile() as header_file, tempfile.NamedTemporaryFile() as body_file:
-            cmd = [
-                "curl",
-                "--silent",
-                "--show-error",
-                "--insecure",
-                "-X",
-                "POST",
-                url,
-                "-D",
-                header_file.name,
-                "-o",
-                body_file.name,
-                "--cert",
-                cert[0],
-                "--key",
-                cert[1],
-            ]
-            for key, value in headers.items():
-                cmd.extend(["-H", f"{key}: {value}"])
-            cmd.extend(["--data", data])
-
-            result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-            body_bytes = Path(body_file.name).read_bytes()
-            header_text = Path(header_file.name).read_text(encoding="utf-8", errors="replace")
-            if result.returncode != 0:
-                raise LeapmotorApiError(f"curl request failed: {result.stderr.strip()}")
-
-        status_code = 0
-        for line in header_text.splitlines():
-            if line.startswith("HTTP/"):
-                parts = line.split()
-                if len(parts) >= 2 and parts[1].isdigit():
-                    status_code = int(parts[1])
-        return {"status_code": status_code, "body": body_bytes, "headers": header_text}
+        """Send a POST with the configured API transport and return raw bytes."""
+        return self.transport.post_binary(path=path, headers=headers, data=data, cert=cert)
 
 
 def normalize_vehicle(
