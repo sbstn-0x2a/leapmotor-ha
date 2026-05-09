@@ -15,8 +15,9 @@ research logs, or reverse-engineering workfiles.
   tracker, tire pressure, diagnostics, and mileage/energy history.
 - Native Home Assistant entities for sensors, binary sensors, lock, buttons,
   number, image, and device tracker.
-- Remote-control services for supported actions such as lock/unlock, climate,
-  windows, trunk, sunshade, charge limit, and send destination to navigation.
+- Remote-control services for supported actions such as lock/unlock, charger
+  unlock, climate, windows, trunk, sunshade, charge limit, and send destination
+  to navigation.
 - Optional ABRP Generic Telemetry push and EVCC helper sensors.
 - Multi-vehicle support for main-account and shared vehicles.
 - Redacted diagnostics export for support.
@@ -106,6 +107,7 @@ accept either `vin` or an existing Leapmotor `entity_id`.
 | Service | PIN required | Purpose |
 |---|---:|---|
 | `leapmotor.lock` / `leapmotor.unlock` | yes | Lock or unlock vehicle |
+| `leapmotor.unlock_charger` | yes | Unlock the charging connector before unplugging |
 | `leapmotor.trunk_open` / `leapmotor.trunk_close` | yes | Open or close trunk |
 | `leapmotor.find_car` | yes | Find vehicle |
 | `leapmotor.windows_open` / `leapmotor.windows_close` | yes | Open or close windows |
