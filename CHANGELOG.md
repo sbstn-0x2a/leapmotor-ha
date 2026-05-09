@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.39 - 2026-05-09
+
+- Add a dedicated charger-unlock button and `leapmotor.unlock_charger`
+  service using the live-verified app command `cmdId=192` with
+  `{"operation":"unlock"}`.
+- Document the charger-unlock service example for Home Assistant automations.
+
 ## 0.5.38 - 2026-05-08
 
 - Correct positive latitude values for southern-hemisphere Home Assistant

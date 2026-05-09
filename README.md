@@ -162,6 +162,9 @@ Special thanks to [sbstn-0x2a](https://github.com/sbstn-0x2a) for validating and
 sharing additional Leapmotor raw-signal mappings across charging, doors,
 climate, heating, seating, range, and diagnostics.
 
+Special thanks to [Marco Ceri](https://github.com/markoceri) for the public
+Leapmotor API and certificate research that helped cross-check this integration.
+
 ## Legal
 
 See [LEGAL.md](LEGAL.md) and [SECURITY.md](SECURITY.md) before publishing logs,

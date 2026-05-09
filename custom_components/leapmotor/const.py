@@ -46,6 +46,7 @@ STATIC_CERT_STORAGE_DIR = "leapmotor"
 
 REMOTE_CTL_LOCK = "lock"
 REMOTE_CTL_UNLOCK = "unlock"
+REMOTE_CTL_UNLOCK_CHARGER = "unlock_charger"
 REMOTE_CTL_TRUNK = "trunk"
 REMOTE_CTL_TRUNK_OPEN = "trunk_open"
 REMOTE_CTL_TRUNK_CLOSE = "trunk_close"

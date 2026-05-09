@@ -28,6 +28,20 @@ unlock:
       description: Optional Leapmotor entity to resolve the target vehicle.
       selector:
         text:
+unlock_charger:
+  name: Unlock charger
+  description: Unlock the charging gun/charger connector for unplugging. Requires the configured Vehicle PIN.
+  fields:
+    vin:
+      name: VIN
+      description: Target VIN. Required when multiple vehicles are configured.
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: Optional Leapmotor entity to resolve the target vehicle.
+      selector:
+        text:
 trunk_open:
   name: Open trunk
   description: Open the trunk. Requires the configured Vehicle PIN.

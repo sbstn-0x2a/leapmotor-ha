@@ -22,6 +22,7 @@ from .const import (
     REMOTE_CTL_SUNSHADE_OPEN,
     REMOTE_CTL_TRUNK_CLOSE,
     REMOTE_CTL_TRUNK_OPEN,
+    REMOTE_CTL_UNLOCK_CHARGER,
     REMOTE_CTL_WINDSHIELD_DEFROST,
     REMOTE_CTL_WINDOWS_CLOSE,
     REMOTE_CTL_WINDOWS_OPEN,
@@ -33,6 +34,13 @@ from .remote_helpers import RemoteActionSpec, async_execute_remote_action
 
 
 BUTTON_SPECS: tuple[RemoteActionSpec, ...] = (
+    RemoteActionSpec(
+        action=REMOTE_CTL_UNLOCK_CHARGER,
+        translation_key="unlock_charger",
+        icon="mdi:ev-plug-type2",
+        method_name="unlock_charger",
+        service_name=REMOTE_CTL_UNLOCK_CHARGER,
+    ),
     RemoteActionSpec(
         action=REMOTE_CTL_TRUNK_OPEN,
         translation_key="open_trunk",

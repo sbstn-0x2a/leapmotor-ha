@@ -44,6 +44,7 @@ Available data includes:
 - Tire pressures
 - GPS location as a Home Assistant device tracker
 - Remote-control buttons for:
+  - Charger unlock
   - Trunk
   - Find vehicle
   - Sunshade
@@ -247,6 +248,14 @@ action: leapmotor.set_charge_limit
 data:
   entity_id: number.c10_set_charge_limit
   charge_limit_percent: 85
+```
+
+Unlock the charger before unplugging:
+
+```yaml
+action: leapmotor.unlock_charger
+data:
+  entity_id: sensor.c10_battery
 ```
 
 Start quick climate heating:

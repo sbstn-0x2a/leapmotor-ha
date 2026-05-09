@@ -405,6 +405,9 @@
       }
     },
     "button": {
+      "unlock_charger": {
+        "name": "Deverrouiller le chargeur"
+      },
       "open_trunk": {
         "name": "Ouvrir le coffre"
       },

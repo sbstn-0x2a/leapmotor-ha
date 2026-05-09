@@ -405,6 +405,9 @@
       }
     },
     "button": {
+      "unlock_charger": {
+        "name": "Odblokuj ladowarke"
+      },
       "open_trunk": {
         "name": "Otworz bagaznik"
       },

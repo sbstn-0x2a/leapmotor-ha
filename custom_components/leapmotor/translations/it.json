@@ -405,6 +405,9 @@
       }
     },
     "button": {
+      "unlock_charger": {
+        "name": "Sblocca caricatore"
+      },
       "open_trunk": {
         "name": "Apri bagagliaio"
       },

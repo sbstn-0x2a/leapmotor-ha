@@ -50,6 +50,7 @@ from .const import (
     REMOTE_CTL_TRUNK_CLOSE,
     REMOTE_CTL_TRUNK_OPEN,
     REMOTE_CTL_UNLOCK,
+    REMOTE_CTL_UNLOCK_CHARGER,
     REMOTE_CTL_WINDSHIELD_DEFROST,
     REMOTE_CTL_WINDOWS,
     REMOTE_CTL_WINDOWS_CLOSE,
@@ -110,6 +111,10 @@ class RemoteActionSpec:
 REMOTE_ACTION_SPECS: dict[str, RemoteActionSpec] = {
     REMOTE_CTL_UNLOCK: RemoteActionSpec(cmd_id="110", cmd_content='{"value":"unlock"}'),
     REMOTE_CTL_LOCK: RemoteActionSpec(cmd_id="110", cmd_content='{"value":"lock"}'),
+    REMOTE_CTL_UNLOCK_CHARGER: RemoteActionSpec(
+        cmd_id="192",
+        cmd_content='{"operation":"unlock"}',
+    ),
     REMOTE_CTL_TRUNK: RemoteActionSpec(cmd_id="130", cmd_content='{"value":"true"}'),
     REMOTE_CTL_TRUNK_OPEN: RemoteActionSpec(cmd_id="130", cmd_content='{"value":"true"}'),
     REMOTE_CTL_TRUNK_CLOSE: RemoteActionSpec(cmd_id="130", cmd_content='{"value":"false"}'),
@@ -256,6 +261,10 @@ class LeapmotorApiClient:
     def unlock_vehicle(self, vin: str) -> dict[str, Any]:
         """Unlock one vehicle via remote control."""
         return self._remote_control(vin=vin, action=REMOTE_CTL_UNLOCK)
+
+    def unlock_charger(self, vin: str) -> dict[str, Any]:
+        """Unlock the charging gun via remote control."""
+        return self._remote_control(vin=vin, action=REMOTE_CTL_UNLOCK_CHARGER)
 
     def open_trunk(self, vin: str) -> dict[str, Any]:
         """Open the trunk via remote control."""

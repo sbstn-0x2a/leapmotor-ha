@@ -52,6 +52,7 @@ _ENGLISH_ENTITY_SLUGS: dict[tuple[str, str], str] = {
     ("binary_sensor", "windows_remote_supported"): "windows_remote_supported",
     ("binary_sensor", "door_control_allowed"): "door_control_allowed",
     ("button", "refresh_data"): "refresh_data",
+    ("button", "unlock_charger"): "unlock_charger",
     ("button", "trunk_open"): "open_trunk",
     ("button", "trunk_close"): "close_trunk",
     ("button", "find_car"): "find_vehicle",

@@ -405,6 +405,9 @@
       }
     },
     "button": {
+      "unlock_charger": {
+        "name": "Laadpistool ontgrendelen"
+      },
       "open_trunk": {
         "name": "Kofferbak openen"
       },

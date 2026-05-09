@@ -405,6 +405,9 @@
       }
     },
     "button": {
+      "unlock_charger": {
+        "name": "Ladegerät entriegeln"
+      },
       "open_trunk": {
         "name": "Kofferraum öffnen"
       },

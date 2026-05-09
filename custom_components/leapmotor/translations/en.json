@@ -405,6 +405,9 @@
       }
     },
     "button": {
+      "unlock_charger": {
+        "name": "Unlock charger"
+      },
       "open_trunk": {
         "name": "Open trunk"
       },
