@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.4 - 2026-05-10
+
+- Use the APK tire-pressure slot mapping for all models after live C10
+  verification showed the previous non-B10/default mapping displayed rear right
+  pressure as front left.
+
 ## 0.6.3 - 2026-05-10
 
 - Add setup-time warning logs with compact last API result metadata when login

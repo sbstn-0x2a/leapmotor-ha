@@ -1662,10 +1662,10 @@ def _named_status_to_signal(status_data: dict[str, Any]) -> dict[str, Any]:
         "rightFrontWindowPercent": "3728",
         "leftRearWindowPercent": "1879",
         "rightRearWindowPercent": "1880",
-        "leftFrontTirePressure": "2667",
+        "leftFrontTirePressure": "2646",
         "rightFrontTirePressure": "2653",
-        "leftRearTirePressure": "2646",
-        "rightRearTirePressure": "2660",
+        "leftRearTirePressure": "2660",
+        "rightRearTirePressure": "2667",
         "leftFrontTirePressureState": "2641",
         "rightFrontTirePressureState": "2648",
         "leftRearTirePressureState": "2655",
@@ -1730,19 +1730,12 @@ def _status_signal_count(status_json: dict[str, Any]) -> int:
 
 
 def _tire_pressures_bar(car_type: str | None, signal: dict[str, Any]) -> dict[str, float | None]:
-    """Return model-specific tire-pressure slot mapping."""
-    if str(car_type or "").strip().upper() == "B10":
-        return {
-            "tire_pressure_front_left_bar": _to_bar(signal.get("2646")),
-            "tire_pressure_front_right_bar": _to_bar(signal.get("2653")),
-            "tire_pressure_rear_left_bar": _to_bar(signal.get("2660")),
-            "tire_pressure_rear_right_bar": _to_bar(signal.get("2667")),
-        }
+    """Return tire-pressure slots verified against APK names and live C10/B10 checks."""
     return {
-        "tire_pressure_front_left_bar": _to_bar(signal.get("2667")),
+        "tire_pressure_front_left_bar": _to_bar(signal.get("2646")),
         "tire_pressure_front_right_bar": _to_bar(signal.get("2653")),
-        "tire_pressure_rear_left_bar": _to_bar(signal.get("2646")),
-        "tire_pressure_rear_right_bar": _to_bar(signal.get("2660")),
+        "tire_pressure_rear_left_bar": _to_bar(signal.get("2660")),
+        "tire_pressure_rear_right_bar": _to_bar(signal.get("2667")),
     }
 
 
