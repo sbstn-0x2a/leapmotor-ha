@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +43,8 @@ from .const import (
     STATIC_APP_KEY,
     STATIC_CERT_STORAGE_DIR,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
@@ -177,7 +180,14 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         static_cert_dir=app_certificate_dir(hass),
     )
     try:
-        result = await hass.async_add_executor_job(client.fetch_data)
+        try:
+            result = await hass.async_add_executor_job(client.fetch_data)
+        except LeapmotorApiError:
+            _LOGGER.warning(
+                "Leapmotor setup validation failed after login; last API results: %s",
+                client.last_api_results,
+            )
+            raise
     finally:
         await hass.async_add_executor_job(client.close)
 

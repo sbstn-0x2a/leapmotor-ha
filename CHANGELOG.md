@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.3 - 2026-05-10
+
+- Add setup-time warning logs with compact last API result metadata when login
+  succeeds but the first vehicle-data refresh fails. This helps diagnose setup
+  failures before the config entry exists and before diagnostics services are
+  available.
+
 ## 0.6.2 - 2026-05-09
 
 - Remove the energy device class from the rolling 7-day energy sensor because
