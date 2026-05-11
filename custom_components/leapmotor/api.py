@@ -1344,7 +1344,16 @@ class LeapmotorApiClient:
         cert: tuple[str, str],
     ) -> dict[str, Any]:
         """Send a POST with the configured API transport."""
-        return self.transport.post(path=path, headers=headers, data=data, cert=cert)
+        try:
+            return self.transport.post(path=path, headers=headers, data=data, cert=cert)
+        except LeapmotorApiError as exc:
+            self._record_api_result(
+                f"transport {path}",
+                status_code=0,
+                code="transport_error",
+                message=str(exc),
+            )
+            raise
 
     def _post_binary_with_curl(
         self,
@@ -1355,7 +1364,16 @@ class LeapmotorApiClient:
         cert: tuple[str, str],
     ) -> dict[str, Any]:
         """Send a POST with the configured API transport and return raw bytes."""
-        return self.transport.post_binary(path=path, headers=headers, data=data, cert=cert)
+        try:
+            return self.transport.post_binary(path=path, headers=headers, data=data, cert=cert)
+        except LeapmotorApiError as exc:
+            self._record_api_result(
+                f"transport {path}",
+                status_code=0,
+                code="transport_error",
+                message=str(exc),
+            )
+            raise
 
 
 def normalize_vehicle(
@@ -1416,10 +1434,9 @@ def normalize_vehicle(
             "is_parked": vehicle_state == "parked" if vehicle_state is not None else None,
             "vehicle_state": vehicle_state,
             "vehicle_state_source": "raw_signal",
-            "raw_charge_status_code": signal.get("1939"),
-            "raw_ac_fan_mode_code": signal.get("1939"),
+            "raw_ac_operation_mode_code": signal.get("1939"),
             "raw_charge_connection_code": signal.get("1149"),
-            "raw_drive_status_code": signal.get("1941"),
+            "raw_ac_fan_speed_code": signal.get("1941"),
             "raw_vehicle_state_code": signal.get("1944"),
             "raw_parked_status_code": signal.get("1298"),
             "interior_temp_c": signal.get("1349"),
@@ -1897,20 +1914,21 @@ def _range_mode(signal: dict[str, Any]) -> str | None:
 
 
 def _derive_vehicle_state(signal: dict[str, Any]) -> str | None:
-    """Return the movement state independent from charging state."""
-    drive_status = _safe_int(signal.get("1941"))
-    vehicle_state = _safe_int(signal.get("1944"))
-    if drive_status in (1, 2, 4, 7) or vehicle_state in (1, 2, 4):
-        return "parked"
-    if drive_status in (3, 5) or vehicle_state in (5,):
-        return "driving"
+    """Return the movement state independent from charging and HVAC signals."""
+    gear = _safe_int(signal.get("1010"))
+    if gear is not None:
+        if gear in (1, 3):
+            return "driving"
+        if gear in (0, 2):
+            return "parked"
 
     speed = _safe_float(signal.get("1319"))
     if speed is not None:
         return "driving" if speed > 0 else "parked"
-    gear = _safe_int(signal.get("1010"))
-    if gear is not None:
-        return "parked" if gear == 0 else "driving"
+
+    on3 = _one_is_on(signal.get("1258"))
+    if on3 is not None:
+        return "parked"
 
     return None
 

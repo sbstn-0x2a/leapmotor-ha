@@ -820,8 +820,13 @@ class LeapmotorSensor(CoordinatorEntity[LeapmotorDataUpdateCoordinator], SensorE
                     "stale_vehicle_state": status.get("stale_vehicle_state"),
                     "vehicle_state_age_seconds": status.get("vehicle_state_age_seconds"),
                     "vehicle_state_is_stale": status.get("vehicle_state_is_stale"),
-                    "raw_charge_status_code": status.get("raw_charge_status_code"),
-                    "raw_drive_status_code": status.get("raw_drive_status_code"),
+                    "raw_ac_operation_mode_code": status.get(
+                        "raw_ac_operation_mode_code"
+                    ),
+                    "raw_charge_connection_code": status.get(
+                        "raw_charge_connection_code"
+                    ),
+                    "raw_ac_fan_speed_code": status.get("raw_ac_fan_speed_code"),
                     "raw_vehicle_state_code": status.get("raw_vehicle_state_code"),
                     "raw_parked_status_code": status.get("raw_parked_status_code"),
                 }

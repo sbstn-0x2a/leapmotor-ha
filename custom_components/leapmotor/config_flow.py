@@ -182,9 +182,10 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     try:
         try:
             result = await hass.async_add_executor_job(client.fetch_data)
-        except LeapmotorApiError:
+        except LeapmotorApiError as exc:
             _LOGGER.warning(
-                "Leapmotor setup validation failed after login; last API results: %s",
+                "Leapmotor setup validation failed after login: %s; last API results: %s",
+                exc,
                 client.last_api_results,
             )
             raise

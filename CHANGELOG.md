@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.5 - 2026-05-11
+
+- Improve setup failure diagnostics by recording transport-level API errors
+  before a parsed API response exists.
+- Use the `markoceri` GitHub handle consistently in README credits.
+- Stop exposing signal `1939` as a raw charge status and rename the raw
+  vehicle-state metadata to `raw_ac_operation_mode_code`; charge connection
+  metadata remains based on signal `1149`.
+- Stop using signal `1941` for vehicle parked/driving state. Movement state is
+  now derived from gear (`1010`), speed (`1319`), and ON3 (`1258`), while
+  `1941` is exposed as `raw_ac_fan_speed_code`.
+
 ## 0.6.4 - 2026-05-10
 
 - Use the APK tire-pressure slot mapping for all models after live C10
