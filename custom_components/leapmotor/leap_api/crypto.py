@@ -40,10 +40,10 @@ def derive_operpwd_key_iv(token: str | None) -> tuple[str, str]:
     return key_text, iv_text
 
 
-def derive_session_device_id(token: str | None) -> str:
+def derive_session_device_id(token: str | None, fallback: str = DEFAULT_DEVICE_ID) -> str:
     """Extract the session deviceId from the JWT payload."""
     if not token:
-        return DEFAULT_DEVICE_ID
+        return fallback
     try:
         payload_b64 = token.split(".")[1]
         payload_b64 += "=" * (-len(payload_b64) % 4)
@@ -54,4 +54,4 @@ def derive_session_device_id(token: str | None) -> str:
             return parts[2]
     except Exception:  # noqa: BLE001
         pass
-    return DEFAULT_DEVICE_ID
+    return fallback

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.6 - 2026-05-12
+
+- Use `en-GB` as the default signed API language to better match the standalone
+  API client and international app behavior.
+- Generate and persist a unique login device ID per Home Assistant config entry
+  instead of reusing the same static device ID for every installation.
+
 ## 0.6.5 - 2026-05-11
 
 - Improve setup failure diagnostics by recording transport-level API errors

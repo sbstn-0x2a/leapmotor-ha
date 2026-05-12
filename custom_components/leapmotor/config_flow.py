@@ -6,6 +6,7 @@ import os
 import logging
 from pathlib import Path
 from typing import Any
+import uuid
 
 import voluptuous as vol
 
@@ -32,6 +33,7 @@ from .const import (
     CONF_APP_CERT_PEM,
     CONF_APP_KEY_FILE,
     CONF_APP_KEY_PEM,
+    CONF_DEVICE_ID,
     CONF_ECO_POLLING_ENABLED,
     CONF_ECO_SCAN_INTERVAL,
     CONF_OPERATION_PASSWORD,
@@ -177,6 +179,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         username=data[CONF_USERNAME],
         password=data[CONF_PASSWORD],
         operation_password=data.get(CONF_OPERATION_PASSWORD) or None,
+        device_id=data.get(CONF_DEVICE_ID),
         static_cert_dir=app_certificate_dir(hass),
     )
     try:
@@ -265,8 +268,10 @@ class LeapmotorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
+            data = dict(user_input)
+            data.setdefault(CONF_DEVICE_ID, uuid.uuid4().hex)
             try:
-                info = await validate_input(self.hass, user_input)
+                info = await validate_input(self.hass, data)
             except LeapmotorMissingAppCertError:
                 errors["base"] = "missing_app_cert"
             except LeapmotorAccountCertError:
@@ -284,18 +289,19 @@ class LeapmotorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 await self.async_set_unique_id(user_input[CONF_USERNAME].lower())
                 self._abort_if_unique_id_configured()
-                data = {
-                    CONF_USERNAME: user_input[CONF_USERNAME],
-                    CONF_PASSWORD: user_input[CONF_PASSWORD],
-                    CONF_OPERATION_PASSWORD: user_input.get(CONF_OPERATION_PASSWORD) or "",
-                    CONF_SCAN_INTERVAL: user_input[CONF_SCAN_INTERVAL],
-                    CONF_ECO_POLLING_ENABLED: bool(user_input.get(CONF_ECO_POLLING_ENABLED)),
-                    CONF_ECO_SCAN_INTERVAL: user_input[CONF_ECO_SCAN_INTERVAL],
-                    CONF_ABRP_ENABLED: bool(user_input.get(CONF_ABRP_ENABLED)),
-                    CONF_ABRP_TOKEN: user_input.get(CONF_ABRP_TOKEN) or "",
+                entry_data = {
+                    CONF_USERNAME: data[CONF_USERNAME],
+                    CONF_PASSWORD: data[CONF_PASSWORD],
+                    CONF_DEVICE_ID: data[CONF_DEVICE_ID],
+                    CONF_OPERATION_PASSWORD: data.get(CONF_OPERATION_PASSWORD) or "",
+                    CONF_SCAN_INTERVAL: data[CONF_SCAN_INTERVAL],
+                    CONF_ECO_POLLING_ENABLED: bool(data.get(CONF_ECO_POLLING_ENABLED)),
+                    CONF_ECO_SCAN_INTERVAL: data[CONF_ECO_SCAN_INTERVAL],
+                    CONF_ABRP_ENABLED: bool(data.get(CONF_ABRP_ENABLED)),
+                    CONF_ABRP_TOKEN: data.get(CONF_ABRP_TOKEN) or "",
                 }
 
-                return self.async_create_entry(title=info["title"], data=data)
+                return self.async_create_entry(title=info["title"], data=entry_data)
 
         return self.async_show_form(
             step_id=step_id,

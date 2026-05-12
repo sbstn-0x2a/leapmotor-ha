@@ -10,6 +10,7 @@ import logging
 import random
 import tempfile
 import time
+import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -25,7 +26,6 @@ from .const import (
     DEFAULT_APP_VERSION,
     DEFAULT_BASE_URL,
     DEFAULT_CHANNEL,
-    DEFAULT_DEVICE_ID,
     DEFAULT_DEVICE_TYPE,
     DEFAULT_LANGUAGE,
     DEFAULT_P12_ENC_ALG,
@@ -90,6 +90,8 @@ class LeapmotorApiClient:
         operation_password: str | None = None,
         account_p12_password: str | None = None,
         base_url: str = DEFAULT_BASE_URL,
+        device_id: str | None = None,
+        language: str = DEFAULT_LANGUAGE,
         static_cert_dir: str | Path | None = None,
     ) -> None:
         self.username = username
@@ -99,7 +101,9 @@ class LeapmotorApiClient:
         self.base_url = base_url.rstrip("/")
         self.transport = CurlTransport(self.base_url)
         self.session = requests.Session()
-        self.device_id = DEFAULT_DEVICE_ID
+        self.login_device_id = device_id or uuid.uuid4().hex
+        self.device_id = self.login_device_id
+        self.language = language
         self.user_id: str | None = None
         self.token: str | None = None
         self.sign_ikm: str | None = None
@@ -134,7 +138,7 @@ class LeapmotorApiClient:
     def _clear_auth(self) -> None:
         """Clear token and account certificate state before re-login."""
         self.token = None
-        self.device_id = DEFAULT_DEVICE_ID
+        self.device_id = self.login_device_id
         self.user_id = None
         self.sign_ikm = None
         self.sign_salt = None
@@ -461,7 +465,7 @@ class LeapmotorApiClient:
         login_data = data.get("data") or {}
         self.user_id = str(login_data.get("id"))
         self.token = str(login_data.get("token"))
-        self.device_id = derive_session_device_id(self.token)
+        self.device_id = derive_session_device_id(self.token, fallback=self.login_device_id)
         self.sign_ikm = str(login_data.get("signIkm"))
         self.sign_salt = str(login_data.get("signSalt"))
         self.sign_info = str(login_data.get("signInfo"))
@@ -923,7 +927,7 @@ class LeapmotorApiClient:
         timestamp = str(int(time.time() * 1000))
         sign_input = "".join(
             [
-                DEFAULT_LANGUAGE,
+                self.language,
                 DEFAULT_DEVICE_TYPE,
                 self.device_id,
                 "1",
@@ -940,7 +944,7 @@ class LeapmotorApiClient:
         )
         return {
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,
@@ -956,7 +960,7 @@ class LeapmotorApiClient:
         nonce = str(random.randint(100000, 9999999))
         timestamp = str(int(time.time() * 1000))
         sign_input_parts = [
-            DEFAULT_LANGUAGE,
+            self.language,
             DEFAULT_CHANNEL,
             self.device_id,
             DEFAULT_DEVICE_TYPE,
@@ -969,7 +973,7 @@ class LeapmotorApiClient:
             sign_input_parts.append(vin)
         sign_input = "".join(sign_input_parts)
         return {
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,
@@ -987,7 +991,7 @@ class LeapmotorApiClient:
         timestamp = str(int(time.time() * 1000))
         sign_input = "".join(
             [
-                DEFAULT_LANGUAGE,
+                self.language,
                 DEFAULT_CHANNEL,
                 self.device_id,
                 DEFAULT_DEVICE_TYPE,
@@ -1007,7 +1011,7 @@ class LeapmotorApiClient:
         timestamp = str(int(time.time() * 1000))
         sign_input = "".join(
             [
-                DEFAULT_LANGUAGE,
+                self.language,
                 carvin,
                 DEFAULT_CHANNEL,
                 self.device_id,
@@ -1032,7 +1036,7 @@ class LeapmotorApiClient:
         timestamp = str(int(time.time() * 1000))
         sign_input = "".join(
             [
-                DEFAULT_LANGUAGE,
+                self.language,
                 begintime,
                 DEFAULT_CHANNEL,
                 self.device_id,
@@ -1059,7 +1063,7 @@ class LeapmotorApiClient:
         timestamp = str(int(time.time() * 1000))
         sign_input = "".join(
             [
-                DEFAULT_LANGUAGE,
+                self.language,
                 begintime,
                 carvin,
                 DEFAULT_CHANNEL,
@@ -1083,7 +1087,7 @@ class LeapmotorApiClient:
     ) -> dict[str, str]:
         """Return common signed app headers for account-certificate requests."""
         return {
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,
@@ -1100,7 +1104,7 @@ class LeapmotorApiClient:
         nonce = str(random.randint(100000, 9999999))
         timestamp = str(int(time.time() * 1000))
         sign_input = (
-            f"{DEFAULT_LANGUAGE}"
+            f"{self.language}"
             f"{DEFAULT_CHANNEL}"
             f"{self.device_id}"
             f"{self.device_id}"
@@ -1112,7 +1116,7 @@ class LeapmotorApiClient:
             f"{vin}"
         )
         return {
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,
@@ -1129,7 +1133,7 @@ class LeapmotorApiClient:
         nonce = str(random.randint(100000, 9999999))
         timestamp = str(int(time.time() * 1000))
         sign_input = (
-            f"{DEFAULT_LANGUAGE}"
+            f"{self.language}"
             f"{DEFAULT_CHANNEL}"
             f"{self.device_id}"
             f"{DEFAULT_DEVICE_TYPE}"
@@ -1140,7 +1144,7 @@ class LeapmotorApiClient:
             f"{DEFAULT_APP_VERSION}"
         )
         return {
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "source": DEFAULT_SOURCE,
@@ -1155,7 +1159,7 @@ class LeapmotorApiClient:
         nonce = str(random.randint(100000, 9999999))
         timestamp = str(int(time.time() * 1000))
         sign_input = (
-            f"{DEFAULT_LANGUAGE}"
+            f"{self.language}"
             f"{DEFAULT_CHANNEL}"
             f"{self.device_id}"
             f"{DEFAULT_DEVICE_TYPE}"
@@ -1167,7 +1171,7 @@ class LeapmotorApiClient:
             f"{vin}"
         )
         return {
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,
@@ -1190,7 +1194,7 @@ class LeapmotorApiClient:
         nonce = str(random.randint(100000, 9999999))
         timestamp = str(int(time.time() * 1000))
         sign_input = (
-            f"{DEFAULT_LANGUAGE}"
+            f"{self.language}"
             f"{DEFAULT_CHANNEL}"
             f"{cmd_content}"
             f"{cmd_id}"
@@ -1204,7 +1208,7 @@ class LeapmotorApiClient:
             f"{vin}"
         )
         return {
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,
@@ -1226,7 +1230,7 @@ class LeapmotorApiClient:
         nonce = str(random.randint(100000, 9999999))
         timestamp = str(int(time.time() * 1000))
         sign_input = (
-            f"{DEFAULT_LANGUAGE}"
+            f"{self.language}"
             f"{DEFAULT_CHANNEL}"
             f"{cmd_content}"
             f"{cmd_id}"
@@ -1239,7 +1243,7 @@ class LeapmotorApiClient:
             f"{vin}"
         )
         return {
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,
@@ -1255,7 +1259,7 @@ class LeapmotorApiClient:
         nonce = str(random.randint(100000, 9999999))
         timestamp = str(int(time.time() * 1000))
         sign_input = (
-            f"{DEFAULT_LANGUAGE}"
+            f"{self.language}"
             f"{DEFAULT_CHANNEL}"
             f"{self.device_id}"
             f"{DEFAULT_DEVICE_TYPE}"
@@ -1266,7 +1270,7 @@ class LeapmotorApiClient:
             f"{DEFAULT_APP_VERSION}"
         )
         return {
-            "acceptLanguage": DEFAULT_LANGUAGE,
+            "acceptLanguage": self.language,
             "channel": DEFAULT_CHANNEL,
             "deviceType": DEFAULT_DEVICE_TYPE,
             "X-P12_ENC_ALG": DEFAULT_P12_ENC_ALG,

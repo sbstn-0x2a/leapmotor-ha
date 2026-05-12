@@ -7,6 +7,7 @@ from functools import partial
 import json
 import logging
 from pathlib import Path
+import uuid
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
@@ -18,6 +19,7 @@ from .api import LeapmotorApiClient
 from .button import BUTTON_SPECS
 from .const import (
     CONF_ACCOUNT_P12_PASSWORD,
+    CONF_DEVICE_ID,
     CONF_ECO_POLLING_ENABLED,
     CONF_ECO_SCAN_INTERVAL,
     CONF_OPERATION_PASSWORD,
@@ -102,28 +104,34 @@ PLATFORMS: list[Platform] = [
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Leapmotor from a config entry."""
+    entry_data = dict(entry.data)
+    if not entry_data.get(CONF_DEVICE_ID):
+        entry_data[CONF_DEVICE_ID] = uuid.uuid4().hex
+        hass.config_entries.async_update_entry(entry, data=entry_data)
+
     scan_interval = int(
         entry.options.get(
             CONF_SCAN_INTERVAL,
-            entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES),
+            entry_data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES),
         )
     )
     eco_scan_interval = int(
         entry.options.get(
             CONF_ECO_SCAN_INTERVAL,
-            entry.data.get(CONF_ECO_SCAN_INTERVAL, DEFAULT_ECO_SCAN_INTERVAL_MINUTES),
+            entry_data.get(CONF_ECO_SCAN_INTERVAL, DEFAULT_ECO_SCAN_INTERVAL_MINUTES),
         )
     )
     operation_password = (
         entry.options[CONF_OPERATION_PASSWORD]
         if CONF_OPERATION_PASSWORD in entry.options
-        else entry.data.get(CONF_OPERATION_PASSWORD)
+        else entry_data.get(CONF_OPERATION_PASSWORD)
     )
     client = LeapmotorApiClient(
-        username=entry.data[CONF_USERNAME],
-        password=entry.data[CONF_PASSWORD],
-        account_p12_password=entry.data.get(CONF_ACCOUNT_P12_PASSWORD),
+        username=entry_data[CONF_USERNAME],
+        password=entry_data[CONF_PASSWORD],
+        account_p12_password=entry_data.get(CONF_ACCOUNT_P12_PASSWORD),
         operation_password=operation_password or None,
+        device_id=entry_data[CONF_DEVICE_ID],
         static_cert_dir=hass.config.path(STATIC_CERT_STORAGE_DIR),
     )
     coordinator = LeapmotorDataUpdateCoordinator(
@@ -134,7 +142,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         eco_polling_enabled=bool(
             entry.options.get(
                 CONF_ECO_POLLING_ENABLED,
-                entry.data.get(CONF_ECO_POLLING_ENABLED, False),
+                entry_data.get(CONF_ECO_POLLING_ENABLED, False),
             )
         ),
         eco_update_interval=timedelta(minutes=max(eco_scan_interval, scan_interval)),
