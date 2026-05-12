@@ -172,6 +172,9 @@ charging power/current/voltage, odometer, and `charging_finish_time`.
   Home Assistant.
 - Certificate/login issues: upload/paste both PEM files or place them as
   `/config/leapmotor/app_cert.pem` and `/config/leapmotor/app_key.pem`.
+- Login `code 21` / incorrect account or password: if the same credentials work
+  in the official app, log out fully and change/reset the password once in the
+  official Leapmotor app, then retry Home Assistant.
 - App logout issues: use a second Leapmotor account with shared vehicle access.
 - Stale or wrong values: press `Refresh data`, check `Last refresh`, then run
   `leapmotor.export_diagnostics`.

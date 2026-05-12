@@ -365,6 +365,9 @@ data:
 - Certificate errors: upload/paste both `app_cert.pem` and `app_key.pem`, or
   store them as `/config/leapmotor/app_cert.pem` and
   `/config/leapmotor/app_key.pem`.
+- Login `code 21` / incorrect account or password: if the same credentials work
+  in the official app, log out fully and change/reset the password once in the
+  official Leapmotor app, then retry Home Assistant.
 - Do not rely on certificate files inside `custom_components/leapmotor`; HACS
   can replace that folder during updates.
 - App logout: use a second Leapmotor account and share the vehicle to it.
