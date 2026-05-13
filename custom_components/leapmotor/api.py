@@ -2083,20 +2083,19 @@ def _climate_mode(signal: dict[str, Any]) -> str | None:
 
 
 def _charging_power_kw(signal: dict[str, Any]) -> float | None:
-    """Return charging power without using GPS longitude-like signal 2191."""
+    """Return charging power in kW. Signal 1178 is negative when charging, positive when discharging."""
     current = _safe_float(signal.get("1178"))
     voltage = _safe_float(signal.get("1177"))
     if current is None or voltage is None:
         return None
-    abs_current = abs(current)
-    raw_power_kw = abs(current * voltage) / 1000.0
-    if abs_current < 1.0:
+    # Only negative current means energy is flowing into the battery (charging).
+    # Positive current = driving/discharging — not charging power.
+    if current >= 0:
         return 0.0
-    # The C10 plugged-idle snapshot shows about 1.5 A without active charging,
-    # while B10 can actively AC-charge around 2.5 A. In this grey zone, require
-    # either remaining charge time or a clearly non-trivial calculated power.
-    if abs_current < 3.0:
+    raw_power_kw = abs(current * voltage) / 1000.0
+    # Filter out tiny values from plugged-idle state (cable connected, not actively charging).
+    if raw_power_kw < 1.0:
         remaining_charge_minutes = _safe_int(signal.get("1200"))
-        if remaining_charge_minutes is None and raw_power_kw < 1.0:
-            return None
+        if remaining_charge_minutes is None:
+            return 0.0
     return round(raw_power_kw, 3)
