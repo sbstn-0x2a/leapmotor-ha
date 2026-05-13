@@ -2083,19 +2083,12 @@ def _climate_mode(signal: dict[str, Any]) -> str | None:
 
 
 def _charging_power_kw(signal: dict[str, Any]) -> float | None:
-    """Return charging power in kW. Signal 1178 is negative when charging, positive when discharging."""
+    """Return charging power in kW. Only non-zero when signal 1149 == 2 (actively charging)."""
+    # Signal 1149: 0=no cable, 1=connecting, 2=charging — gate on actual charging state
+    if _safe_int(signal.get("1149")) != 2:
+        return 0.0
     current = _safe_float(signal.get("1178"))
     voltage = _safe_float(signal.get("1177"))
     if current is None or voltage is None:
         return None
-    # Only negative current means energy is flowing into the battery (charging).
-    # Positive current = driving/discharging — not charging power.
-    if current >= 0:
-        return 0.0
-    raw_power_kw = abs(current * voltage) / 1000.0
-    # Filter out tiny values from plugged-idle state (cable connected, not actively charging).
-    if raw_power_kw < 1.0:
-        remaining_charge_minutes = _safe_int(signal.get("1200"))
-        if remaining_charge_minutes is None:
-            return 0.0
-    return round(raw_power_kw, 3)
+    return round(abs(current * voltage) / 1000.0, 3)
