@@ -136,6 +136,7 @@ _ENGLISH_ENTITY_SLUGS: dict[tuple[str, str], str] = {
     ("sensor", "unread_message_count"): "unread_message_count",
     ("sensor", "last_message_title"): "last_message_title",
     ("sensor", "last_message_time"): "last_message_time",
+    ("switch", "charging_schedule"): "charging_schedule",
 }
 
 

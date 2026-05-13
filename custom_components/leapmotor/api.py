@@ -263,6 +263,20 @@ class LeapmotorApiClient:
 
     def set_charge_limit(self, vin: str, charge_limit_percent: int) -> dict[str, Any]:
         """Set the charge limit while preserving the current charging plan values."""
+        return self._set_charging_plan(vin, charge_limit_percent=charge_limit_percent)
+
+    def set_charging_plan_enabled(self, vin: str, enabled: bool) -> dict[str, Any]:
+        """Enable or disable the charging plan while preserving its values."""
+        return self._set_charging_plan(vin, charge_plan_enabled=enabled)
+
+    def _set_charging_plan(
+        self,
+        vin: str,
+        *,
+        charge_limit_percent: int | None = None,
+        charge_plan_enabled: bool | None = None,
+    ) -> dict[str, Any]:
+        """Update the charging plan command payload while preserving existing values."""
         vehicle = self._find_vehicle_by_vin(vin)
         status_json = self.get_vehicle_status(vehicle)
         charge_plan = (((status_json.get("data") or {}).get("config") or {}).get("3") or {})
@@ -270,14 +284,26 @@ class LeapmotorApiClient:
         start_time = charge_plan.get("beginTime")
         end_time = charge_plan.get("endTime")
         cycles = charge_plan.get("cycles")
+        current_charge_limit = _safe_int(charge_plan.get("percent"))
         if not start_time or not end_time or not cycles:
             raise LeapmotorApiError(
-                "Current charging plan is incomplete, cannot safely update charge limit."
+                "Current charging plan is incomplete, cannot safely update it."
             )
+        if charge_limit_percent is None:
+            if current_charge_limit is None:
+                raise LeapmotorApiError(
+                    "Current charging plan has no charge limit, cannot safely update it."
+                )
+            charge_limit_percent = current_charge_limit
+        charge_enable = (
+            int(bool(charge_plan_enabled))
+            if charge_plan_enabled is not None
+            else 1 if _safe_int(charge_plan.get("isEnable")) else 0
+        )
 
         cmd_content = json.dumps(
             {
-                "chargeEnable": 1 if _safe_int(charge_plan.get("isEnable")) else 0,
+                "chargeEnable": charge_enable,
                 "chargesoc": int(charge_limit_percent),
                 "circulation": _safe_int(charge_plan.get("circulation")) or 0,
                 "cycles": str(cycles),
@@ -291,7 +317,11 @@ class LeapmotorApiClient:
             vin=vin,
             cmd_id="190",
             cmd_content=cmd_content,
-            action_label="set_charge_limit",
+            action_label=(
+                "set_charging_plan_enabled"
+                if charge_plan_enabled is not None
+                else "set_charge_limit"
+            ),
             vehicle=vehicle,
         )
 

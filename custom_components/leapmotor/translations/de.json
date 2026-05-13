@@ -485,6 +485,11 @@
       "charge_limit_setting": {
         "name": "Ladelimit einstellen"
       }
+    },
+    "switch": {
+      "charging_schedule": {
+        "name": "Ladeplanung"
+      }
     }
   },
   "options": {

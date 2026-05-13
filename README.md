@@ -14,10 +14,12 @@ research logs, or reverse-engineering workfiles.
 - Vehicle state, battery, range, odometer, charging, doors, windows, lock, GPS
   tracker, tire pressure, diagnostics, and mileage/energy history.
 - Native Home Assistant entities for sensors, binary sensors, lock, buttons,
-  number, image, and device tracker.
+  number, switch, image, and device tracker.
 - Remote-control services for supported actions such as lock/unlock, charger
   unlock, climate, windows, trunk, sunshade, charge limit, and send destination
   to navigation.
+- Charging schedule switch for enabling/disabling the existing schedule while
+  preserving start time, end time, recurrence, and charge limit.
 - Optional ABRP Generic Telemetry push and EVCC helper sensors.
 - Multi-vehicle support for main-account and shared vehicles.
 - Redacted diagnostics export for support.
@@ -135,6 +137,14 @@ permissions.
 `sunshade_open` / `sunshade_close` accept optional `value` from `0` to `10`.
 `set_charge_limit` requires `charge_limit_percent`. `send_destination` requires
 `name`, `latitude`, and `longitude`; `address` is optional.
+
+Disable the charging schedule:
+
+```yaml
+action: switch.turn_off
+target:
+  entity_id: switch.c10_charging_schedule
+```
 
 Unlock the charging connector:
 

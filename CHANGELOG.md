@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.7 - 2026-05-13
+
+- Add a controllable charging schedule switch that toggles the existing
+  charging plan while preserving start time, end time, recurrence, and charge
+  limit.
+
 ## 0.6.6 - 2026-05-12
 
 - Use `en-GB` as the default signed API language to better match the standalone

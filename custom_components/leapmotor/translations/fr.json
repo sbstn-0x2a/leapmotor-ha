@@ -485,6 +485,11 @@
       "charge_limit_setting": {
         "name": "Regler limite de charge"
       }
+    },
+    "switch": {
+      "charging_schedule": {
+        "name": "Programme de charge"
+      }
     }
   },
   "options": {

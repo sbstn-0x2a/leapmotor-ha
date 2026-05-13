@@ -41,6 +41,8 @@ Available data includes:
 - Charge limit
 - Scheduled charging window and recurrence details
 - Scheduled charging flag as a read-only binary sensor
+- Charging schedule switch for enabling/disabling the existing schedule while
+  preserving start time, end time, recurrence, and charge limit
 - Tire pressures
 - GPS location as a Home Assistant device tracker
 - Remote-control buttons for:
@@ -257,6 +259,14 @@ action: leapmotor.set_charge_limit
 data:
   entity_id: number.c10_set_charge_limit
   charge_limit_percent: 85
+```
+
+Disable the charging schedule:
+
+```yaml
+action: switch.turn_off
+target:
+  entity_id: switch.c10_charging_schedule
 ```
 
 Unlock the charger before unplugging:

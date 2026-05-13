@@ -485,6 +485,11 @@
       "charge_limit_setting": {
         "name": "Ustaw limit ladowania"
       }
+    },
+    "switch": {
+      "charging_schedule": {
+        "name": "Harmonogram ladowania"
+      }
     }
   },
   "options": {

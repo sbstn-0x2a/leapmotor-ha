@@ -99,6 +99,7 @@ PLATFORMS: list[Platform] = [
     Platform.LOCK,
     Platform.NUMBER,
     Platform.SENSOR,
+    Platform.SWITCH,
 ]
 
 
